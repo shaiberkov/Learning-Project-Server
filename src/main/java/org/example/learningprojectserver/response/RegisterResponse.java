@@ -6,14 +6,24 @@ public class RegisterResponse extends BasicResponse{
     private String usernameTaken;
     private String phoneTaken;
     private String emailTaken;
+    private String passwordDontMatch;
 
 
-    public RegisterResponse(boolean success, String errorCode, String message, String usernameTaken, String phoneTaken, String emailTaken) {
+    public RegisterResponse(boolean success, String errorCode, String message, String usernameTaken, String phoneTaken, String emailTaken, String passwordDontMatch) {
         super(success, errorCode);
         this.message = message;
         this.usernameTaken = usernameTaken;
         this.phoneTaken = phoneTaken;
         this.emailTaken = emailTaken;
+        this.passwordDontMatch = passwordDontMatch;
+    }
+
+    public void setPasswordDontMatch(String passwordDontMatch) {
+        this.passwordDontMatch = passwordDontMatch;
+    }
+
+    public String getPasswordDontMatch() {
+        return passwordDontMatch;
     }
 
     public RegisterResponse() {

@@ -29,7 +29,7 @@ public class UserService {
      }
 
      if (!password.equals(confirmPassword)) {
-         registerResponse.setMessage("Passwords do not match");
+         registerResponse.setPasswordDontMatch("password doesnt match");
          registerResponse.setSuccess(false);
          return registerResponse;
      }
