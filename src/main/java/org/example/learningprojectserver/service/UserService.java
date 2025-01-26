@@ -3,7 +3,9 @@ package org.example.learningprojectserver.service;
 import org.example.learningprojectserver.entities.UserEntity;
 import org.example.learningprojectserver.repository.UserRepository;
 import org.example.learningprojectserver.response.BasicResponse;
+import org.example.learningprojectserver.response.LoginResponse;
 import org.example.learningprojectserver.response.RegisterResponse;
+import org.example.learningprojectserver.utils.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -81,8 +83,8 @@ public class UserService {
 
             isValid = false;
         }
-        if (userRepository.existsByEmail(email)){
-            registerResponse.setEmailTaken("Email Taken");
+        if (isValidEmail(email)){
+            registerResponse.setEmailTaken("Email is not valid");
 
             isValid = false;
         }
@@ -104,7 +106,7 @@ public class UserService {
 
             if (userEntity == null) {
                 basicResponse.setSuccess(false);
-                basicResponse.setErrorCode("User not found");
+                basicResponse.setErrorCode("password/username not found");
                 return basicResponse;
             }
             String hashedPassword = hashPassword(password, userEntity.getSalt());
@@ -112,11 +114,11 @@ public class UserService {
             System.out.println(userEntity.getPasswordHash());
             if (!hashedPassword.equals(userEntity.getPasswordHash())) {
                 basicResponse.setSuccess(false);
-                basicResponse.setErrorCode("Password does not match");
+                basicResponse.setErrorCode("Password isnt correct");
                 return basicResponse;
             }
             basicResponse.setSuccess(true);
-            basicResponse.setErrorCode("User logged in");
+            basicResponse.setErrorCode("");
             return basicResponse;
 
         } catch (Exception e) {
@@ -136,11 +138,7 @@ public class UserService {
         }
 
         try {
-
-
-
             UserEntity userEntity = userRepository.findByUsername(username);
-
             if (userEntity == null) {
                 basicResponse.setSuccess(false);
                 basicResponse.setErrorCode("User not found");
@@ -170,52 +168,51 @@ public class UserService {
 
 
 
-        public BasicResponse verifyOtp(String username, String otp) {
-            BasicResponse basicResponse = new BasicResponse();
-
+        public LoginResponse verifyOtp(String username, String otp) {
+            LoginResponse loginResponse = new LoginResponse();
             if (username == null || otp == null) {
-                basicResponse.setSuccess(false);
-                basicResponse.setErrorCode("username or otp is required");
-
-                return basicResponse;
+                loginResponse.setSuccess(false);
+                loginResponse.setErrorCode("username or otp is required");
+                return loginResponse;
             }
-
             try {
                 UserEntity userEntity = userRepository.findByUsername(username);
 
                 if (userEntity == null) {
-                    basicResponse.setSuccess(false);
-                    basicResponse.setErrorCode("User not found");
+                    loginResponse.setSuccess(false);
+                    loginResponse.setErrorCode("User not found");
 
-                    return basicResponse;
+                    return loginResponse;
                 }
 
                 if (userEntity.getOtp() == null || !userEntity.getOtp().equals(otp)) {
-                    basicResponse.setSuccess(false);
-                    basicResponse.setErrorCode("verfication code does not match");
-                    return basicResponse;
+                    loginResponse.setSuccess(false);
+                    loginResponse.setErrorCode("verfication code does not match");
+                    return loginResponse;
                 }
 
                 long otpTimestamp = userEntity.getOtpTimestamp();
                 long currentTime = System.currentTimeMillis();
                 if (currentTime - otpTimestamp > 120000) {
-                    basicResponse.setSuccess(false);
-                    basicResponse.setErrorCode("2 minutes passed");
-                    return basicResponse;
+                    loginResponse.setSuccess(false);
+                    loginResponse.setErrorCode("2 minutes passed");
+                    return loginResponse;
                 }
-
-                basicResponse.setSuccess(true);
-                basicResponse.setErrorCode("code is correct");
+                String token = JwtUtils.generateToken(username);
+                loginResponse.setSuccess(true);
+                loginResponse.setErrorCode("code is correct");
+                loginResponse.setToken(token);
                 userEntity.setOtp(null);
                 userEntity.setOtpTimestamp(null);
+
                 userRepository.save(userEntity);
-                return basicResponse;
+                return loginResponse;
 
             } catch (Exception e) {
                 e.printStackTrace();
-                basicResponse.setSuccess(false);
-                basicResponse.setErrorCode("Error occurred during verify otp");
-                return basicResponse;
+                loginResponse.setSuccess(false);
+                loginResponse.setErrorCode("Error occurred during verify otp");
+                return loginResponse;
             }
         }
     }

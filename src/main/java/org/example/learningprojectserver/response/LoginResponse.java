@@ -13,6 +13,7 @@ public class LoginResponse extends BasicResponse {
         this.token = token;
     }
 
+
     public String getToken() {
         return token;
     }

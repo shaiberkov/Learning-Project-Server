@@ -2,6 +2,7 @@ package org.example.learningprojectserver.controller;
 
 
 import org.example.learningprojectserver.response.BasicResponse;
+import org.example.learningprojectserver.response.LoginResponse;
 import org.example.learningprojectserver.response.RegisterResponse;
 import org.example.learningprojectserver.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +39,7 @@ private UserService userService;
         return userService.sendOtp(username, phoneNumber);
     }
     @PostMapping("/verify-otp")
-    public BasicResponse verifyOtp(@RequestParam String username, @RequestParam String otp) {
+    public LoginResponse verifyOtp(@RequestParam String username, @RequestParam String otp) {
         return userService.verifyOtp(username, otp);
     }
 
