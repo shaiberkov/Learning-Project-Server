@@ -2,7 +2,6 @@ package org.example.learningprojectserver.service.MathQuestion;
 
 import org.example.learningprojectserver.entities.QuestionEntity;
 
-import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.regex.Matcher;
@@ -14,45 +13,39 @@ public class DerivativeQuestion implements MathQuestion {
 
     @Override
     public QuestionEntity generateQuestion(int difficulty) {
-        // בחר פונקציה אקראית לפי רמת הקושי
         String function = getFunction(difficulty);
 
-        // בנה את השאלה
         String questionText = "מהי הנגזרת של הפונקציה: " + function + "?";
         System.out.println(questionText);
 
-        // מחשבים את הנגזרת
-//        String answer = calculateDerivative(function);
         String answer = computeDerivative(function);
+        System.out.println(answer);
         return new QuestionEntity("מתמטיקה", "ניגזרות", questionText, answer);
     }
 
-    // בחר פונקציה אקראית לפי רמת הקושי
     private String getFunction(int difficulty) {
         StringBuilder function = new StringBuilder();
 
-        // מקדם אקראי לכל חזקת x
         int coefficient, exponent, b, c, d, e;
 
-        // נבחרת החזקה אקראית
-        exponent = random.nextInt(3) + 1; // החזקה יכולה להיות בין 1 ל-3
+        exponent = random.nextInt(3) + 1;
 
         switch (difficulty) {
             case 1:
-                coefficient = random.nextInt(5) + 1; // מקדם אקראי
+                coefficient = random.nextInt(5) + 1;
                 function.append(coefficient).append("x^").append(exponent);
                 break;
             case 2:
                 coefficient = random.nextInt(5) + 1;
                 b = random.nextInt(5) + 1;
-                exponent = random.nextInt(3) + 1; // חזקה אקראית
+                exponent = random.nextInt(3) + 1;
                 function.append(coefficient).append("x^").append(exponent).append(" + ").append(b);
                 break;
             case 3:
                 coefficient = random.nextInt(5) + 1;
                 b = random.nextInt(5) + 1;
                 c = random.nextInt(5) + 1;
-                exponent = random.nextInt(3) + 1; // חזקה אקראית
+                exponent = random.nextInt(3) + 1;
                 function.append(coefficient).append("x^").append(exponent).append(" + ").append(b).append("x^2 + ").append(c);
                 break;
             case 4:
@@ -60,7 +53,7 @@ public class DerivativeQuestion implements MathQuestion {
                 b = random.nextInt(5) + 1;
                 c = random.nextInt(5) + 1;
                 d = random.nextInt(5) + 1;
-                exponent = random.nextInt(3) + 1; // חזקה אקראית
+                exponent = random.nextInt(3) + 1;
                 function.append(coefficient).append("x^").append(exponent).append(" - ").append(b).append("x^3 + ").append(c).append("x^2 - ").append(d);
                 break;
             case 5:
@@ -69,7 +62,7 @@ public class DerivativeQuestion implements MathQuestion {
                 c = random.nextInt(5) + 1;
                 d = random.nextInt(5) + 1;
                 e = random.nextInt(5) + 1;
-                exponent = random.nextInt(3) + 1; // חזקה אקראית
+                exponent = random.nextInt(3) + 1;
                 function.append(coefficient).append("x^").append(exponent).append(" - ").append(b).append("x^4 + ").append(c).append("x^3 - ").append(d).append("x^2 + ").append(e).append("x");
                 break;
             default:
@@ -79,22 +72,16 @@ public class DerivativeQuestion implements MathQuestion {
         return function.toString();
     }
     public  String computeDerivative(String expression) {
-        // הסרת רווחים מיותרים
         expression = expression.replaceAll("\\s+", "");
-
-        // רשימה לאחסון מונחים חדשים אחרי חישוב הנגזרת
         ArrayList<String> terms = new ArrayList<>();
-
-        // תבנית לזיהוי מונחים: ax^n, ax, או מספר קבוע
         Pattern termPattern = Pattern.compile("([+-]?\\d*)x\\^?(\\d*)|([+-]?\\d+)");
         Matcher matcher = termPattern.matcher(expression);
 
         while (matcher.find()) {
-            String coefficient = matcher.group(1); // המקדמים (a)
-            String power = matcher.group(2);       // החזקות (n)
-            String constant = matcher.group(3);    // מספרים קבועים
-
-            if (coefficient != null && power != null) { // ax^n
+            String coefficient = matcher.group(1);
+            String power = matcher.group(2);
+            String constant = matcher.group(3);
+            if (coefficient != null && power != null) {
                 int a = coefficient.isEmpty() || coefficient.equals("+") ? 1 :
                         coefficient.equals("-") ? -1 : Integer.parseInt(coefficient);
                 int n = power.isEmpty() ? 1 : Integer.parseInt(power);
@@ -106,12 +93,11 @@ public class DerivativeQuestion implements MathQuestion {
                     int newPower = n - 1;
                     terms.add(newCoefficient + "x" + (newPower == 1 ? "" : "^" + newPower));
                 }
-            } else if (coefficient != null) { // ax
+            } else if (coefficient != null) {
                 int a = coefficient.isEmpty() || coefficient.equals("+") ? 1 :
                         coefficient.equals("-") ? -1 : Integer.parseInt(coefficient);
                 terms.add(String.valueOf(a));
-            } else if (constant != null) { // מספר קבוע
-                // נגזרת של מספר קבוע היא 0, ולכן מתעלמים ממנו
+            } else if (constant != null) {
             }
         }
         String answer=String.join(" + ", terms).replaceAll("\\+ -", "- ");
