@@ -47,6 +47,8 @@ public class FractionAdditionSubtractionQuestion implements MathQuestion {
         // בניית השאלה
         String questionText = buildQuestionText(numerator1, denominator1, numerator2, denominator2, numerator3, denominator3, operator1, operator2, difficulty);
         String answer = simplifiedDenominator == 1 ? String.valueOf(simplifiedNumerator) : simplifiedNumerator + "/" + simplifiedDenominator;
+        System.out.println(questionText);
+        System.out.println(answer);
 
         return new QuestionEntity("מתמטיקה", "חיבור וחיסור שברים", questionText, answer);
     }

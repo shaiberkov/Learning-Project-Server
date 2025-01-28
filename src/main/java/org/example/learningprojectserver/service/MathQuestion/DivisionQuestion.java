@@ -16,7 +16,7 @@ public class DivisionQuestion implements MathQuestion {
         int result = random.nextInt(max) + 1;
         int dividend = divisor * result;
 
-        String questionText = String.format(" %d ÷ %d=? ", dividend, divisor);
+        String questionText = String.format(" %d ÷ %d= ? ", dividend, divisor);
         String answer = String.valueOf(result);
 
         return new QuestionEntity("מתמטיקה", "חילוק", questionText, answer);

@@ -37,7 +37,8 @@ public class FractionAdditionQuestion implements MathQuestion {
 
         String questionText = buildQuestionText(numerator1, denominator1, numerator2, denominator2, numerator3, denominator3, difficulty);
         String answer = simplifiedDenominator == 1 ? String.valueOf(simplifiedNumerator) : simplifiedNumerator + "/" + simplifiedDenominator;
-
+        System.out.println(questionText);
+        System.out.println(answer);
         return new QuestionEntity("מתמטיקה", "חיבור שברים", questionText, answer);
     }
 

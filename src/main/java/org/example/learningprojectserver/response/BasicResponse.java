@@ -28,4 +28,12 @@ public class BasicResponse {
     public void setErrorCode(String errorCode) {
         this.errorCode = errorCode;
     }
+
+    @Override
+    public String toString() {
+        return "BasicResponse{" +
+                "success=" + success +
+                ", errorCode='" + errorCode + '\'' +
+                '}';
+    }
 }

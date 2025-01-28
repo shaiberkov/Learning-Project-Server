@@ -83,7 +83,7 @@ public class UserService {
 
             isValid = false;
         }
-        if (isValidEmail(email)){
+        if (!isValidEmail(email)){
             registerResponse.setEmailTaken("Email is not valid");
 
             isValid = false;
@@ -119,6 +119,7 @@ public class UserService {
             }
             basicResponse.setSuccess(true);
             basicResponse.setErrorCode("");
+            System.out.println(basicResponse);
             return basicResponse;
 
         } catch (Exception e) {

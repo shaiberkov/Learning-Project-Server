@@ -21,4 +21,11 @@ public class LoginResponse extends BasicResponse {
     public void setToken(String token) {
         this.token = token;
     }
+
+    @Override
+    public String toString() {
+        return "LoginResponse{" +
+                "token='" + token + '\'' + super.toString() +
+                '}';
+    }
 }

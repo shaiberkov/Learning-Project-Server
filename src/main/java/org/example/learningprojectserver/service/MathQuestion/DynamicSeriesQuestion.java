@@ -19,7 +19,8 @@ public class DynamicSeriesQuestion implements MathQuestion {
         String series = generateSeries(startingValue, numTerms);
         String questionText = String.format("השלם את הסדרה: ___%s ", series);
         String answer = String.format("%d", calculateNextTerm(startingValue, numTerms));
-
+        System.out.println(questionText);
+        System.out.println(answer);
         return new QuestionEntity("מתמטיקה", "סדרות דינמיות", questionText, answer);
     }
 

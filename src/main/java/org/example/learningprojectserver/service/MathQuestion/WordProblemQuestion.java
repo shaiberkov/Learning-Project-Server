@@ -111,7 +111,8 @@ public class WordProblemQuestion implements MathQuestion {
         }
 
         String answer = String.valueOf(itemsLeft);
-
+        System.out.println(questionText);
+        System.out.println(answer);
         return new QuestionEntity("מתמטיקה", "שאלה מילולית", questionText, answer);
     }
 

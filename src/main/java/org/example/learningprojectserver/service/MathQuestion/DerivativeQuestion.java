@@ -2,7 +2,11 @@ package org.example.learningprojectserver.service.MathQuestion;
 
 import org.example.learningprojectserver.entities.QuestionEntity;
 
+import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Random;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class DerivativeQuestion implements MathQuestion {
 
@@ -15,10 +19,11 @@ public class DerivativeQuestion implements MathQuestion {
 
         // בנה את השאלה
         String questionText = "מהי הנגזרת של הפונקציה: " + function + "?";
+        System.out.println(questionText);
 
         // מחשבים את הנגזרת
-        String answer = calculateDerivative(function);
-
+//        String answer = calculateDerivative(function);
+        String answer = computeDerivative(function);
         return new QuestionEntity("מתמטיקה", "ניגזרות", questionText, answer);
     }
 
@@ -73,51 +78,44 @@ public class DerivativeQuestion implements MathQuestion {
 
         return function.toString();
     }
+    public  String computeDerivative(String expression) {
+        // הסרת רווחים מיותרים
+        expression = expression.replaceAll("\\s+", "");
 
-    // מחשבים את הנגזרת של הפונקציה
-    private String calculateDerivative(String function) {
-        StringBuilder derivative = new StringBuilder();
+        // רשימה לאחסון מונחים חדשים אחרי חישוב הנגזרת
+        ArrayList<String> terms = new ArrayList<>();
 
-        // פוקנציה גזירה של חזקה כללית
-        if (function.contains("x^5")) {
-            int coefficient = getCoefficient(function, "x^5");
-            derivative.append(coefficient * 5).append("x^4");
-        }
-        if (function.contains("x^4") && !function.contains("x^5")) {
-            int coefficient = getCoefficient(function, "x^4");
-            derivative.append(coefficient * 4).append("x^3");
-        }
-        if (function.contains("x^3") && !function.contains("x^4")) {
-            int coefficient = getCoefficient(function, "x^3");
-            derivative.append(coefficient * 3).append("x^2");
-        }
-        if (function.contains("x^2") && !function.contains("x^3")) {
-            int coefficient = getCoefficient(function, "x^2");
-            derivative.append(coefficient * 2).append("x");
-        }
-        if (function.contains("x") && !function.contains("x^2")) {
-            int coefficient = getCoefficient(function, "x");
-            derivative.append(coefficient);
-        }
-        if (derivative.length() == 0) {
-            throw new IllegalArgumentException("פונקציה לא נתמכת");
-        }
+        // תבנית לזיהוי מונחים: ax^n, ax, או מספר קבוע
+        Pattern termPattern = Pattern.compile("([+-]?\\d*)x\\^?(\\d*)|([+-]?\\d+)");
+        Matcher matcher = termPattern.matcher(expression);
 
-        return derivative.toString();
-    }
+        while (matcher.find()) {
+            String coefficient = matcher.group(1); // המקדמים (a)
+            String power = matcher.group(2);       // החזקות (n)
+            String constant = matcher.group(3);    // מספרים קבועים
 
-    // מקבל את הקבוע מתוך הפונקציה, לדוגמה עבור x^2 או x^3
-    private int getCoefficient(String function, String term) {
-        String[] parts = function.split(term);
-        String coefficientStr = parts[0].trim();
+            if (coefficient != null && power != null) { // ax^n
+                int a = coefficient.isEmpty() || coefficient.equals("+") ? 1 :
+                        coefficient.equals("-") ? -1 : Integer.parseInt(coefficient);
+                int n = power.isEmpty() ? 1 : Integer.parseInt(power);
 
-        // אם הקבוע הוא חיובי או שלילי או לא מוגדר, יש להחזיר ערך ברירת מחדל
-        if (coefficientStr.equals("") || coefficientStr.equals("+")) {
-            return 1;
-        } else if (coefficientStr.equals("-")) {
-            return -1;
-        } else {
-            return Integer.parseInt(coefficientStr);
+                if (n == 1) {
+                    terms.add(String.valueOf(a));
+                } else {
+                    int newCoefficient = a * n;
+                    int newPower = n - 1;
+                    terms.add(newCoefficient + "x" + (newPower == 1 ? "" : "^" + newPower));
+                }
+            } else if (coefficient != null) { // ax
+                int a = coefficient.isEmpty() || coefficient.equals("+") ? 1 :
+                        coefficient.equals("-") ? -1 : Integer.parseInt(coefficient);
+                terms.add(String.valueOf(a));
+            } else if (constant != null) { // מספר קבוע
+                // נגזרת של מספר קבוע היא 0, ולכן מתעלמים ממנו
+            }
         }
+        String answer=String.join(" + ", terms).replaceAll("\\+ -", "- ");
+        System.out.println(answer);
+        return String.join(" + ", terms).replaceAll("\\+ -", "- ");
     }
 }
