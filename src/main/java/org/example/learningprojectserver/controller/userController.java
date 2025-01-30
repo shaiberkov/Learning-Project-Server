@@ -42,6 +42,18 @@ private UserService userService;
     public LoginResponse verifyOtp(@RequestParam String username, @RequestParam String otp) {
         return userService.verifyOtp(username, otp);
     }
+    @PostMapping("/forgot-password")
+    public BasicResponse forgotPassword(@RequestParam String username) {
+        return userService.sendPasswordResetOtp(username);
+    }
+
+    @PostMapping("/reset-password")
+    public BasicResponse resetPassword(@RequestParam String username,
+                                       @RequestParam String otp,
+                                       @RequestParam String newPassword) {
+        return userService.resetPassword(username, otp, newPassword);
+    }
+
 
 
 }

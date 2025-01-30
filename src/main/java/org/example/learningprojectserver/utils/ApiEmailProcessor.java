@@ -11,10 +11,13 @@ import java.util.Properties;
 
 public class ApiEmailProcessor {
 
-    private static final String SENDER_EMAIL = "your-email@gmail.com"; // האימייל השולח
-    private static final String SENDER_PASSWORD = "your-email-password"; // הסיסמה/סיסמת האפליקציה
-    private static final String PERSONAL = "Your App Name"; // שם אישי שיוצג בשורת השולח
+    private static final String SENDER_EMAIL = "shai27133@gmail.com"; // האימייל השולח
+    private static final String SENDER_PASSWORD = "jkey sefo oeus jgnp"; // הסיסמה/סיסמת האפליקציה
+    private static final String PERSONAL = "learning app"; // שם אישי שיוצג בשורת השולח
 
+    public static void main(String[] args) {
+        sendEmail("shonberko@gmail.com","reez","שון יאלוף");
+    }
     public static boolean sendEmail(String recipient, String subject, String content) {
         final String host = "smtp.gmail.com";
         final int port = 465;
@@ -54,15 +57,15 @@ public class ApiEmailProcessor {
 
             // תמונה מצורפת להודעה
             MimeBodyPart imagePart = new MimeBodyPart();
-            File imageFile = new ClassPathResource("SocialNetwork.png").getFile();
-            imagePart.attachFile(imageFile);
-            imagePart.setContentID("<profileImage>");
-            imagePart.setDisposition(MimeBodyPart.INLINE);
+//            File imageFile = new ClassPathResource("SocialNetwork.png").getFile();
+//            imagePart.attachFile(imageFile);
+//            imagePart.setContentID("<profileImage>");
+//            imagePart.setDisposition(MimeBodyPart.INLINE);
 
             // שילוב חלקי האימייל ל-Multipart
             MimeMultipart multipart = new MimeMultipart();
             multipart.addBodyPart(textPart);
-            multipart.addBodyPart(imagePart);
+//            multipart.addBodyPart(imagePart);
 
             message.setContent(multipart);
 

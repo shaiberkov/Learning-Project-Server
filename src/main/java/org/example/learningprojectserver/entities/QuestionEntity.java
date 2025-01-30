@@ -2,19 +2,21 @@ package org.example.learningprojectserver.entities;
 
 public class QuestionEntity {
 
-    private String subject;
-    private String subSubject;
+    private String subject;   // מקצוע (למשל, מתמטיקה)
+    private String topic;     // נושא (למשל, שברים)
+    private String subTopic;  // תת-נושא (למשל, חיבור שברים)
     private String questionText;
     private String answer;
 
-
-    public QuestionEntity(String subject, String subSubject, String questionText, String answer) {
+    public QuestionEntity(String subject, String topic, String subTopic, String questionText, String answer) {
         this.subject = subject;
-        this.subSubject = subSubject;
+        this.topic = topic;
+        this.subTopic = subTopic;
         this.questionText = questionText;
         this.answer = answer;
     }
 
+    // Getters and Setters
     public String getSubject() {
         return subject;
     }
@@ -23,12 +25,20 @@ public class QuestionEntity {
         this.subject = subject;
     }
 
-    public String getSubSubject() {
-        return subSubject;
+    public String getTopic() {
+        return topic;
     }
 
-    public void setSubSubject(String subSubject) {
-        this.subSubject = subSubject;
+    public void setTopic(String topic) {
+        this.topic = topic;
+    }
+
+    public String getSubTopic() {
+        return subTopic;
+    }
+
+    public void setSubTopic(String subTopic) {
+        this.subTopic = subTopic;
     }
 
     public String getQuestionText() {
@@ -47,4 +57,3 @@ public class QuestionEntity {
         this.answer = answer;
     }
 }
-

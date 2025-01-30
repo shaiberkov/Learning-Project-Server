@@ -75,18 +75,15 @@ public class GeneratorUtils {
             return false;
         }
 
-        // בדיקה בסיסית לפי התבנית
         if (!EMAIL_PATTERN.matcher(email).matches()) {
             return false;
         }
 
-        // בדיקה אם הדומיין מכיל לפחות תו אחד (לדוגמה example@com לא תקין)
         String[] emailParts = email.split("@");
         if (emailParts.length != 2 || emailParts[1].startsWith(".") || emailParts[1].endsWith(".")) {
             return false;
         }
 
-        // בדיקה אם שם הדומיין מכיל לפחות נקודה אחת
         String domain = emailParts[1];
         if (!domain.contains(".")) {
             return false;

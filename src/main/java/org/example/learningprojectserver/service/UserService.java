@@ -5,13 +5,16 @@ import org.example.learningprojectserver.repository.UserRepository;
 import org.example.learningprojectserver.response.BasicResponse;
 import org.example.learningprojectserver.response.LoginResponse;
 import org.example.learningprojectserver.response.RegisterResponse;
+import org.example.learningprojectserver.utils.ApiEmailProcessor;
 import org.example.learningprojectserver.utils.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
+import static org.example.learningprojectserver.utils.ApiEmailProcessor.sendEmail;
 import static org.example.learningprojectserver.utils.GeneratorUtils.*;
 import static org.example.learningprojectserver.utils.SmsSender.sendSms;
 
@@ -20,9 +23,9 @@ public class UserService {
 
 @Autowired
     private UserRepository userRepository;
-
+    private static final ConcurrentHashMap<String, String> otpStorage = new ConcurrentHashMap<>();
  public RegisterResponse createUser(String username, String password, String confirmPassword, String email, String phone) {
-
+//todo להוסיף פונקציה שבודקת תקינות סיסמא
      RegisterResponse registerResponse=new RegisterResponse();
      if (username == null || password == null || confirmPassword == null || email == null || phone == null) {
          registerResponse.setMessage("All fields are required");
@@ -51,6 +54,8 @@ public class UserService {
          newUser.setPhoneNumber(phone);
          newUser.setSalt(salt);
          newUser.setPasswordHash(hashedPassword);
+         String textToSendInMailToUser =generateMailText(username);
+         sendEmail(email,"ברוך הבא ל-'מרכז תרגול אישי' – החשבון שלך נוצר בהצלחה!",textToSendInMailToUser);
          userRepository.save(newUser);
 
          registerResponse.setMessage("User successfully registered");
@@ -110,8 +115,6 @@ public class UserService {
                 return basicResponse;
             }
             String hashedPassword = hashPassword(password, userEntity.getSalt());
-            System.out.println(hashedPassword);
-            System.out.println(userEntity.getPasswordHash());
             if (!hashedPassword.equals(userEntity.getPasswordHash())) {
                 basicResponse.setSuccess(false);
                 basicResponse.setErrorCode("Password isnt correct");
@@ -119,7 +122,6 @@ public class UserService {
             }
             basicResponse.setSuccess(true);
             basicResponse.setErrorCode("");
-            System.out.println(basicResponse);
             return basicResponse;
 
         } catch (Exception e) {
@@ -216,7 +218,73 @@ public class UserService {
                 return loginResponse;
             }
         }
+    public BasicResponse sendPasswordResetOtp(String username) {
+        // חיפוש המשתמש לפי שם משתמש
+        UserEntity user = userRepository.findByUsername(username);
+        if (user == null) {
+            return new BasicResponse(false, "שם משתמש לא נמצא.");
+        }
+
+        // יצירת OTP ושליחתו
+        String otp = generatorCode();
+        otpStorage.put(username, otp); // שמירת OTP זמנית
+        sendSms( otp,  List.of(user.getPhoneNumber()) ); // שליחת OTP לטלפון
+
+        return new BasicResponse(true, "קוד האימות נשלח לטלפון שלך.");
     }
+    //todo להוסיף פונקציה שבודקת תקינות סיסמא
+    public BasicResponse resetPassword(String username, String otp, String newPassword) {
+        String subject = "הסיסמה שלך שונתה בהצלחה";
+        String message = "שלום,\n\nסיסמתך שונתה בהצלחה. אם לא ביצעת שינוי זה, אנא צור קשר עם התמיכה שלנו באופן מיידי.\n\nבברכה,\nצוות התמיכה";
+        // בדיקת OTP
+        if(!otpStorage.containsKey(username)){
+            return new BasicResponse(false,"שם משתמש לא תקין");
+        }
+        if (!otpStorage.get(username).equals(otp)) {
+            return new BasicResponse(false, "קוד האימות שגוי או שפג תוקפו.");
+        }
+
+
+
+        UserEntity user = userRepository.findByUsername(username);
+        if (user == null) {
+            return new BasicResponse(false, "שם משתמש לא נמצא.");
+        }
+        String userSalt = user.getSalt();
+        String hashPassword=hashPassword(newPassword,userSalt);
+        user.setPasswordHash(hashPassword);
+        userRepository.save(user);
+        otpStorage.remove(username);
+        sendEmail(user.getEmail(), subject, message);
+        return new BasicResponse(true, "הסיסמה שונתה בהצלחה.");
+    }
+
+    private String generateMailText(String username) {
+        return """
+        <html>
+        <body>
+            <h2>ברוך הבא ל-"מרכז תרגול אישי"!</h2>
+            <p>שלום %s,</p>
+            <p>אנו שמחים שבחרת להצטרף אלינו!</p>
+            <p>בפלטפורמה שלנו תוכל לשפר את הידע שלך, לתרגל נושאים שונים ולעקוב אחרי ההתקדמות שלך.</p>
+            
+            <h3>איך להתחיל?</h3>
+            <ul>
+                <li>היכנס לחשבון שלך והשלם את פרופיל המשתמש.</li>
+                <li>בחר את הנושא שתרצה לתרגל.</li>
+                <li>עקוב אחר ההתקדמות שלך ושפר את הביצועים!</li>
+            </ul>
+
+            <p>אם יש לך שאלות או בעיות, אל תהסס לפנות אלינו.</p>
+            <p>צוות <strong>מרכז תרגול אישי</strong></p>
+
+            <p style="color: gray; font-size: 12px;">אם לא נרשמת לאתר שלנו, ניתן להתעלם מהודעה זו.</p>
+        </body>
+        </html>
+        """.formatted(username);
+    }
+
+}
 
 
 
