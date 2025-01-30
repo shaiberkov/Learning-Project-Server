@@ -5,6 +5,7 @@ import org.example.learningprojectserver.repository.UserRepository;
 import org.example.learningprojectserver.response.BasicResponse;
 import org.example.learningprojectserver.response.LoginResponse;
 import org.example.learningprojectserver.response.RegisterResponse;
+import org.example.learningprojectserver.response.ResetPasswordResponse;
 import org.example.learningprojectserver.utils.ApiEmailProcessor;
 import org.example.learningprojectserver.utils.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -218,37 +219,50 @@ public class UserService {
                 return loginResponse;
             }
         }
-    public BasicResponse sendPasswordResetOtp(String username) {
-        // חיפוש המשתמש לפי שם משתמש
+    public ResetPasswordResponse sendPasswordResetOtp(String username) {
+        ResetPasswordResponse resetPasswordResponse= new ResetPasswordResponse();
         UserEntity user = userRepository.findByUsername(username);
         if (user == null) {
-            return new BasicResponse(false, "שם משתמש לא נמצא.");
+            resetPasswordResponse.setSuccess(false);
+            resetPasswordResponse.setUserNameError("User not found");
+            return resetPasswordResponse;
         }
 
-        // יצירת OTP ושליחתו
         String otp = generatorCode();
         otpStorage.put(username, otp); // שמירת OTP זמנית
         sendSms( otp,  List.of(user.getPhoneNumber()) ); // שליחת OTP לטלפון
-
-        return new BasicResponse(true, "קוד האימות נשלח לטלפון שלך.");
+            resetPasswordResponse.setSuccess(true);
+        return resetPasswordResponse;
     }
-    //todo להוסיף פונקציה שבודקת תקינות סיסמא
-    public BasicResponse resetPassword(String username, String otp, String newPassword) {
+
+    public ResetPasswordResponse resetPassword(String username, String otp, String newPassword) {
+       ResetPasswordResponse resetPasswordResponse= new ResetPasswordResponse();
         String subject = "הסיסמה שלך שונתה בהצלחה";
         String message = "שלום,\n\nסיסמתך שונתה בהצלחה. אם לא ביצעת שינוי זה, אנא צור קשר עם התמיכה שלנו באופן מיידי.\n\nבברכה,\nצוות התמיכה";
-        // בדיקת OTP
         if(!otpStorage.containsKey(username)){
-            return new BasicResponse(false,"שם משתמש לא תקין");
+
+             resetPasswordResponse.setSuccess(false);
+            resetPasswordResponse.setUserNameError("שם משתמש לא תקין");
+            return resetPasswordResponse;
+
         }
         if (!otpStorage.get(username).equals(otp)) {
-            return new BasicResponse(false, "קוד האימות שגוי או שפג תוקפו.");
+            resetPasswordResponse.setSuccess(false);
+            resetPasswordResponse.setOtpError("קוד האימות שגוי או שפג תוקפו.");
+            return resetPasswordResponse;
         }
 
-
+        if(!isPasswordStrong(newPassword)){
+            resetPasswordResponse.setSuccess(false);
+            resetPasswordResponse.setPasswordError("הסיסמא חייבת לכלול לפחות אות גדולה וקטנה, ו-6 תווים לפחות");
+            return resetPasswordResponse;
+        }
 
         UserEntity user = userRepository.findByUsername(username);
         if (user == null) {
-            return new BasicResponse(false, "שם משתמש לא נמצא.");
+            resetPasswordResponse.setSuccess(false);
+            resetPasswordResponse.setUserNameError("שם משתמש לא נמצא.");
+            return resetPasswordResponse;
         }
         String userSalt = user.getSalt();
         String hashPassword=hashPassword(newPassword,userSalt);
@@ -256,7 +270,8 @@ public class UserService {
         userRepository.save(user);
         otpStorage.remove(username);
         sendEmail(user.getEmail(), subject, message);
-        return new BasicResponse(true, "הסיסמה שונתה בהצלחה.");
+        resetPasswordResponse.setSuccess(true);
+        return resetPasswordResponse;
     }
 
     private String generateMailText(String username) {

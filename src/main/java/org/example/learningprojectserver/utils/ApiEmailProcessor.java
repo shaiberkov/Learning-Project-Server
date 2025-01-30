@@ -1,24 +1,25 @@
 package org.example.learningprojectserver.utils;
-import org.springframework.core.io.ClassPathResource;
 
-import java.io.File;
 import java.util.Properties;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import javax.mail.*;
 import javax.mail.internet.*;
-
-import java.io.File;
-import java.util.Properties;
 
 public class ApiEmailProcessor {
 
     private static final String SENDER_EMAIL = "shai27133@gmail.com"; // האימייל השולח
     private static final String SENDER_PASSWORD = "jkey sefo oeus jgnp"; // הסיסמה/סיסמת האפליקציה
     private static final String PERSONAL = "learning app"; // שם אישי שיוצג בשורת השולח
-
+    private static final ExecutorService emailExecutor = Executors.newCachedThreadPool();
     public static void main(String[] args) {
         sendEmail("shonberko@gmail.com","reez","שון יאלוף");
     }
-    public static boolean sendEmail(String recipient, String subject, String content) {
+
+    public static void sendEmail(String recipient, String subject, String content) {
+        emailExecutor.execute(() -> sendEmail1(recipient, subject, content));
+    }
+    public static boolean sendEmail1(String recipient, String subject, String content) {
         final String host = "smtp.gmail.com";
         final int port = 465;
 

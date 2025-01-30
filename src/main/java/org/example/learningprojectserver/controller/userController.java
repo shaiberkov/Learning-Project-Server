@@ -4,6 +4,7 @@ package org.example.learningprojectserver.controller;
 import org.example.learningprojectserver.response.BasicResponse;
 import org.example.learningprojectserver.response.LoginResponse;
 import org.example.learningprojectserver.response.RegisterResponse;
+import org.example.learningprojectserver.response.ResetPasswordResponse;
 import org.example.learningprojectserver.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -43,12 +44,12 @@ private UserService userService;
         return userService.verifyOtp(username, otp);
     }
     @PostMapping("/forgot-password")
-    public BasicResponse forgotPassword(@RequestParam String username) {
+    public ResetPasswordResponse forgotPassword(@RequestParam String username) {
         return userService.sendPasswordResetOtp(username);
     }
 
     @PostMapping("/reset-password")
-    public BasicResponse resetPassword(@RequestParam String username,
+    public ResetPasswordResponse resetPassword(@RequestParam String username,
                                        @RequestParam String otp,
                                        @RequestParam String newPassword) {
         return userService.resetPassword(username, otp, newPassword);

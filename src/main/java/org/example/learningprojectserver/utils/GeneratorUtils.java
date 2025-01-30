@@ -52,6 +52,9 @@ public class GeneratorUtils {
             throw new RuntimeException("Error hashing password", e);
         }
     }
+    public static boolean isPasswordStrong(String password){
+        return password.matches("(?=.*[a-z])(?=.*[A-Z]).{6,}");
+    }
     public static boolean isValidPhoneNumber(String phoneNumber) {
         if (phoneNumber.length() != 10) {
             return false;

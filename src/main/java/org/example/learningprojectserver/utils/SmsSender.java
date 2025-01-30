@@ -11,19 +11,17 @@ import org.springframework.web.client.RestTemplate;
 
     import java.util.ArrayList;
     import java.util.List;
+    import java.util.concurrent.ExecutorService;
+    import java.util.concurrent.Executors;
 
 
+public class SmsSender {
+    private static final ExecutorService emailExecutor = Executors.newCachedThreadPool();
 
-    public class SmsSender {
-
-        public static void main(String[] args) {
-            List<String>k= new ArrayList<>();
-            k.add("0508804519");
-            k.add("0532248853");
-            sendSms("שלום פאפnmjkl';'אלה",k);
-        }
-
-        public static boolean sendSms (String text, List<String> phones) {
+    public static void sendSms(String text, List<String> phones) {
+        emailExecutor.execute(() -> sendSms1(text,phones));
+    }
+        public static boolean sendSms1 (String text, List<String> phones) {
             String token = "ZmVlZGJhY2sxOnlheGZxMzJpd2lnYW15bHBvMG9tNHVycjU";
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("Message", text);
