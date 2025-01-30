@@ -229,8 +229,8 @@ public class UserService {
         }
 
         String otp = generatorCode();
-        otpStorage.put(username, otp); // שמירת OTP זמנית
-        sendSms( otp,  List.of(user.getPhoneNumber()) ); // שליחת OTP לטלפון
+        otpStorage.put(username, otp);
+        sendSms( otp,  List.of(user.getPhoneNumber()) );
             resetPasswordResponse.setSuccess(true);
         return resetPasswordResponse;
     }
@@ -274,30 +274,6 @@ public class UserService {
         return resetPasswordResponse;
     }
 
-    private String generateMailText(String username) {
-        return """
-        <html>
-        <body>
-            <h2>ברוך הבא ל-"מרכז תרגול אישי"!</h2>
-            <p>שלום %s,</p>
-            <p>אנו שמחים שבחרת להצטרף אלינו!</p>
-            <p>בפלטפורמה שלנו תוכל לשפר את הידע שלך, לתרגל נושאים שונים ולעקוב אחרי ההתקדמות שלך.</p>
-            
-            <h3>איך להתחיל?</h3>
-            <ul>
-                <li>היכנס לחשבון שלך והשלם את פרופיל המשתמש.</li>
-                <li>בחר את הנושא שתרצה לתרגל.</li>
-                <li>עקוב אחר ההתקדמות שלך ושפר את הביצועים!</li>
-            </ul>
-
-            <p>אם יש לך שאלות או בעיות, אל תהסס לפנות אלינו.</p>
-            <p>צוות <strong>מרכז תרגול אישי</strong></p>
-
-            <p style="color: gray; font-size: 12px;">אם לא נרשמת לאתר שלנו, ניתן להתעלם מהודעה זו.</p>
-        </body>
-        </html>
-        """.formatted(username);
-    }
 
 }
 
