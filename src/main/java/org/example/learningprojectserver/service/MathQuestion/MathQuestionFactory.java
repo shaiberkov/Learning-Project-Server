@@ -24,18 +24,18 @@ import org.example.learningprojectserver.service.MathQuestion.Vectors.VectorSubt
 import org.example.learningprojectserver.service.MathQuestion.VerbalQuestions.DiscountQuestion;
 import org.example.learningprojectserver.service.MathQuestion.VerbalQuestions.TimeProblemQuestion;
 import org.example.learningprojectserver.service.MathQuestion.VerbalQuestions.WordProblemQuestion;
-import org.example.learningprojectserver.service.SubjectQuestionGenerator;
-import org.example.learningprojectserver.service.QuestionGenerator;
+import org.example.learningprojectserver.service.QuestionGenerator.SubjectQuestionGenerator;
+import org.example.learningprojectserver.service.QuestionGenerator.QuestionGenerator;
 
 public class MathQuestionFactory implements SubjectQuestionGenerator {
 
     @Override
     public QuestionGenerator getQuestionGenerator(String topic, String subTopic) {
         return switch (subTopic.toLowerCase()) {
-            case "חיבור" -> new AdditionQuestion();
-            case "חיסור" -> new SubtractionQuestion();
-            case "כפל" -> new MultiplicationQuestion();
-            case "חילוק" -> new DivisionQuestion();
+            case "חיבור מספרים שלמים" -> new AdditionQuestion();
+            case "חיסור מספרים שלמים" -> new SubtractionQuestion();
+            case "כפל מספרים שלמים" -> new MultiplicationQuestion();
+            case "חילוק מספרים שלמים" -> new DivisionQuestion();
             case "חזקות" -> new ExponentiationQuestion();
             case "שורש ריבועי" -> new SquareRootQuestion();
             case "חיבור שברים" -> new FractionAdditionQuestion();

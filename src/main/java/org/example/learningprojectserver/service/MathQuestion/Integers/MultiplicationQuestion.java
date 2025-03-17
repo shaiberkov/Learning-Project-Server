@@ -2,7 +2,7 @@ package org.example.learningprojectserver.service.MathQuestion.Integers;
 
 
 import org.example.learningprojectserver.entities.QuestionEntity;
-import org.example.learningprojectserver.service.QuestionGenerator;
+import org.example.learningprojectserver.service.QuestionGenerator.QuestionGenerator;
 
 import java.util.Random;
 
@@ -27,7 +27,7 @@ public class MultiplicationQuestion implements QuestionGenerator {
         String questionText = buildQuestionText(numbers);
         String answer = String.valueOf(calculateProduct(numbers));
 
-        return new QuestionEntity("מתמטיקה", "מספרים שלמים","כפל", questionText, answer);
+        return new QuestionEntity("מתמטיקה", "מספרים שלמים","כפל מספרים שלמים", questionText, answer);
     }
 
     private String buildQuestionText(int[] numbers) {

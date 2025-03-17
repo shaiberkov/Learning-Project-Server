@@ -1,4 +1,4 @@
-package org.example.learningprojectserver.service;
+package org.example.learningprojectserver.service.QuestionGenerator;
 
 import org.example.learningprojectserver.entities.QuestionEntity;
 

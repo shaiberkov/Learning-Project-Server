@@ -2,7 +2,7 @@ package org.example.learningprojectserver.service.MathQuestion.AnalyticGeometry;
 
 
 import org.example.learningprojectserver.entities.QuestionEntity;
-import org.example.learningprojectserver.service.QuestionGenerator;
+import org.example.learningprojectserver.service.QuestionGenerator.QuestionGenerator;
 
 import java.util.Random;
 

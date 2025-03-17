@@ -31,6 +31,22 @@ public class UserEntity {
     @Column(nullable = true)
     private String profilePicture;
 
+
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private UserProgressEntity userProgressEntity;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private QuestionHistoryEntity questionHistoryEntity;
+
+    public UserProgressEntity getUserProgressEntitiy() {
+        return userProgressEntity;
+    }
+
+    public void setUserProgressEntitiy(UserProgressEntity userProgressEntity) {
+        this.userProgressEntity = userProgressEntity;
+    }
+
     public UserEntity() {
     }
 
@@ -86,6 +102,14 @@ public class UserEntity {
 //        return age;
 //    }
 
+    public QuestionHistoryEntity getQuestionHistoryEntity() {
+        return questionHistoryEntity;
+    }
+
+    public void setQuestionHistoryEntity(QuestionHistoryEntity questionHistoryEntity) {
+        this.questionHistoryEntity = questionHistoryEntity;
+    }
+
     public String getProfilePicture() {
         return profilePicture;
     }
@@ -126,7 +150,31 @@ public class UserEntity {
 //        this.age = age;
 //    }
 
+    @Override
+    public String toString() {
+        return "UserEntity{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                ", passwordConfirm='" + passwordConfirm + '\'' +
+                ", passwordHash='" + passwordHash + '\'' +
+                ", salt='" + salt + '\'' +
+                ", phoneNumber='" + phoneNumber + '\'' +
+                ", email='" + email + '\'' +
+                ", otp='" + otp + '\'' +
+                ", otpTimestamp=" + otpTimestamp +
+                ", profilePicture='" + profilePicture + '\'' +
+                ", userProgressEntity=" + userProgressEntity +
+                ", questionHistoryEntity=" + questionHistoryEntity +
+                '}';
+    }
+
     public void setProfilePicture(String profilePicture) {
         this.profilePicture = profilePicture;
     }
 }
+
+
+
+
+

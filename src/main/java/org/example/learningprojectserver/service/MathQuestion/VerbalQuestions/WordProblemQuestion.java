@@ -70,7 +70,7 @@ package org.example.learningprojectserver.service.MathQuestion.VerbalQuestions;
 
 import com.github.javafaker.Faker;
 import org.example.learningprojectserver.entities.QuestionEntity;
-import org.example.learningprojectserver.service.QuestionGenerator;
+import org.example.learningprojectserver.service.QuestionGenerator.QuestionGenerator;
 
 import java.util.List;
 import java.util.Random;

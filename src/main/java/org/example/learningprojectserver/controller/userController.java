@@ -1,6 +1,7 @@
 package org.example.learningprojectserver.controller;
 
 
+import org.example.learningprojectserver.dto.UserDto;
 import org.example.learningprojectserver.response.BasicResponse;
 import org.example.learningprojectserver.response.LoginResponse;
 import org.example.learningprojectserver.response.RegisterResponse;
@@ -53,6 +54,11 @@ private UserService userService;
                                        @RequestParam String otp,
                                        @RequestParam String newPassword) {
         return userService.resetPassword(username, otp, newPassword);
+    }
+    @GetMapping("/user/phone")
+    public UserDto getUserPhoneNumber(@RequestParam String username) {
+        return userService.getUserPhoneNumber(username);
+
     }
 
 

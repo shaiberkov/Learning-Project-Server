@@ -1,6 +1,13 @@
 package org.example.learningprojectserver.entities;
 
+import jakarta.persistence.*;
+
+
+@Entity
 public class QuestionEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     private String subject;   // מקצוע (למשל, מתמטיקה)
     private String topic;     // נושא (למשל, שברים)
@@ -8,12 +15,33 @@ public class QuestionEntity {
     private String questionText;
     private String answer;
 
+    @ManyToOne
+    @JoinColumn(name = "user_progress_id")
+    private UserProgressEntity userProgressEntity;
+
+    @ManyToOne
+    @JoinColumn(name = "question_history_id")
+    private QuestionHistoryEntity questionHistory;
+
+
+    public QuestionHistoryEntity getQuestionHistory() {
+        return questionHistory;
+    }
+
+    public void setQuestionHistory(QuestionHistoryEntity questionHistory) {
+        this.questionHistory = questionHistory;
+    }
+
     public QuestionEntity(String subject, String topic, String subTopic, String questionText, String answer) {
         this.subject = subject;
         this.topic = topic;
         this.subTopic = subTopic;
         this.questionText = questionText;
         this.answer = answer;
+    }
+
+    public QuestionEntity() {
+
     }
 
     // Getters and Setters
@@ -56,4 +84,38 @@ public class QuestionEntity {
     public void setAnswer(String answer) {
         this.answer = answer;
     }
+
+    public UserProgressEntity getUserProgressEntitiy() {
+        return userProgressEntity;
+    }
+
+    public void setUserProgressEntitiy(UserProgressEntity userProgressEntity) {
+        this.userProgressEntity = userProgressEntity;
+    }
+
+    public UserProgressEntity getUserProgressEntity() {
+        return userProgressEntity;
+    }
+
+    public void setUserProgressEntity(UserProgressEntity userProgressEntity) {
+        this.userProgressEntity = userProgressEntity;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    //@Override
+//    public String toString() {
+//        return "QuestionEntity{" +
+//                "id=" + id +
+//                ", subject='" + subject + '\'' +
+//                ", topic='" + topic + '\'' +
+//                ", subTopic='" + subTopic + '\'' +
+//                ", questionText='" + questionText + '\'' +
+//                ", answer='" + answer + '\'' +
+//                ", userProgressEntity=" + userProgressEntity +
+//                ", questionHistory=" + questionHistory +
+//                '}';
+//    }
 }

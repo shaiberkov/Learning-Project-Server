@@ -1,7 +1,7 @@
 package org.example.learningprojectserver.service.MathQuestion.Integers;
 
 import org.example.learningprojectserver.entities.QuestionEntity;
-import org.example.learningprojectserver.service.QuestionGenerator;
+import org.example.learningprojectserver.service.QuestionGenerator.QuestionGenerator;
 
 import java.util.Random;
 
@@ -29,7 +29,7 @@ public class SubtractionQuestion implements QuestionGenerator {
         String questionText = buildQuestionText(minuend, subtrahend);
         String answer = String.valueOf(difference);
 
-        return new QuestionEntity("מתמטיקה","מספרים שלמים", "חיסור", questionText, answer);
+        return new QuestionEntity("מתמטיקה","מספרים שלמים", "חיסור מספרים שלמים", questionText, answer);
     }
 
     private String buildQuestionText(int minuend, int subtrahend) {

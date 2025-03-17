@@ -1,7 +1,7 @@
 package org.example.learningprojectserver.service.MathQuestion.Integers;
 
 import org.example.learningprojectserver.entities.QuestionEntity;
-import org.example.learningprojectserver.service.QuestionGenerator;
+import org.example.learningprojectserver.service.QuestionGenerator.QuestionGenerator;
 
 import java.util.Random;
 
@@ -19,7 +19,7 @@ public class DivisionQuestion implements QuestionGenerator {
         String questionText = String.format(" %d ÷ %d= ? ", dividend, divisor);
         String answer = String.valueOf(result);
 
-        return new QuestionEntity("מתמטיקה","מספרים שלמים", "חילוק", questionText, answer);
+        return new QuestionEntity("מתמטיקה","מספרים שלמים", "חילוק מספרים שלמים", questionText, answer);
     }
 
     private int getMaxNumber(int difficulty) {

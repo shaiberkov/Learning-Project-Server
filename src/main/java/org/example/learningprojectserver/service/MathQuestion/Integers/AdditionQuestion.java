@@ -1,7 +1,7 @@
 package org.example.learningprojectserver.service.MathQuestion.Integers;
 
 import org.example.learningprojectserver.entities.QuestionEntity;
-import org.example.learningprojectserver.service.QuestionGenerator;
+import org.example.learningprojectserver.service.QuestionGenerator.QuestionGenerator;
 
 import java.util.Random;
 
@@ -23,7 +23,7 @@ public class AdditionQuestion implements QuestionGenerator {
         String questionText = buildQuestionText(numbers);
         String answer = String.valueOf(calculateSum(numbers));
 
-        return new QuestionEntity("מתמטיקה","מספרים שלמים", "חיבור", questionText, answer);
+        return new QuestionEntity("מתמטיקה","מספרים שלמים", "חיבור מספרים שלמים", questionText, answer);
     }
 
 

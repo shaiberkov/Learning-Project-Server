@@ -1,4 +1,4 @@
-package org.example.learningprojectserver.service;
+package org.example.learningprojectserver.service.QuestionGenerator;
 
 import org.example.learningprojectserver.service.MathQuestion.MathQuestionFactory;
 import org.example.learningprojectserver.service.LanguageQuestion.LanguageQuestionFactory;

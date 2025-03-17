@@ -18,6 +18,7 @@ import org.springframework.web.client.RestTemplate;
 public class SmsSender {
     private static final ExecutorService emailExecutor = Executors.newCachedThreadPool();
 
+
     public static void sendSms(String text, List<String> phones) {
         emailExecutor.execute(() -> sendSms1(text,phones));
     }

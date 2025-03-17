@@ -1,17 +1,22 @@
 package org.example.learningprojectserver.service;
 
+import org.example.learningprojectserver.dto.UserDto;
+import org.example.learningprojectserver.entities.QuestionHistoryEntity;
+import org.example.learningprojectserver.entities.Session;
 import org.example.learningprojectserver.entities.UserEntity;
+import org.example.learningprojectserver.entities.UserProgressEntity;
+import org.example.learningprojectserver.repository.SessionRepository;
 import org.example.learningprojectserver.repository.UserRepository;
 import org.example.learningprojectserver.response.BasicResponse;
 import org.example.learningprojectserver.response.LoginResponse;
 import org.example.learningprojectserver.response.RegisterResponse;
 import org.example.learningprojectserver.response.ResetPasswordResponse;
-import org.example.learningprojectserver.utils.ApiEmailProcessor;
 import org.example.learningprojectserver.utils.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -24,6 +29,8 @@ public class UserService {
 
 @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private SessionRepository sessionRepository;
     private static final ConcurrentHashMap<String, String> otpStorage = new ConcurrentHashMap<>();
  public RegisterResponse createUser(String username, String password, String confirmPassword, String email, String phone) {
 //todo להוסיף פונקציה שבודקת תקינות סיסמא
@@ -46,18 +53,50 @@ public class UserService {
      }
 
      try {
+//
+//         String salt = generateSalt();
+//         String hashedPassword = hashPassword(password, salt);
+//         UserEntity newUser = new UserEntity();
+//         newUser.setUsername(username);
+//         newUser.setEmail(email);
+//         newUser.setPhoneNumber(phone);
+//         newUser.setSalt(salt);
+//         newUser.setPasswordHash(hashedPassword);
+//         String textToSendInMailToUser =generateMailText(username);
+//         sendEmail(email,"ברוך הבא ל-'מרכז תרגול אישי' – החשבון שלך נוצר בהצלחה!",textToSendInMailToUser);
+//
+//         userRepository.save(newUser);
 
          String salt = generateSalt();
          String hashedPassword = hashPassword(password, salt);
+
+         // יצירת הישות הראשית של המשתמש
          UserEntity newUser = new UserEntity();
          newUser.setUsername(username);
          newUser.setEmail(email);
          newUser.setPhoneNumber(phone);
          newUser.setSalt(salt);
          newUser.setPasswordHash(hashedPassword);
-         String textToSendInMailToUser =generateMailText(username);
-         sendEmail(email,"ברוך הבא ל-'מרכז תרגול אישי' – החשבון שלך נוצר בהצלחה!",textToSendInMailToUser);
+
+         // יצירת הישויות המשניות
+         QuestionHistoryEntity questionHistoryEntity = new QuestionHistoryEntity();
+         UserProgressEntity userProgressEntity = new UserProgressEntity();
+
+         // קישור הישויות למשתמש
+         questionHistoryEntity.setUser(newUser);
+         userProgressEntity.setUser(newUser);
+
+         // קישור המשתמש לישויות
+         newUser.setUserProgressEntitiy(userProgressEntity);
+         newUser.setQuestionHistoryEntity(questionHistoryEntity);
+
+         // שליחת מייל ברכה למשתמש החדש
+         String textToSendInMailToUser = generateMailText(username);
+         sendEmail(email, "ברוך הבא ל-'מרכז תרגול אישי' – החשבון שלך נוצר בהצלחה!", textToSendInMailToUser);
+
+         // שמירת המשתמש במסד הנתונים
          userRepository.save(newUser);
+
 
          registerResponse.setMessage("User successfully registered");
          registerResponse.setSuccess(true);
@@ -121,6 +160,7 @@ public class UserService {
                 basicResponse.setErrorCode("Password isnt correct");
                 return basicResponse;
             }
+
             basicResponse.setSuccess(true);
             basicResponse.setErrorCode("");
             return basicResponse;
@@ -208,7 +248,12 @@ public class UserService {
                 loginResponse.setToken(token);
                 userEntity.setOtp(null);
                 userEntity.setOtpTimestamp(null);
+                Session session = new Session();
+                session.setUser(userEntity);  // קישור המשתמש ל-Session
+                session.setLastActivity(new Date());  // עדכון זמן הפעולה האחרונה
 
+                // שמירת ה-session במסד הנתונים
+                sessionRepository.save(session);
                 userRepository.save(userEntity);
                 return loginResponse;
 
@@ -275,6 +320,12 @@ public class UserService {
     }
 
 
+    public UserDto getUserPhoneNumber(String username) {
+        UserDto userDto=new UserDto();
+        String userPhoneNumber= userRepository.findPhoneNumberByUsername(username);
+        userDto.setPhoneNumber(userPhoneNumber);
+        return userDto;
+    }
 }
 
 
