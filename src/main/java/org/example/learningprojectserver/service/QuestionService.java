@@ -43,6 +43,8 @@ public class QuestionService {
 
     }
 
+
+
     private QuestionDTO mapToDTO(QuestionEntity questionEntity) {
         return new QuestionDTO(
                 questionEntity.getId(),
@@ -56,11 +58,13 @@ public class QuestionService {
     public QuestionDTO generateQuestion(String userName, String subject, String topic, String subTopic) {
         // שליפת ההתקדמות של המשתמש (חובה שהרשומה קיימת)
         UserProgressEntity userProgressEntity = userprogressRepository.findByUserName(userName);
+        System.out.println(userProgressEntity);
         if (userProgressEntity == null) {
             //throw new RuntimeException("User progress record not found for user: " + userName);
         }
 
         Map<String, Integer> skillLevelsBySubTopic = userProgressEntity.getSkillLevelsBySubTopic();
+        System.out.println(skillLevelsBySubTopic);
 
         // אם המשתמש אף פעם לא ענה על שאלה מהסוג הזה, נוסיף אותו עם רמה 1
         skillLevelsBySubTopic.putIfAbsent(subTopic, 1);

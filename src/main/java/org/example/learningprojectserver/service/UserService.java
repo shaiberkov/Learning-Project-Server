@@ -102,7 +102,6 @@ public class UserService {
          registerResponse.setSuccess(true);
          return registerResponse;
      } catch (Exception e) {
-         e.printStackTrace();
          registerResponse.setMessage("Error occurred during registration");
          registerResponse.setSuccess(false);
          return registerResponse;
@@ -166,7 +165,6 @@ public class UserService {
             return basicResponse;
 
         } catch (Exception e) {
-            e.printStackTrace();
             basicResponse.setSuccess(false);
             basicResponse.setErrorCode("Error occurred during login");
             return basicResponse;
@@ -202,7 +200,6 @@ public class UserService {
             return basicResponse;
 
         } catch (Exception e) {
-            e.printStackTrace();
             basicResponse.setSuccess(false);
             basicResponse.setErrorCode("Error occurred during send otp");
             return basicResponse;
@@ -258,7 +255,7 @@ public class UserService {
                 return loginResponse;
 
             } catch (Exception e) {
-                e.printStackTrace();
+
                 loginResponse.setSuccess(false);
                 loginResponse.setErrorCode("Error occurred during verify otp");
                 return loginResponse;

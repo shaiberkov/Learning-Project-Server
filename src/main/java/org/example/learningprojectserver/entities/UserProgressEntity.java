@@ -109,4 +109,14 @@ public class UserProgressEntity {
 //                ", skillLevelsBySubTopic=" + skillLevelsBySubTopic +
 //                '}';
 //    }
+
+    @Override
+    public String toString() {
+        return "UserProgressEntity{" +
+                "id=" + id +
+                ", subTopicSuccessStreak=" + subTopicSuccessStreak +
+                ", subTopicIncorrectStreak=" + subTopicIncorrectStreak +
+                ", skillLevelsBySubTopic=" + skillLevelsBySubTopic +
+                '}';
+    }
 }

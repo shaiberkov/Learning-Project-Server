@@ -19,7 +19,7 @@ public class QuestionHistoryEntity {
     @JoinColumn(name = "user_id")
     private UserEntity user;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "answered_questions", joinColumns = @JoinColumn(name = "history_id"))
     @MapKeyJoinColumn(name = "question_id")
     @Column(name = "is_answered_correct")

@@ -36,6 +36,7 @@ public class UserEntity {
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private UserProgressEntity userProgressEntity;
 
+
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private QuestionHistoryEntity questionHistoryEntity;
 
