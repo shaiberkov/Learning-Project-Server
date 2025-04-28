@@ -23,9 +23,24 @@ public class QuestionEntity {
     @JoinColumn(name = "question_history_id")
     private QuestionHistoryEntity questionHistory;
 
+    @ManyToOne
+    @JoinColumn(name = "test_id", nullable = true)
+    private TestEntity test;
 
     public QuestionHistoryEntity getQuestionHistory() {
         return questionHistory;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public TestEntity getTest() {
+        return test;
+    }
+
+    public void setTest(TestEntity test) {
+        this.test = test;
     }
 
     public void setQuestionHistory(QuestionHistoryEntity questionHistory) {

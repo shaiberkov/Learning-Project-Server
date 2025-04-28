@@ -56,4 +56,15 @@ public class QuestionDTO {
     public void setQuestionText(String questionText) {
         this.questionText = questionText;
     }
+
+    @Override
+    public String toString() {
+        return "QuestionDTO{" +
+                "id=" + id +
+                ", subject='" + subject + '\'' +
+                ", topic='" + topic + '\'' +
+                ", subTopic='" + subTopic + '\'' +
+                ", questionText='" + questionText + '\'' +
+                '}';
+    }
 }

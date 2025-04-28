@@ -17,6 +17,7 @@ public class StatisticController {
 
     @GetMapping("/get-User-Statistic")
     public UserStatisticsEntity getUserStatistic(  @RequestParam String userName) {
+        System.out.println("getUserStatistic");
          return statisticsService.getUserStats(userName);
     }
 }

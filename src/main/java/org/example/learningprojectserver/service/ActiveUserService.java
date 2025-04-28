@@ -1,6 +1,5 @@
 package org.example.learningprojectserver.service;
 
-import org.example.learningprojectserver.entities.UserStatisticsEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.concurrent.ConcurrentHashMap;

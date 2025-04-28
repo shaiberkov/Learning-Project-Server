@@ -1,9 +1,13 @@
 package org.example.learningprojectserver.entities;
 
 import jakarta.persistence.*;
+import org.example.learningprojectserver.enums.Role;
+
+import java.util.List;
 
 @Entity
-public class UserEntity {
+@Inheritance(strategy = InheritanceType.JOINED)
+public abstract class UserEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,25 +35,70 @@ public class UserEntity {
     @Column(nullable = true)
     private String profilePicture;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role;
 
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-    private UserProgressEntity userProgressEntity;
-
-
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-    private QuestionHistoryEntity questionHistoryEntity;
-
-    public UserProgressEntity getUserProgressEntitiy() {
-        return userProgressEntity;
+    public Role getRole() {
+        return role;
     }
 
-    public void setUserProgressEntitiy(UserProgressEntity userProgressEntity) {
-        this.userProgressEntity = userProgressEntity;
+    public void setRole(Role role) {
+        this.role = role;
     }
+
+//
+//    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+//    private UserProgressEntity userProgressEntity;
+//
+//
+//    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+//    private QuestionHistoryEntity questionHistoryEntity;
+//
+//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+//    private List<TestResultEntity> userTestsResult;
+//    @OneToMany(mappedBy = "user",fetch = FetchType.EAGER ,cascade = CascadeType.ALL)
+//    private List<TestEntity> userTests;
+
+
+
+
+
+//    public UserProgressEntity getUserProgressEntitiy() {
+//        return userProgressEntity;
+//    }
+//
+//    public void setUserProgressEntitiy(UserProgressEntity userProgressEntity) {
+//        this.userProgressEntity = userProgressEntity;
+//    }
 
     public UserEntity() {
     }
+
+//    public UserProgressEntity getUserProgressEntity() {
+//        return userProgressEntity;
+//    }
+//
+//    public void setUserProgressEntity(UserProgressEntity userProgressEntity) {
+//        this.userProgressEntity = userProgressEntity;
+//    }
+//
+//    public List<TestResultEntity> getUserTestsResult() {
+//        return userTestsResult;
+//    }
+//
+//    public void setUserTestsResult(List<TestResultEntity> userTestsResult) {
+//        this.userTestsResult = userTestsResult;
+//    }
+//
+//    public List<TestEntity> getUserTests() {
+//        return userTests;
+//    }
+//
+//    public void setUserTests(List<TestEntity> userTests) {
+//        this.userTests = userTests;
+//    }
 
     public String getOtp() {
         return otp;
@@ -103,13 +152,13 @@ public class UserEntity {
 //        return age;
 //    }
 
-    public QuestionHistoryEntity getQuestionHistoryEntity() {
-        return questionHistoryEntity;
-    }
-
-    public void setQuestionHistoryEntity(QuestionHistoryEntity questionHistoryEntity) {
-        this.questionHistoryEntity = questionHistoryEntity;
-    }
+//    public QuestionHistoryEntity getQuestionHistoryEntity() {
+//        return questionHistoryEntity;
+//    }
+//
+//    public void setQuestionHistoryEntity(QuestionHistoryEntity questionHistoryEntity) {
+//        this.questionHistoryEntity = questionHistoryEntity;
+//    }
 
     public String getProfilePicture() {
         return profilePicture;
@@ -165,8 +214,8 @@ public class UserEntity {
                 ", otp='" + otp + '\'' +
                 ", otpTimestamp=" + otpTimestamp +
                 ", profilePicture='" + profilePicture + '\'' +
-                ", userProgressEntity=" + userProgressEntity +
-                ", questionHistoryEntity=" + questionHistoryEntity +
+//                ", userProgressEntity=" + userProgressEntity +
+//                ", questionHistoryEntity=" + questionHistoryEntity +
                 '}';
     }
 

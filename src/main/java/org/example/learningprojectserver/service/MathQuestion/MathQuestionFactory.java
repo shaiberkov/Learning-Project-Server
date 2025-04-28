@@ -27,6 +27,8 @@ import org.example.learningprojectserver.service.MathQuestion.VerbalQuestions.Wo
 import org.example.learningprojectserver.service.QuestionGenerator.SubjectQuestionGenerator;
 import org.example.learningprojectserver.service.QuestionGenerator.QuestionGenerator;
 
+import java.util.List;
+
 public class MathQuestionFactory implements SubjectQuestionGenerator {
 
     @Override
@@ -66,4 +68,6 @@ public class MathQuestionFactory implements SubjectQuestionGenerator {
             default -> throw new IllegalArgumentException("תת-נושא לא נתמך: " + subTopic);
         };
     }
+
+
 }

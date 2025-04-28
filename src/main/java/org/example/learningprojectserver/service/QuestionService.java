@@ -37,11 +37,13 @@ public class QuestionService {
         this.userprogressRepository = UserprogressRepository;
 
     }
-    @PostConstruct
-    public void init() {
-
-
-    }
+//    @PostConstruct
+//    public void init() {
+//        System.out.println("QuestionService initilized")
+//        ;
+//        System.out.println(generateQuestion("shai","מתמטיקה","מספרים שלמים","חיבור מספרים שלמים"));;
+//
+//    }
 
 
 
@@ -54,6 +56,8 @@ public class QuestionService {
                 questionEntity.getQuestionText()
         );
     }
+
+
 
     public QuestionDTO generateQuestion(String userName, String subject, String topic, String subTopic) {
         // שליפת ההתקדמות של המשתמש (חובה שהרשומה קיימת)
@@ -83,21 +87,68 @@ public class QuestionService {
         // שליפת היסטוריית השאלות של המשתמש
         QuestionHistoryEntity historyEntity = questionHistoryRepository.findByUserName(userName);
 
-
         // **עדכון המפתחות הזרים** לפני שמירת השאלה
         questionEntity.setQuestionHistory(historyEntity);
         questionEntity.setUserProgressEntitiy(userProgressEntity);
 
+        // סינון תווי LRM מטקסט השאלה לפני שמירה
+        String questionTextWithoutLRM = questionEntity.getQuestionText().replaceAll("[\u200E\u200F]", "");
+        questionEntity.setQuestionText(questionTextWithoutLRM);
+
+        // סינון תווי LRM מהתשובה לפני שמירה
+        String answerWithoutLRM = questionEntity.getAnswer().replaceAll("[\u200E\u200F]", "");
+        questionEntity.setAnswer(answerWithoutLRM);
+
         // שמירת השאלה במסד הנתונים
         questionEntity = questionRepository.save(questionEntity);
-
-        // הוספת השאלה להיסטוריית השאלות
-//        historyEntity.addAnsweredQuestion(questionEntity, null);
-//        questionHistoryRepository.save(historyEntity);
 
         // החזרת השאלה כ-DTO
         return mapToDTO(questionEntity);
     }
+
+//    public QuestionDTO generateQuestion(String userName, String subject, String topic, String subTopic) {
+//        // שליפת ההתקדמות של המשתמש (חובה שהרשומה קיימת)
+//        UserProgressEntity userProgressEntity = userprogressRepository.findByUserName(userName);
+//        System.out.println(userProgressEntity);
+//        if (userProgressEntity == null) {
+//            //throw new RuntimeException("User progress record not found for user: " + userName);
+//        }
+//
+//        Map<String, Integer> skillLevelsBySubTopic = userProgressEntity.getSkillLevelsBySubTopic();
+//        System.out.println(skillLevelsBySubTopic);
+//
+//        // אם המשתמש אף פעם לא ענה על שאלה מהסוג הזה, נוסיף אותו עם רמה 1
+//        skillLevelsBySubTopic.putIfAbsent(subTopic, 1);
+//
+//        // עדכון הנתונים ושמירתם
+//        userProgressEntity.setSkillLevelsBySubTopic(skillLevelsBySubTopic);
+//        userprogressRepository.save(userProgressEntity);
+//
+//        // קבלת הרמה של המשתמש
+//        int level = skillLevelsBySubTopic.get(subTopic);
+//        // יצירת שאלה באמצעות מחולל השאלות המתאים
+//        SubjectQuestionGenerator generator = QuestionGeneratorFactory.getSubjectQuestionGenerator(subject);
+//        QuestionGenerator questionGenerator = generator.getQuestionGenerator(topic, subTopic);
+//        QuestionEntity questionEntity = questionGenerator.generateQuestion(level);
+//
+//        // שליפת היסטוריית השאלות של המשתמש
+//        QuestionHistoryEntity historyEntity = questionHistoryRepository.findByUserName(userName);
+//
+//
+//        // **עדכון המפתחות הזרים** לפני שמירת השאלה
+//        questionEntity.setQuestionHistory(historyEntity);
+//        questionEntity.setUserProgressEntitiy(userProgressEntity);
+//
+//        // שמירת השאלה במסד הנתונים
+//        questionEntity = questionRepository.save(questionEntity);
+//
+//        // הוספת השאלה להיסטוריית השאלות
+////        historyEntity.addAnsweredQuestion(questionEntity, null);
+////        questionHistoryRepository.save(historyEntity);
+//
+//        // החזרת השאלה כ-DTO
+//        return mapToDTO(questionEntity);
+//    }
 
 
     //TODO להשאיר רמה מקסימלית ל5

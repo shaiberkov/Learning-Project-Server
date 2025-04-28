@@ -10,12 +10,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/chat")
 public class ChatController {
 
-    // מתודה לשליחת הודעה ולקבל תשובה
     @PostMapping("/send-message")
     public String sendMessage(@RequestParam String userName, @RequestParam String message) {
-        // קבלת תשובה מה-ChatService
         String response = GptMassenger.getResponseFromChatGpt(userName, message);
-        System.out.println(response);
         if (response != null) {
             return response;
         } else {
@@ -23,7 +20,6 @@ public class ChatController {
         }
     }
 
-    // מתודה לניקוי שיחה של משתמש
     @PostMapping("/clear-conversation")
     public void clearConversation(@RequestParam String userName) {
         GptMassenger.clearConversation(userName);

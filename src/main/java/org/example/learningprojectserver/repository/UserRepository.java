@@ -18,6 +18,8 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
         "(SELECT s.user FROM Session s WHERE s.lastActivity >= :lastWeek)")
 List<UserEntity> findUsersNotLoggedInLastWeek(@Param("lastWeek") Date lastWeek);
 
+    @Query("SELECT u FROM UserEntity u WHERE u.username = :userName")
+    UserEntity findByUserName(@Param("userName") String userName);
 
 @Query("SELECT u.phoneNumber FROM UserEntity u WHERE u.username=:userName")
 String findPhoneNumberByUsername(@Param ("userName")String username);

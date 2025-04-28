@@ -22,18 +22,18 @@ public class UserProgressEntity {
 //    private Map<String, Integer> questionsAnsweredBySubTopic;
 
     // שמירת התקדמות לפי תתי נושא
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "sub_topic_success_streak", joinColumns = @JoinColumn(name = "progress_id"))
     @Column(name = "success_streak")
     private Map<String, Integer> subTopicSuccessStreak;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "sub_topic_incorrect_streak", joinColumns = @JoinColumn(name = "progress_id"))
     @Column(name = "incorrect_streak")
     private Map<String, Integer> subTopicIncorrectStreak;
 
     // שמירת רמות המיומנות לפי תתי נושא
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "skill_levels_by_sub_topic", joinColumns = @JoinColumn(name = "progress_id"))
     @Column(name = "skill_level")
     private Map<String, Integer> skillLevelsBySubTopic;
