@@ -32,7 +32,7 @@ public class SecurityConfig {
                         //ליזכור לשנות הרשאה לאדמין
                         .requestMatchers("/Learning-App/System-Admin/**").permitAll()//hasRole("SYSTEM_ADMIN")
                         .requestMatchers("/Learning-App/School-Manager/**").permitAll()    //hasAnyRole("SCHOOLMANAGER", "SYSTEM_ADMIN")
-                        .requestMatchers("/Learning-App/Teacher/**").permitAll()//hasAnyRole("TEACHER", "SCHOOLMANAGER", "SYSTEM_ADMIN")//todo  לבודד את ההרשאות
+                        .requestMatchers("/Learning-App/Teacher/**").permitAll()    //hasAnyRole("TEACHER", "SCHOOLMANAGER", "SYSTEM_ADMIN")//todo  לבודד את ההרשאות
                         .requestMatchers("/Learning-App/Student/**").hasAnyRole("STUDENT")
                         .requestMatchers("/Learning-App/Active-User/**").hasAnyRole("SYSTEM_ADMIN","TEACHER", "SCHOOLMANAGER","STUDENT")
                         .requestMatchers("/Learning-App/Chat/**").hasAnyRole("SYSTEM_ADMIN","TEACHER", "SCHOOLMANAGER","STUDENT" )
