@@ -8,7 +8,7 @@ import org.springframework.data.repository.query.Param;
 public interface UserProgressRepository extends JpaRepository<UserProgressEntity, Long> {
 
 
-    @Query("SELECT up FROM UserProgressEntity up JOIN up.user u WHERE u.username = :userName")
-    UserProgressEntity findByUserName(@Param("userName") String userName);
+//    @Query("SELECT up FROM UserProgressEntity up JOIN up.user u WHERE u.username = :userName")
+//    UserProgressEntity findByUserName(@Param("userName") String userName);
 
 }

@@ -126,4 +126,26 @@ public class GeneratorUtils {
         """.formatted(username);
     }
 
+
+    public static boolean isValidIsraeliId(String id) {
+        if (id == null || id.length() > 9 || !id.matches("\\d+")) {
+            return false;
+        }
+
+        // מוסיף אפסים מובילים אם צריך
+        id = String.format("%9s", id).replace(' ', '0');
+
+        int sum = 0;
+        for (int i = 0; i < 9; i++) {
+            int num = Character.getNumericValue(id.charAt(i));
+            num *= (i % 2) + 1;
+            if (num > 9) {
+                num -= 9;
+            }
+            sum += num;
+        }
+
+        return sum % 10 == 0;
+    }
+
 }

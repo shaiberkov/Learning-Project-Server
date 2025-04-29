@@ -53,101 +53,107 @@ public class TestService {
 //    private String difficulty;
 //    private int questionCount;
 
-    @Transactional
-    public TestDTO generateTest(String userName, String subject, String topic, String difficulty, int questionCount) {
-        UserEntity user = UserRepository.findByUserName(userName);
 
-        Random random = new Random();
-        SubjectQuestionGenerator generatorFactory = QuestionGeneratorFactory.getSubjectQuestionGenerator(subject);
 
-        List<QuestionEntity> questions = new ArrayList<>();
-        List<String> subTopics = getSubTopics(topic);
-        int[] difficultyLevels = getDifficultyLevels(difficulty);
 
-        TestEntity testEntity = new TestEntity();
-        testEntity.setUser(user);
 
-        //todo הוספתי ליראות שנישמר
-        testEntity.setSubject(subject);
-        testEntity.setTopic(topic);
-        testEntity.setDifficulty(difficulty);
-        testEntity.setQuestionCount(questionCount);
-        testRepository.save(testEntity);
 
-        for (int i = 0; i < questionCount; i++) {
-            int level = difficultyLevels[random.nextInt(difficultyLevels.length)];
-            String subTopic = subTopics.get(random.nextInt(subTopics.size()));
-            QuestionGenerator questionGenerator = generatorFactory.getQuestionGenerator(topic, subTopic);
-            QuestionEntity questionEntity = questionGenerator.generateQuestion(level);
 
-            questionEntity.setTest(testEntity);
-            questionRepository.save(questionEntity);
-            questions.add(questionEntity);
-        }
-
-        testEntity.setQuestions(questions);
-        testRepository.save(testEntity);
-
-        return mapToTestDto(testEntity,questions);
-    }
-
-    public TestResultEntity checkTest(String userName, Long testId, Map<Long, String> userAnswers) {
-
-        UserEntity user = UserRepository.findByUserName(userName);
-        TestEntity test = testRepository.findById(testId).orElse(null);
-
-        List<QuestionEntity> correctQuestions = new ArrayList<>();
-        List<QuestionEntity> incorrectQuestions = new ArrayList<>();
-        int correctCount = 0;
-
-        for (QuestionEntity question : test.getQuestions()) {
-            String userAnswer = userAnswers.get(question.getId());
-            if (userAnswer != null && userAnswer.equalsIgnoreCase(question.getAnswer().trim())) {
-                correctQuestions.add(question);
-                correctCount++;
-            } else {
-                incorrectQuestions.add(question);
-            }
-        }
-
-        int score = (int) (((double) correctCount / test.getQuestions().size()) * 100);
-
-        TestResultEntity testResult = new TestResultEntity();
-        testResult.setUser(user);
-        testResult.setTest(test);
-        testResult.setScore(score);
-        testResult.setCorrectAnswers(correctCount);
-        testResult.setIncorrectAnswers(test.getQuestions().size() - correctCount);
-        testResult.setCorrectQuestions(correctQuestions);
-        testResult.setIncorrectQuestions(incorrectQuestions);
-
-        testResultRepository.save(testResult);
-
-        // עדכון UserEntity
-        if (user.getUserTestsResult() == null) {
-            user.setUserTestsResult(new ArrayList<>());
-        }
-        user.getUserTestsResult().add(testResult);
-        UserRepository.save(user);
-
-        return testResult;
-    }
-    public TestResultResponse getTestResultResponse(String userName, Long testId, Map<Long, String> userAnswers) {
-        TestResultEntity testResultEntity = checkTest(userName, testId, userAnswers);
-
-        if (testResultEntity == null) {
-            return null;
-        }
-
-        TestResultResponse response = new TestResultResponse();
-        response.setScore(testResultEntity.getScore());
-        response.setCorrectAnswers(testResultEntity.getCorrectAnswers());
-        response.setIncorrectAnswers(testResultEntity.getIncorrectAnswers());
-        response.setCorrectAnswerList(testResultEntity.getCorrectQuestions().stream().map(QuestionEntity::getQuestionText).collect(Collectors.toList()));
-        response.setIncorrectAnswerList(testResultEntity.getIncorrectQuestions().stream().map(QuestionEntity::getQuestionText).collect(Collectors.toList()));
-
-        return response;
-    }
+//    @Transactional
+//    public TestDTO generateTest(String userName, String subject, String topic, String difficulty, int questionCount) {
+//        UserEntity user = UserRepository.findByUserName(userName);
+//
+//        Random random = new Random();
+//        SubjectQuestionGenerator generatorFactory = QuestionGeneratorFactory.getSubjectQuestionGenerator(subject);
+//
+//        List<QuestionEntity> questions = new ArrayList<>();
+//        List<String> subTopics = getSubTopics(topic);
+//        int[] difficultyLevels = getDifficultyLevels(difficulty);
+//
+//        TestEntity testEntity = new TestEntity();
+//        testEntity.setUser(user);
+//
+//        //todo הוספתי ליראות שנישמר
+//        testEntity.setSubject(subject);
+//        testEntity.setTopic(topic);
+//        testEntity.setDifficulty(difficulty);
+//        testEntity.setQuestionCount(questionCount);
+//        testRepository.save(testEntity);
+//
+//        for (int i = 0; i < questionCount; i++) {
+//            int level = difficultyLevels[random.nextInt(difficultyLevels.length)];
+//            String subTopic = subTopics.get(random.nextInt(subTopics.size()));
+//            QuestionGenerator questionGenerator = generatorFactory.getQuestionGenerator(topic, subTopic);
+//            QuestionEntity questionEntity = questionGenerator.generateQuestion(level);
+//
+//            questionEntity.setTest(testEntity);
+//            questionRepository.save(questionEntity);
+//            questions.add(questionEntity);
+//        }
+//
+//        testEntity.setQuestions(questions);
+//        testRepository.save(testEntity);
+//
+//        return mapToTestDto(testEntity,questions);
+//    }
+//
+//    public TestResultEntity checkTest(String userName, Long testId, Map<Long, String> userAnswers) {
+//
+//        UserEntity user = UserRepository.findByUserName(userName);
+//        TestEntity test = testRepository.findById(testId).orElse(null);
+//
+//        List<QuestionEntity> correctQuestions = new ArrayList<>();
+//        List<QuestionEntity> incorrectQuestions = new ArrayList<>();
+//        int correctCount = 0;
+//
+//        for (QuestionEntity question : test.getQuestions()) {
+//            String userAnswer = userAnswers.get(question.getId());
+//            if (userAnswer != null && userAnswer.equalsIgnoreCase(question.getAnswer().trim())) {
+//                correctQuestions.add(question);
+//                correctCount++;
+//            } else {
+//                incorrectQuestions.add(question);
+//            }
+//        }
+//
+//        int score = (int) (((double) correctCount / test.getQuestions().size()) * 100);
+//
+//        TestResultEntity testResult = new TestResultEntity();
+//        testResult.setUser(user);
+//        testResult.setTest(test);
+//        testResult.setScore(score);
+//        testResult.setCorrectAnswers(correctCount);
+//        testResult.setIncorrectAnswers(test.getQuestions().size() - correctCount);
+//        testResult.setCorrectQuestions(correctQuestions);
+//        testResult.setIncorrectQuestions(incorrectQuestions);
+//
+//        testResultRepository.save(testResult);
+//
+//        // עדכון UserEntity
+//        if (user.getUserTestsResult() == null) {
+//            user.setUserTestsResult(new ArrayList<>());
+//        }
+//        user.getUserTestsResult().add(testResult);
+//        UserRepository.save(user);
+//
+//        return testResult;
+//    }
+//    public TestResultResponse getTestResultResponse(String userName, Long testId, Map<Long, String> userAnswers) {
+//        TestResultEntity testResultEntity = checkTest(userName, testId, userAnswers);
+//
+//        if (testResultEntity == null) {
+//            return null;
+//        }
+//
+//        TestResultResponse response = new TestResultResponse();
+//        response.setScore(testResultEntity.getScore());
+//        response.setCorrectAnswers(testResultEntity.getCorrectAnswers());
+//        response.setIncorrectAnswers(testResultEntity.getIncorrectAnswers());
+//        response.setCorrectAnswerList(testResultEntity.getCorrectQuestions().stream().map(QuestionEntity::getQuestionText).collect(Collectors.toList()));
+//        response.setIncorrectAnswerList(testResultEntity.getIncorrectQuestions().stream().map(QuestionEntity::getQuestionText).collect(Collectors.toList()));
+//
+//        return response;
+//    }
 
     private TestDTO mapToTestDto(TestEntity testEntity,List<QuestionEntity> questions) {
         Long id=testEntity.getId();

@@ -3,6 +3,7 @@ package org.example.learningprojectserver.entities;
 import jakarta.persistence.*;
 import org.example.learningprojectserver.enums.Role;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -12,8 +13,10 @@ public abstract class UserEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String username;
+    @Column(nullable = false)
+    private String userId;
     @Transient
     private String password;
     @Transient
@@ -34,11 +37,28 @@ public abstract class UserEntity {
 //    private int age;
     @Column(nullable = true)
     private String profilePicture;
+    @OneToMany(mappedBy = "user",fetch = FetchType.EAGER ,cascade = CascadeType.ALL)
+    private List<Session> sessionList=new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
 
+    public String getUserId() {
+        return userId;
+    }
+
+    public List<Session> getSessionList() {
+        return sessionList;
+    }
+
+    public void setSessionList(List<Session> sessionList) {
+        this.sessionList = sessionList;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
 
     public Role getRole() {
         return role;

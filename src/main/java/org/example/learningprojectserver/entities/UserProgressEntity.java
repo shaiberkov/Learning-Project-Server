@@ -14,8 +14,9 @@ public class UserProgressEntity {
 
     // קשר OneToOne עם UserEntity
     @OneToOne
-    @JoinColumn(name = "user_id")
-    private UserEntity user;
+    @JoinColumn(name = "student_id") // השם בעמודת הדאטהבייס
+    private StudentEntity student;
+
 
     // מאפיינים לשמירת התקדמות המשתמש
 //    @ElementCollection
@@ -56,6 +57,14 @@ public class UserProgressEntity {
         this.subTopicIncorrectStreak = subTopicIncorrectStreak;
     }
 
+    public StudentEntity getStudent() {
+        return student;
+    }
+
+    public void setStudent(StudentEntity student) {
+        this.student = student;
+    }
+
     public Long getId() {
         return id;
     }
@@ -64,13 +73,13 @@ public class UserProgressEntity {
         this.id = id;
     }
 
-    public UserEntity getUser() {
-        return user;
-    }
-
-    public void setUser(UserEntity user) {
-        this.user = user;
-    }
+//    public UserEntity getUser() {
+//        return user;
+//    }
+//
+//    public void setUser(UserEntity user) {
+//        this.user = user;
+//    }
 
 
 

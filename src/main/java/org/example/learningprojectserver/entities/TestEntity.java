@@ -11,8 +11,14 @@ public class TestEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ManyToOne
-    @JoinColumn(name = "user_id")
-    private UserEntity user;
+    @JoinColumn(name = "student_id") // קשר Many-to-One (רבים ליחיד)
+    private StudentEntity student;
+
+
+    @ManyToOne
+    @JoinColumn(name = "teacher_id") // קשר ל-TeacherEntity
+    private TeacherEntity teacher;
+
     @OneToMany(mappedBy = "test", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<QuestionEntity> questions;
 
@@ -33,7 +39,7 @@ public class TestEntity {
     public String toString() {
         return "TestEntity{" +
                 "id=" + id +
-                ", user=" + user +
+//                ", user=" + user +
                 ", questions=" + questions +
                 ", subject='" + subject + '\'' +
                 ", topic='" + topic + '\'' +
@@ -67,14 +73,14 @@ public class TestEntity {
     }
 
     public TestEntity() {}
+//
+//    public UserEntity getUser() {
+//        return user;
+//    }
 
-    public UserEntity getUser() {
-        return user;
-    }
-
-    public void setUser(UserEntity user) {
-        this.user = user;
-    }
+//    public void setUser(UserEntity user) {
+//        this.user = user;
+//    }
 
     public void setQuestions(List<QuestionEntity> questions) {
         this.questions = questions;

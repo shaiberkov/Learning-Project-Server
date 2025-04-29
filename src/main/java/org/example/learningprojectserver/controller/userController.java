@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("Learning-App/")
+@RequestMapping("/Learning-App/User")
 public class userController {
 @Autowired
 private UserService userService;
@@ -19,6 +19,7 @@ private UserService userService;
 
     @PostMapping("/add-user/")
     public RegisterResponse registerUser(@RequestParam String username,
+                                         @RequestParam String userId,
                                          @RequestParam String password,
                                          @RequestParam String confirmPassword,
                                          @RequestParam String email,
@@ -26,6 +27,7 @@ private UserService userService;
 
         return userService.createUser(
                 username,
+                userId,
                 password,
                 confirmPassword,
                 email,
@@ -33,31 +35,32 @@ private UserService userService;
         );
     }
     @PostMapping("/login")
-    public BasicResponse loginUser(@RequestParam String username, @RequestParam String password) {
-        return userService.loginUser(username, password);
+    public BasicResponse loginUser(@RequestParam String userId, @RequestParam String password) {
+        return userService.loginUser(userId, password);
     }
     @PostMapping("/send-otp")
-    public BasicResponse sendOtp(@RequestParam String username, @RequestParam String phoneNumber) {
-        return userService.sendOtp(username, phoneNumber);
+    public BasicResponse sendOtp(@RequestParam String userId, @RequestParam String phoneNumber) {
+        return userService.sendOtp(userId, phoneNumber);
     }
     @PostMapping("/verify-otp")
-    public LoginResponse verifyOtp(@RequestParam String username, @RequestParam String otp) {
-        return userService.verifyOtp(username, otp);
+    public LoginResponse verifyOtp(@RequestParam String userId, @RequestParam String otp) {
+        return userService.verifyOtp(userId, otp);
     }
+
     @PostMapping("/forgot-password")
-    public ResetPasswordResponse forgotPassword(@RequestParam String username) {
-        return userService.sendPasswordResetOtp(username);
+    public ResetPasswordResponse forgotPassword(@RequestParam String userId) {
+        return userService.sendPasswordResetOtp(userId);
     }
 
     @PostMapping("/reset-password")
-    public ResetPasswordResponse resetPassword(@RequestParam String username,
+    public ResetPasswordResponse resetPassword(@RequestParam String userId,
                                        @RequestParam String otp,
                                        @RequestParam String newPassword) {
-        return userService.resetPassword(username, otp, newPassword);
+        return userService.resetPassword(userId, otp, newPassword);
     }
     @GetMapping("/user/phone")
-    public UserDto getUserPhoneNumber(@RequestParam String username) {
-        return userService.getUserPhoneNumber(username);
+    public UserDto getUserPhoneNumber(@RequestParam String userId) {
+        return userService.getUserPhoneNumber(userId);
 
     }
 

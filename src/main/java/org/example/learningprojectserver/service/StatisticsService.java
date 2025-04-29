@@ -28,27 +28,29 @@ public class StatisticsService {
        this.activeUserService = activeUserService;
    }
 
-   public UserStatisticsEntity getUserStatistics( String userName) {
-        UserStatisticsEntity userStatistics = new UserStatisticsEntity();
-        userStatistics.setLoginStreak(countConsecutiveActiveDays(userName));
-        userStatistics.setUserLearningStatistics(generateUserLearningStatsMap(userName));
-
-     return userStatistics;
-   }
+//   public UserStatisticsEntity getUserStatistics( String userName) {
+//        UserStatisticsEntity userStatistics = new UserStatisticsEntity();
+//        userStatistics.setLoginStreak(countConsecutiveActiveDays(userName));
+//        userStatistics.setUserLearningStatistics(generateUserLearningStatsMap(userName));
+//
+//     return userStatistics;
+//   }
 
 //    @PostConstruct
 //    public void init() {
 //
 //
 //    }
-    @Scheduled(fixedRate = 1000) // מתעדכן רק למשתמשים מחוברים
-    public void refreshStatistics() {
-        userStats.keySet().removeIf(userName -> !activeUserService.isUserActive(userName));
-        for (String userName: activeUserService.getActiveUsers().keySet()) {
-            UserStatisticsEntity userStatistics = getUserStatistics(userName);
-            userStats.put(userName,userStatistics);
-        }
-    }
+
+
+//    @Scheduled(fixedRate = 1000) // מתעדכן רק למשתמשים מחוברים
+//    public void refreshStatistics() {
+//        userStats.keySet().removeIf(userName -> !activeUserService.isUserActive(userName));
+//        for (String userName: activeUserService.getActiveUsers().keySet()) {
+//            UserStatisticsEntity userStatistics = getUserStatistics(userName);
+//            userStats.put(userName,userStatistics);
+//        }
+//    }
 
 
 
@@ -74,37 +76,37 @@ public class StatisticsService {
 
         return consecutiveDays;
     }
-
-public Map<String, Map<String, Map<String, Map<String, Integer>>>> generateUserLearningStatsMap(String userName) {
-    Map<String, Map<String, Map<String, Map<String, Integer>>>> userLearningStatsMap = new HashMap<>();
-    QuestionHistoryEntity questionHistoryEntity = questionHistoryRepository.findByUserName(userName);
-    Map<QuestionEntity, Boolean> questionEntityMap = questionHistoryEntity.getAnsweredQuestions();
-
-    for (Map.Entry<QuestionEntity, Boolean> entry : questionEntityMap.entrySet()) {
-        QuestionEntity questionEntity = entry.getKey();
-        Boolean isAnsweredCorrectly = entry.getValue();
-
-        String subject = questionEntity.getSubject();
-        String topic = questionEntity.getTopic();
-        String subTopic = questionEntity.getSubTopic();
-
-        if (!userLearningStatsMap.containsKey(subject)) {
-            userLearningStatsMap.put(subject, new HashMap<>());
-        }
-        Map<String, Map<String, Map<String, Integer>>> topicMap = userLearningStatsMap.get(subject);
-        if (!topicMap.containsKey(topic)) {
-            topicMap.put(topic, new HashMap<>());
-        }
-        Map<String, Map<String, Integer>> subTopicMap = topicMap.get(topic);
-        if (!subTopicMap.containsKey(subTopic)) {
-            subTopicMap.put(subTopic, new HashMap<>());
-        }
-        Map<String, Integer> correctAnswerMap = subTopicMap.get(subTopic);
-        String resultKey = isAnsweredCorrectly ? "correct" : "incorrect";
-        correctAnswerMap.put(resultKey, correctAnswerMap.getOrDefault(resultKey, 0) + 1);
-    }
-    return userLearningStatsMap;
-}
+//
+//public Map<String, Map<String, Map<String, Map<String, Integer>>>> generateUserLearningStatsMap(String userName) {
+//    Map<String, Map<String, Map<String, Map<String, Integer>>>> userLearningStatsMap = new HashMap<>();
+//    QuestionHistoryEntity questionHistoryEntity = questionHistoryRepository.findByUserName(userName);
+//    Map<QuestionEntity, Boolean> questionEntityMap = questionHistoryEntity.getAnsweredQuestions();
+//
+//    for (Map.Entry<QuestionEntity, Boolean> entry : questionEntityMap.entrySet()) {
+//        QuestionEntity questionEntity = entry.getKey();
+//        Boolean isAnsweredCorrectly = entry.getValue();
+//
+//        String subject = questionEntity.getSubject();
+//        String topic = questionEntity.getTopic();
+//        String subTopic = questionEntity.getSubTopic();
+//
+//        if (!userLearningStatsMap.containsKey(subject)) {
+//            userLearningStatsMap.put(subject, new HashMap<>());
+//        }
+//        Map<String, Map<String, Map<String, Integer>>> topicMap = userLearningStatsMap.get(subject);
+//        if (!topicMap.containsKey(topic)) {
+//            topicMap.put(topic, new HashMap<>());
+//        }
+//        Map<String, Map<String, Integer>> subTopicMap = topicMap.get(topic);
+//        if (!subTopicMap.containsKey(subTopic)) {
+//            subTopicMap.put(subTopic, new HashMap<>());
+//        }
+//        Map<String, Integer> correctAnswerMap = subTopicMap.get(subTopic);
+//        String resultKey = isAnsweredCorrectly ? "correct" : "incorrect";
+//        correctAnswerMap.put(resultKey, correctAnswerMap.getOrDefault(resultKey, 0) + 1);
+//    }
+//    return userLearningStatsMap;
+//}
 
     public UserStatisticsEntity getUserStats(String userName) {
         return userStats.get(userName);

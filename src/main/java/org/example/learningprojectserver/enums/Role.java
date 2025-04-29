@@ -3,6 +3,6 @@ package org.example.learningprojectserver.enums;
 public enum Role {
     STUDENT,
     TEACHER,
-    ADMIN,
+    SCHOOLMANAGER,
     SYSTEM_ADMIN
 }

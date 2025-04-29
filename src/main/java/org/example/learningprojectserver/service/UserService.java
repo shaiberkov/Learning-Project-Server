@@ -1,10 +1,8 @@
 package org.example.learningprojectserver.service;
 
 import org.example.learningprojectserver.dto.UserDto;
-import org.example.learningprojectserver.entities.QuestionHistoryEntity;
-import org.example.learningprojectserver.entities.Session;
-import org.example.learningprojectserver.entities.UserEntity;
-import org.example.learningprojectserver.entities.UserProgressEntity;
+import org.example.learningprojectserver.entities.*;
+import org.example.learningprojectserver.enums.Role;
 import org.example.learningprojectserver.repository.SessionRepository;
 import org.example.learningprojectserver.repository.UserRepository;
 import org.example.learningprojectserver.response.BasicResponse;
@@ -29,14 +27,18 @@ public class UserService {
 
 @Autowired
     private UserRepository userRepository;
+
+@Autowired
+private JwtService jwtService;
+
     @Autowired
     private SessionRepository sessionRepository;
     private static final ConcurrentHashMap<String, String> otpStorage = new ConcurrentHashMap<>();
- public RegisterResponse createUser(String username, String password, String confirmPassword, String email, String phone) {
+ public RegisterResponse createUser(String username,String userId, String password, String confirmPassword, String email, String phone) {
 //todo להוסיף פונקציה שבודקת תקינות סיסמא
      RegisterResponse registerResponse=new RegisterResponse();
-     if (username == null || password == null || confirmPassword == null || email == null || phone == null) {
-         registerResponse.setMessage("All fields are required");
+     if (username == null || userId==null || password == null || confirmPassword == null || email == null || phone == null) {
+         registerResponse.setMessage("השדות לא מלאים");
          registerResponse.setSuccess(false);
          return registerResponse;
      }
@@ -47,55 +49,40 @@ public class UserService {
          return registerResponse;
      }
 
-     if (!isValid(username, phone, email, registerResponse)) {
+     if (!isValid(userId, phone, email, registerResponse)) {
          registerResponse.setSuccess(false);
          return registerResponse;
      }
 
      try {
-//
-//         String salt = generateSalt();
-//         String hashedPassword = hashPassword(password, salt);
-//         UserEntity newUser = new UserEntity();
-//         newUser.setUsername(username);
-//         newUser.setEmail(email);
-//         newUser.setPhoneNumber(phone);
-//         newUser.setSalt(salt);
-//         newUser.setPasswordHash(hashedPassword);
-//         String textToSendInMailToUser =generateMailText(username);
-//         sendEmail(email,"ברוך הבא ל-'מרכז תרגול אישי' – החשבון שלך נוצר בהצלחה!",textToSendInMailToUser);
-//
-//         userRepository.save(newUser);
+
 
          String salt = generateSalt();
          String hashedPassword = hashPassword(password, salt);
 
-         // יצירת הישות הראשית של המשתמש
-         UserEntity newUser = new UserEntity();
+         StudentEntity newUser = new StudentEntity();
+         newUser.setRole(Role.STUDENT);
+         newUser.setUserId(userId);
          newUser.setUsername(username);
          newUser.setEmail(email);
          newUser.setPhoneNumber(phone);
          newUser.setSalt(salt);
          newUser.setPasswordHash(hashedPassword);
 
-         // יצירת הישויות המשניות
          QuestionHistoryEntity questionHistoryEntity = new QuestionHistoryEntity();
          UserProgressEntity userProgressEntity = new UserProgressEntity();
 
-         // קישור הישויות למשתמש
-         questionHistoryEntity.setUser(newUser);
-         userProgressEntity.setUser(newUser);
+         questionHistoryEntity.setStudent(newUser);
+         userProgressEntity.setStudent(newUser);
 
-         // קישור המשתמש לישויות
-         newUser.setUserProgressEntitiy(userProgressEntity);
+         newUser.setStudentProgressEntity(userProgressEntity);
          newUser.setQuestionHistoryEntity(questionHistoryEntity);
 
-         // שליחת מייל ברכה למשתמש החדש
          String textToSendInMailToUser = generateMailText(username);
          sendEmail(email, "ברוך הבא ל-'מרכז תרגול אישי' – החשבון שלך נוצר בהצלחה!", textToSendInMailToUser);
 
-         // שמירת המשתמש במסד הנתונים
          userRepository.save(newUser);
+         System.out.println(newUser);
 
 
          registerResponse.setMessage("User successfully registered");
@@ -104,15 +91,21 @@ public class UserService {
      } catch (Exception e) {
          registerResponse.setMessage("Error occurred during registration");
          registerResponse.setSuccess(false);
+         e.printStackTrace();
          return registerResponse;
      }
  }
-    private boolean isValid(String userName, String phoneNumber, String email, RegisterResponse registerResponse) {
+    private boolean isValid(String userId, String phoneNumber, String email, RegisterResponse registerResponse) {
         boolean isValid = true;
-        if (userRepository.existsByUsername(userName)){
-           registerResponse.setUsernameTaken("Username Taken");
+         UserEntity user= userRepository.findUserByUserId(userId);
+        if (user!=null){
+           registerResponse.setIdTaken("תעודת זהות זו כבר קיימת במערכת");
             isValid = false;
         }
+//        if (!isValidIsraeliId(userId)){
+//            registerResponse.setIdTaken("תעודת זהות זו לא תקינה");
+//            isValid = false;
+//        }
         if (!isValidPhoneNumber(phoneNumber)){
             registerResponse.setPhoneTaken("Phone number in not valid");
 
@@ -136,17 +129,17 @@ public class UserService {
         return isValid;
     }
 
-    public BasicResponse loginUser(String username, String password) {//TODO סיסמא זהה אבל לא נותן לעשות לוגין
+    public BasicResponse loginUser(String userId, String password) {
         BasicResponse basicResponse = new BasicResponse();
 
-        if (username == null || password == null) {
+        if (userId == null || password == null) {
             basicResponse.setSuccess(false);
             basicResponse.setErrorCode("username or password is required");
             return basicResponse;
         }
 
         try {
-            UserEntity userEntity = userRepository.findByUsername(username);
+            UserEntity userEntity= userRepository.findUserByUserId(userId);
 
             if (userEntity == null) {
                 basicResponse.setSuccess(false);
@@ -170,7 +163,7 @@ public class UserService {
             return basicResponse;
         }
     }
-    public BasicResponse sendOtp(String username, String phoneNumber) {
+    public BasicResponse sendOtp(String userId, String phoneNumber) {
         BasicResponse basicResponse = new BasicResponse();
 
         if (phoneNumber == null) {
@@ -180,7 +173,7 @@ public class UserService {
         }
 
         try {
-            UserEntity userEntity = userRepository.findByUsername(username);
+            UserEntity userEntity= userRepository.findUserByUserId(userId);
             if (userEntity == null) {
                 basicResponse.setSuccess(false);
                 basicResponse.setErrorCode("User not found");
@@ -189,6 +182,7 @@ public class UserService {
             String otp = generatorCode();
             List<String> toSend = new ArrayList<>();
             toSend.add(phoneNumber);
+            System.out.println(phoneNumber);
             userEntity.setOtp(otp);
             userEntity.setOtpTimestamp(System.currentTimeMillis());
             userRepository.save(userEntity);
@@ -209,15 +203,16 @@ public class UserService {
 
 
 
-        public LoginResponse verifyOtp(String username, String otp) {
+        public LoginResponse verifyOtp(String userId, String otp) {
             LoginResponse loginResponse = new LoginResponse();
-            if (username == null || otp == null) {
+            if (userId == null || otp == null) {
                 loginResponse.setSuccess(false);
                 loginResponse.setErrorCode("username or otp is required");
                 return loginResponse;
             }
             try {
-                UserEntity userEntity = userRepository.findByUsername(username);
+                UserEntity userEntity= userRepository.findUserByUserId(userId);
+
 
                 if (userEntity == null) {
                     loginResponse.setSuccess(false);
@@ -239,17 +234,18 @@ public class UserService {
                     loginResponse.setErrorCode("2 minutes passed");
                     return loginResponse;
                 }
-                String token = JwtUtils.generateToken(username);
+                String token = jwtService.generateToken(userId,String.valueOf(userEntity.getRole()));
                 loginResponse.setSuccess(true);
                 loginResponse.setErrorCode("code is correct");
                 loginResponse.setToken(token);
                 userEntity.setOtp(null);
                 userEntity.setOtpTimestamp(null);
                 Session session = new Session();
-                session.setUser(userEntity);  // קישור המשתמש ל-Session
-                session.setLastActivity(new Date());  // עדכון זמן הפעולה האחרונה
+                session.setUser(userEntity);
+                session.setLastActivity(new Date());
 
-                // שמירת ה-session במסד הנתונים
+                userEntity.getSessionList().add(session);
+
                 sessionRepository.save(session);
                 userRepository.save(userEntity);
                 return loginResponse;
@@ -261,34 +257,39 @@ public class UserService {
                 return loginResponse;
             }
         }
-    public ResetPasswordResponse sendPasswordResetOtp(String username) {
+    public ResetPasswordResponse sendPasswordResetOtp(String userId) {
         ResetPasswordResponse resetPasswordResponse= new ResetPasswordResponse();
-        UserEntity user = userRepository.findByUsername(username);
+        UserEntity user = userRepository.findUserByUserId(userId);
         if (user == null) {
             resetPasswordResponse.setSuccess(false);
-            resetPasswordResponse.setUserNameError("User not found");
+            resetPasswordResponse.setUserIdError("משתמש לא נמצא");
             return resetPasswordResponse;
         }
 
         String otp = generatorCode();
-        otpStorage.put(username, otp);
+        otpStorage.put(userId, otp);
+        System.out.println(userId+      "111111"+otpStorage.get(userId));
+
         sendSms( otp,  List.of(user.getPhoneNumber()) );
             resetPasswordResponse.setSuccess(true);
         return resetPasswordResponse;
     }
 
-    public ResetPasswordResponse resetPassword(String username, String otp, String newPassword) {
+    public ResetPasswordResponse resetPassword(String userId, String otp, String newPassword) {
        ResetPasswordResponse resetPasswordResponse= new ResetPasswordResponse();
         String subject = "הסיסמה שלך שונתה בהצלחה";
         String message = "שלום,\n\nסיסמתך שונתה בהצלחה. אם לא ביצעת שינוי זה, אנא צור קשר עם התמיכה שלנו באופן מיידי.\n\nבברכה,\nצוות התמיכה";
-        if(!otpStorage.containsKey(username)){
+        System.out.println(userId+      "22222"+otpStorage.get(userId));
+
+        if(!otpStorage.containsKey(userId)){
+            System.out.println(userId+      "33333"+otpStorage.get(userId));
 
              resetPasswordResponse.setSuccess(false);
-            resetPasswordResponse.setUserNameError("שם משתמש לא תקין");
+            resetPasswordResponse.setUserIdError("תז לא תקין");
             return resetPasswordResponse;
 
         }
-        if (!otpStorage.get(username).equals(otp)) {
+        if (!otpStorage.get(userId).equals(otp)) {
             resetPasswordResponse.setSuccess(false);
             resetPasswordResponse.setOtpError("קוד האימות שגוי או שפג תוקפו.");
             return resetPasswordResponse;
@@ -300,26 +301,26 @@ public class UserService {
             return resetPasswordResponse;
         }
 
-        UserEntity user = userRepository.findByUsername(username);
+        UserEntity user = userRepository.findUserByUserId(userId);
         if (user == null) {
             resetPasswordResponse.setSuccess(false);
-            resetPasswordResponse.setUserNameError("שם משתמש לא נמצא.");
+            resetPasswordResponse.setUserIdError("תז לא נמצא.");
             return resetPasswordResponse;
         }
         String userSalt = user.getSalt();
         String hashPassword=hashPassword(newPassword,userSalt);
         user.setPasswordHash(hashPassword);
         userRepository.save(user);
-        otpStorage.remove(username);
+        otpStorage.remove(userId);
         sendEmail(user.getEmail(), subject, message);
         resetPasswordResponse.setSuccess(true);
         return resetPasswordResponse;
     }
 
 
-    public UserDto getUserPhoneNumber(String username) {
+    public UserDto getUserPhoneNumber(String userId) {
         UserDto userDto=new UserDto();
-        String userPhoneNumber= userRepository.findPhoneNumberByUsername(username);
+        String userPhoneNumber= userRepository.findPhoneNumberByUsername(userId);
         userDto.setPhoneNumber(userPhoneNumber);
         return userDto;
     }
