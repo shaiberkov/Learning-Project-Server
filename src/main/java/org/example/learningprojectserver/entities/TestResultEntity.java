@@ -13,8 +13,8 @@ public class TestResultEntity {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
-    private UserEntity user;
+    @JoinColumn(name = "student_id") // קשר Many-to-One (רבים ליחיד)
+    private StudentEntity student;
 
     @ManyToOne
     @JoinColumn(name = "test_id")
@@ -28,13 +28,13 @@ public class TestResultEntity {
     private List<QuestionEntity> incorrectQuestions;
 
 
-    public UserEntity getUser() {
-        return user;
-    }
-
-    public void setUser(UserEntity user) {
-        this.user = user;
-    }
+//    public UserEntity getUser() {
+//        return user;
+//    }
+//
+//    public void setUser(UserEntity user) {
+//        this.user = user;
+//    }
 
     public TestEntity getTest() {
         return test;

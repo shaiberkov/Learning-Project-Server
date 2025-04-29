@@ -3,16 +3,16 @@ package org.example.learningprojectserver.response;
 public class RegisterResponse extends BasicResponse{
 
     private String message;
-    private String usernameTaken;
+    private String idTaken;
     private String phoneTaken;
     private String emailTaken;
     private String passwordDontMatch;
 
 
-    public RegisterResponse(boolean success, String errorCode, String message, String usernameTaken, String phoneTaken, String emailTaken, String passwordDontMatch) {
+    public RegisterResponse(boolean success, String errorCode, String message,String idTaken, String phoneTaken, String emailTaken, String passwordDontMatch) {
         super(success, errorCode);
         this.message = message;
-        this.usernameTaken = usernameTaken;
+        this.idTaken = idTaken;
         this.phoneTaken = phoneTaken;
         this.emailTaken = emailTaken;
         this.passwordDontMatch = passwordDontMatch;
@@ -29,12 +29,20 @@ public class RegisterResponse extends BasicResponse{
     public RegisterResponse() {
     }
 
-    public String getMassage() {
+    public String getMessage() {
         return message;
     }
 
-    public String getUsernameTaken() {
-        return usernameTaken;
+    public String getIdTaken() {
+        return idTaken;
+    }
+
+    public void setIdTaken(String idTaken) {
+        this.idTaken = idTaken;
+    }
+
+    public String getMassage() {
+        return message;
     }
 
     public String getEmailTaken() {
@@ -47,10 +55,6 @@ public class RegisterResponse extends BasicResponse{
 
     public void setMessage(String message) {
         this.message = message;
-    }
-
-    public void setUsernameTaken(String usernameTaken) {
-        this.usernameTaken = usernameTaken;
     }
 
     public void setPhoneTaken(String phoneTaken) {

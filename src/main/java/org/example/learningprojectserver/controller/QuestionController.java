@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController("Learning-App/")
+@RestController("/Learning-App/Question")
 public class QuestionController {
 
     private final QuestionService questionService;
@@ -20,27 +20,27 @@ public class QuestionController {
         this.questionService = questionService;
     }
 
-    @GetMapping("/generate-question")
-    public QuestionDTO generateQuestion(
-            @RequestParam String userName,
-            @RequestParam String subject,
-            @RequestParam String topic,
-            @RequestParam String subTopic
-            ) {
-        return questionService.generateQuestion(userName,subject, topic, subTopic);
-    }
-
-    @PostMapping("/submit-answer")
-    public SubmitAnswerResponse submitAnswer(
-            @RequestParam String userName,
-            @RequestParam Long id,
-            @RequestParam String subject,
-            @RequestParam String topic,
-            @RequestParam String subTopic,
-            @RequestParam String questionText,
-            @RequestParam String answer
-    ) {
-        return questionService.submitAnswer(userName, id,subject, topic, subTopic, questionText, answer);
-    }
+//    @GetMapping("/generate-question")
+//    public QuestionDTO generateQuestion(
+//            @RequestParam String userName,
+//            @RequestParam String subject,
+//            @RequestParam String topic,
+//            @RequestParam String subTopic
+//            ) {
+//        return questionService.generateQuestion(userName,subject, topic, subTopic);
+//    }
+//
+//    @PostMapping("/submit-answer")
+//    public SubmitAnswerResponse submitAnswer(
+//            @RequestParam String userName,
+//            @RequestParam Long id,
+//            @RequestParam String subject,
+//            @RequestParam String topic,
+//            @RequestParam String subTopic,
+//            @RequestParam String questionText,
+//            @RequestParam String answer
+//    ) {
+//        return questionService.submitAnswer(userName, id,subject, topic, subTopic, questionText, answer);
+//    }
 
 }

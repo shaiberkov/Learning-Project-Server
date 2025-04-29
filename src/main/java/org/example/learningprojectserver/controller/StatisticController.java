@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController("Learning-App/Statistic")
+@RestController("/Learning-App/User-Statistic")
 public class StatisticController {
   private final StatisticsService statisticsService;
  @Autowired

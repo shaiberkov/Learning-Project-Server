@@ -2,7 +2,7 @@ package org.example.learningprojectserver.response;
 
 public class ResetPasswordResponse extends BasicResponse{
 
-    private String userNameError;
+    private String userIdError;
     private String passwordError;
     private String otpError;
 
@@ -10,8 +10,8 @@ public class ResetPasswordResponse extends BasicResponse{
 
     }
 
-    public void setUserNameError(String userNameError) {
-        this.userNameError = userNameError;
+    public void setUserIdError(String userIdError) {
+        this.userIdError = userIdError;
     }
 
     public void setPasswordError(String passwordError) {
@@ -22,8 +22,8 @@ public class ResetPasswordResponse extends BasicResponse{
         this.otpError = otpError;
     }
 
-    public String getUserNameError() {
-        return userNameError;
+    public String getUserIdError() {
+        return userIdError;
     }
 
     public String getPasswordError() {

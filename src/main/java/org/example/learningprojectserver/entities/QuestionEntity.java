@@ -16,7 +16,7 @@ public class QuestionEntity {
     private String answer;
 
     @ManyToOne
-    @JoinColumn(name = "user_progress_id")
+    @JoinColumn(name = "student_progress_id")
     private UserProgressEntity userProgressEntity;
 
     @ManyToOne

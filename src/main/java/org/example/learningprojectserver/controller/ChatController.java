@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/chat")
+@RequestMapping("/Learning-App/Chat")
 public class ChatController {
 
     @PostMapping("/send-message")

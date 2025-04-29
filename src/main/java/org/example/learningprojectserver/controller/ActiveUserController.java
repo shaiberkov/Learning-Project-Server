@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/Learning-App/Active-User")
 public class ActiveUserController {
 
     private final ActiveUserService activeUserService;

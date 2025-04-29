@@ -10,7 +10,7 @@ import java.util.Map;
 
 public interface QuestionHistoryRepository extends JpaRepository<QuestionHistoryEntity, Long> {
 
-    @Query("SELECT qh FROM QuestionHistoryEntity qh JOIN qh.user u WHERE u.username = :userName")
-    QuestionHistoryEntity findByUserName(@Param("userName") String userName);
+//    @Query("SELECT qh FROM QuestionHistoryEntity qh JOIN qh.user u WHERE u.username = :userName")
+//    QuestionHistoryEntity findByUserName(@Param("userName") String userName);
 
 }
