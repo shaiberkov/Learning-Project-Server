@@ -9,6 +9,13 @@ public class ClassRoomEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
+    private String name;
+
+    @ManyToOne
+    @JoinColumn(name = "grade_id")
+    private SchoolGradeEntity grade;
+
     @ManyToMany(mappedBy = "teachingClassRooms")
     private List<TeacherEntity> teachers;
 
@@ -21,6 +28,22 @@ public class ClassRoomEntity {
 
     public ClassRoomEntity() {
 
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public SchoolGradeEntity getGrade() {
+        return grade;
+    }
+
+    public void setGrade(SchoolGradeEntity grade) {
+        this.grade = grade;
     }
 
     public Long getId() {

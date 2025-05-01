@@ -92,6 +92,14 @@ public class TestResultEntity {
         this.id = id;
     }
 
+    public StudentEntity getStudent() {
+        return student;
+    }
+
+    public void setStudent(StudentEntity student) {
+        this.student = student;
+    }
+
     public Long getId() {
         return id;
     }

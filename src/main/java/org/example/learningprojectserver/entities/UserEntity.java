@@ -40,9 +40,33 @@ public abstract class UserEntity {
     @OneToMany(mappedBy = "user",fetch = FetchType.EAGER ,cascade = CascadeType.ALL)
     private List<Session> sessionList=new ArrayList<>();
 
+    @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MessageEntity> sentMessages = new ArrayList<>();
+
+    @OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MessageEntity> receivedMessages = new ArrayList<>();
+
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
+
+
+    public List<MessageEntity> getSentMessages() {
+        return sentMessages;
+    }
+
+    public void setSentMessages(List<MessageEntity> sentMessages) {
+        this.sentMessages = sentMessages;
+    }
+
+    public List<MessageEntity> getReceivedMessages() {
+        return receivedMessages;
+    }
+
+    public void setReceivedMessages(List<MessageEntity> receivedMessages) {
+        this.receivedMessages = receivedMessages;
+    }
 
     public String getUserId() {
         return userId;

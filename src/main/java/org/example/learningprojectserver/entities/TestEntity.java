@@ -52,6 +52,22 @@ public class TestEntity {
         return subject;
     }
 
+    public StudentEntity getStudent() {
+        return student;
+    }
+
+    public TeacherEntity getTeacher() {
+        return teacher;
+    }
+
+    public void setTeacher(TeacherEntity teacher) {
+        this.teacher = teacher;
+    }
+
+    public void setStudent(StudentEntity student) {
+        this.student = student;
+    }
+
     public void setSubject(String subject) {
         this.subject = subject;
     }

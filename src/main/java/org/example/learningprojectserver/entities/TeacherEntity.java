@@ -3,6 +3,7 @@ package org.example.learningprojectserver.entities;
 import jakarta.persistence.*;
 
 import java.util.List;
+
 @Entity
 public class TeacherEntity extends UserEntity {
     @ManyToOne
@@ -29,8 +30,6 @@ public class TeacherEntity extends UserEntity {
     @CollectionTable(name = "teacher_subject", joinColumns = @JoinColumn(name = "teacher_id"))
     @Column(name = "subject_name")
     private List<String> teachingSubjects;
-
-
 
 
     @OneToMany(mappedBy = "teacher")
@@ -76,5 +75,6 @@ public class TeacherEntity extends UserEntity {
         this.tests = tests;
     }
 
-    public TeacherEntity() {}
+    public TeacherEntity() {
+    }
 }

@@ -29,7 +29,6 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/Learning-App/User/**").permitAll()
-                        //ליזכור לשנות הרשאה לאדמין
                         .requestMatchers("/Learning-App/System-Admin/**").permitAll()//hasRole("SYSTEM_ADMIN")
                         .requestMatchers("/Learning-App/School-Manager/**").permitAll()    //hasAnyRole("SCHOOLMANAGER", "SYSTEM_ADMIN")
                         .requestMatchers("/Learning-App/Teacher/**").permitAll()    //hasAnyRole("TEACHER", "SCHOOLMANAGER", "SYSTEM_ADMIN")//todo  לבודד את ההרשאות
@@ -39,7 +38,8 @@ public class SecurityConfig {
                         .requestMatchers("/Learning-App/Question/**").hasAnyRole("TEACHER", "SCHOOLMANAGER","STUDENT")
                         .requestMatchers("/Learning-App/User-Statistic/**").hasAnyRole("TEACHER", "SCHOOLMANAGER","STUDENT")
                         .requestMatchers("/Learning-App/Self-Practice-Test/**").hasAnyRole("STUDENT")
-
+                        .requestMatchers("/Learning-App/Message/**").permitAll()//hasAnyRole("TEACHER", "SCHOOLMANAGER", "SYSTEM_ADMIN")
+                        .requestMatchers("/Learning-App/notifications/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(new JwtAuthenticationFilter(jwtService), UsernamePasswordAuthenticationFilter.class);

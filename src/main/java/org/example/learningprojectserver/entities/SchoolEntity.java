@@ -24,6 +24,10 @@ public class SchoolEntity {
     @OneToMany(mappedBy = "school")
     private List<ClassRoomEntity> classRooms;
 
+    @OneToMany(mappedBy = "school", cascade = CascadeType.ALL)
+    private List<SchoolGradeEntity> schoolGrades;
+
+
     @OneToOne(mappedBy = "school")
     private SchoolManagerEntity schoolManager;
 
@@ -36,6 +40,14 @@ public class SchoolEntity {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public List<SchoolGradeEntity> getSchoolGrades() {
+        return schoolGrades;
+    }
+
+    public void setSchoolGrades(List<SchoolGradeEntity> schoolGrades) {
+        this.schoolGrades = schoolGrades;
     }
 
     public String getSchoolCode() {

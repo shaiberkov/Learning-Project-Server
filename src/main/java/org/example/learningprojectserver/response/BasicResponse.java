@@ -1,13 +1,24 @@
 package org.example.learningprojectserver.response;
 
 
-public class BasicResponse {
+public class BasicResponse<T>{
     private boolean success;
     private String errorCode;
-
+    private T data;
     public BasicResponse(boolean success, String errorCode) {
         this.success = success;
         this.errorCode = errorCode;
+
+
+
+    }
+
+    public T getData() {
+        return data;
+    }
+
+    public void setData(T data) {
+        this.data = data;
     }
 
     public BasicResponse() {

@@ -5,6 +5,8 @@ import org.example.learningprojectserver.entities.SchoolEntity;
 import org.example.learningprojectserver.entities.SchoolManagerEntity;
 import org.example.learningprojectserver.entities.UserEntity;
 import org.example.learningprojectserver.enums.Role;
+import org.example.learningprojectserver.mappers.EntityMapper;
+import org.example.learningprojectserver.mappers.UserMapperFactory;
 import org.example.learningprojectserver.repository.SchoolManagerRepository;
 import org.example.learningprojectserver.repository.SchoolRepository;
 import org.example.learningprojectserver.repository.UserRepository;
@@ -20,10 +22,13 @@ public class SystemAdminService {
 private final UserRepository userRepository;
 
 private final SchoolRepository schoolRepository;
+
+private final UserMapperFactory userMapperFactory;
 @Autowired
-    public SystemAdminService(UserRepository userRepository, SchoolRepository schoolRepository) {
+    public SystemAdminService(UserRepository userRepository, SchoolRepository schoolRepository, UserMapperFactory userMapperFactory) {
         this.userRepository = userRepository;
     this.schoolRepository = schoolRepository;
+    this.userMapperFactory = userMapperFactory;
 }
 
 //    @PostConstruct()
@@ -43,22 +48,8 @@ private final SchoolRepository schoolRepository;
         if(user.getRole()!=Role.STUDENT){
             return new BasicResponse(false, "המשתמש " + user.getUsername() + " משובץ כ־" + user.getRole());
         }
-        SchoolManagerEntity schoolManager = new SchoolManagerEntity();
-
-
-        schoolManager.setUsername(user.getUsername());
-        schoolManager.setUserId(user.getUserId());
-        schoolManager.setPassword(user.getPassword());
-        schoolManager.setPasswordConfirm(user.getPasswordConfirm());
-        schoolManager.setPasswordHash(user.getPasswordHash());
-        schoolManager.setSalt(user.getSalt());
-        schoolManager.setPhoneNumber(user.getPhoneNumber());
-        schoolManager.setEmail(user.getEmail());
-        schoolManager.setOtp(user.getOtp());
-        schoolManager.setOtpTimestamp(user.getOtpTimestamp());
-        schoolManager.setProfilePicture(user.getProfilePicture());
-        schoolManager.setRole(Role.SCHOOLMANAGER);
-        schoolManager.setSessionList(new ArrayList<>());
+        EntityMapper<SchoolManagerEntity> mapper = (EntityMapper<SchoolManagerEntity>) userMapperFactory.getMapper(Role.SCHOOLMANAGER);
+        SchoolManagerEntity schoolManager = mapper.map(user);
 
         userRepository.delete(user);
         userRepository.save(schoolManager);
@@ -99,6 +90,9 @@ private final SchoolRepository schoolRepository;
 
         if (school == null) {
             return new BasicResponse(false, "בית הספר לא נמצא");
+        }
+        if(school.getSchoolManager()!=null){
+            return new BasicResponse(false, "כבר יש מנהל לבית ספר " + school.getSchoolName());
         }
 
         SchoolManagerEntity schoolManager = (SchoolManagerEntity) user;
