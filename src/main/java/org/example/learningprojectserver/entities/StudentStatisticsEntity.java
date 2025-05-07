@@ -1,10 +1,8 @@
 package org.example.learningprojectserver.entities;
 
-import jakarta.persistence.*;
-
 import java.util.Map;
 
-public class UserStatisticsEntity {
+public class StudentStatisticsEntity {
 
     private int loginStreak;
     private Map<String, Map<String, Map<String, Map<String, Integer>>>> userLearningStatistics;
@@ -18,7 +16,7 @@ public class UserStatisticsEntity {
         this.userLearningStatistics = userLearningStatistics;
     }
 
-    public UserStatisticsEntity() {}
+    public StudentStatisticsEntity() {}
 
 
 

@@ -16,12 +16,12 @@ public class ActiveUserController {
     }
 
     @PostMapping("/connect-user")
-    public void userConnected(@RequestParam String userName) {
-        activeUserService.connectUser(userName);
+    public void userConnected(@RequestParam String userId) {
+        activeUserService.connectUser(userId);
     }
 
     @PostMapping("/disconnect-user")
-    public void userDisconnected(@RequestParam String userName) {
-        activeUserService.disconnectUser(userName);
+    public void userDisconnected(@RequestParam String userId) {
+        activeUserService.disconnectUser(userId);
 }
 }

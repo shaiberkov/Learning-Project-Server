@@ -1,6 +1,8 @@
 package org.example.learningprojectserver.mappers;
 
 
+import org.example.learningprojectserver.dto.MessageDTO;
+import org.example.learningprojectserver.entities.MessageEntity;
 import org.example.learningprojectserver.entities.SchoolEntity;
 import org.example.learningprojectserver.entities.TeacherEntity;
 import org.example.learningprojectserver.entities.UserEntity;
@@ -10,18 +12,11 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 
 @Component
-public class UserToTeacherMapper implements EntityMapper<TeacherEntity> {
+public class UserToTeacherMapper implements Mapper<UserEntity, TeacherEntity> {
 
-    private SchoolEntity school;
-
-    @Override
-    public EntityMapper<TeacherEntity> setSchool(SchoolEntity school) {
-        this.school = school;
-        return this;
-    }
 
     @Override
-    public TeacherEntity map(UserEntity user) {
+    public TeacherEntity apply(UserEntity user) {
         TeacherEntity teacher = new TeacherEntity();
 
         teacher.setUserId(user.getUserId());
@@ -36,12 +31,6 @@ public class UserToTeacherMapper implements EntityMapper<TeacherEntity> {
         teacher.setOtpTimestamp(user.getOtpTimestamp());
         teacher.setProfilePicture(user.getProfilePicture());
         teacher.setRole(Role.TEACHER);
-        teacher.setSessionList(new ArrayList<>());
-        teacher.setStudents(new ArrayList<>());
-        teacher.setTeachingClassRooms(new ArrayList<>());
-        teacher.setTeachingSubjects(new ArrayList<>());
-        teacher.setTeachingSchool(school);
-
         return teacher;
     }
 }

@@ -13,17 +13,6 @@ public class TestResultResponse {
 
     }
 
-    @Override
-    public String toString() {
-        return "TestResultResponse{" +
-                "score=" + score +
-                ", correctAnswers=" + correctAnswers +
-                ", incorrectAnswers=" + incorrectAnswers +
-                ", correctAnswerList=" + correctAnswerList +
-                ", incorrectAnswerList=" + incorrectAnswerList +
-                '}';
-    }
-
     public int getScore() {
         return score;
     }
@@ -62,5 +51,16 @@ public class TestResultResponse {
 
     public void setIncorrectAnswerList(List<String> incorrectAnswerList) {
         this.incorrectAnswerList = incorrectAnswerList;
+    }
+
+    @Override
+    public String toString() {
+        return "TestResultResponse{" +
+                "score=" + score +
+                ", correctAnswers=" + correctAnswers +
+                ", incorrectAnswers=" + incorrectAnswers +
+                ", correctAnswerList=" + correctAnswerList +
+                ", incorrectAnswerList=" + incorrectAnswerList +
+                '}';
     }
 }

@@ -1,7 +1,7 @@
 package org.example.learningprojectserver.dto;
 
 public class UserDto {
-    private String username;
+    private String userId;
     private String phoneNumber;
     private String email;
 
@@ -10,11 +10,11 @@ public class UserDto {
     }
 
     public String getUsername() {
-        return username;
+        return userId;
     }
 
     public void setUsername(String username) {
-        this.username = username;
+        this.userId = username;
     }
 
     public String getPhoneNumber() {

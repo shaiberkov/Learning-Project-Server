@@ -9,16 +9,16 @@ import java.util.concurrent.ConcurrentMap;
 public class ActiveUserService {
     private final ConcurrentMap<String, Boolean> activeUsers = new ConcurrentHashMap<>();
 
-    public void connectUser(String userName) {
-        activeUsers.put(userName, true);
+    public void connectUser(String userId) {
+        activeUsers.put(userId, true);
     }
 
-    public void disconnectUser(String userName) {
-        activeUsers.remove(userName);
+    public void disconnectUser(String userId) {
+        activeUsers.remove(userId);
     }
 
-    public boolean isUserActive(String userName) {
-        return activeUsers.containsKey(userName);
+    public boolean isUserActive(String userId) {
+        return activeUsers.containsKey(userId);
     }
 
     public ConcurrentMap<String, Boolean> getActiveUsers() {

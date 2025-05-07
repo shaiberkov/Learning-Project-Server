@@ -134,7 +134,7 @@ public class InactiveUsersJob {
             List<String> emails = loginActivityList.stream().map(UserEntity::getEmail).toList();
             for (String email : emails){
 
-                sendEmail(email,TITLE ,CONTENT);
+//                sendEmail(email,TITLE ,CONTENT);
             }
         }
     }

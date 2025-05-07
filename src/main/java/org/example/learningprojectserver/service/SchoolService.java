@@ -14,9 +14,9 @@ import java.util.List;
 public class SchoolService {
     private final SchoolRepository schoolRepository;
     @Autowired
-    public SchoolService(SchoolRepository schoolRepository, SchoolRepository schoolRepository1) {
+    public SchoolService(SchoolRepository schoolRepository) {
 
-        this.schoolRepository = schoolRepository1;
+        this.schoolRepository = schoolRepository;
     }
     public BasicResponse getGradesBySchoolCode(String schoolCode) {
         // בדיקה אם הקוד ריק או null

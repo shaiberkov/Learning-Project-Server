@@ -24,7 +24,7 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
     UserEntity findByUserName(@Param("userName") String userName);
 
     @Query("SELECT u.phoneNumber FROM UserEntity u WHERE u.userId=:userId")
-    String findPhoneNumberByUsername(@Param("userId") String userId);
+    String findPhoneNumberByUserId(@Param("userId") String userId);
 
     boolean existsByUsername(String username);
 

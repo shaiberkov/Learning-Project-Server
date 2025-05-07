@@ -13,6 +13,15 @@ public class BasicResponse<T>{
 
     }
 
+    @Override
+    public String toString() {
+        return "BasicResponse{" +
+                "success=" + success +
+                ", errorCode='" + errorCode + '\'' +
+                ", data=" + data +
+                '}';
+    }
+
     public T getData() {
         return data;
     }
@@ -40,11 +49,4 @@ public class BasicResponse<T>{
         this.errorCode = errorCode;
     }
 
-    @Override
-    public String toString() {
-        return "BasicResponse{" +
-                "success=" + success +
-                ", errorCode='" + errorCode + '\'' +
-                '}';
-    }
 }

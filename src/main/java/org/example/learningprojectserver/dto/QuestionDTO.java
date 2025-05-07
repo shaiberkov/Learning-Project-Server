@@ -15,6 +15,7 @@ public class QuestionDTO {
         this.subTopic = subTopic;
         this.questionText = questionText;
     }
+    public QuestionDTO() {}
 
     // Getters and Setters
     public String getSubject() {

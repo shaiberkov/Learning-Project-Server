@@ -2,6 +2,7 @@ package org.example.learningprojectserver.entities;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -16,7 +17,7 @@ public class TeacherEntity extends UserEntity {
             joinColumns = @JoinColumn(name = "teacher_id"),
             inverseJoinColumns = @JoinColumn(name = "classroom_id")
     )
-    private List<ClassRoomEntity> teachingClassRooms;
+    private List<ClassRoomEntity> teachingClassRooms = new ArrayList<>();
 
 
     @ManyToMany
@@ -24,16 +25,30 @@ public class TeacherEntity extends UserEntity {
             name = "teacher_student",
             joinColumns = @JoinColumn(name = "teacher_id"),
             inverseJoinColumns = @JoinColumn(name = "student_id"))
-    private List<StudentEntity> students;
+    private List<StudentEntity> students = new ArrayList<>();
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "teacher_subject", joinColumns = @JoinColumn(name = "teacher_id"))
     @Column(name = "subject_name")
-    private List<String> teachingSubjects;
+    private List<String> teachingSubjects=new ArrayList<>();
 
 
     @OneToMany(mappedBy = "teacher")
-    private List<TestEntity> tests;
+    private List<TeacherTestEntity> tests = new ArrayList<>();
+
+    @OneToMany(mappedBy = "teacher", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.EAGER)
+    private List<LessonEntity> lessons = new ArrayList<>();
+
+    @OneToMany(mappedBy = "teacher")
+    private List<TeacherTestResultEntity> testResults=new ArrayList<>();
+
+    public List<TeacherTestResultEntity> getTestResults() {
+        return testResults;
+    }
+
+    public void setTestResults(List<TeacherTestResultEntity> testResults) {
+        this.testResults = testResults;
+    }
 
     public SchoolEntity getTeachingSchool() {
         return teachingSchool;
@@ -67,14 +82,23 @@ public class TeacherEntity extends UserEntity {
         this.teachingSubjects = teachingSubjects;
     }
 
-    public List<TestEntity> getTests() {
+    public List<TeacherTestEntity> getTests() {
         return tests;
     }
 
-    public void setTests(List<TestEntity> tests) {
+    public void setTests(List<TeacherTestEntity> tests) {
         this.tests = tests;
+    }
+
+    public List<LessonEntity> getLessons() {
+        return lessons;
+    }
+
+    public void setLessons(List<LessonEntity> lessons) {
+        this.lessons = lessons;
     }
 
     public TeacherEntity() {
     }
+
 }

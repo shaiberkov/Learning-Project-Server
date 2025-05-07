@@ -3,48 +3,27 @@ package org.example.learningprojectserver.entities;
 import jakarta.persistence.*;
 
 
+
+
+
+
 @Entity
+@Inheritance(strategy = InheritanceType.JOINED)
+@DiscriminatorColumn(name = "question_type")
 public class QuestionEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String subject;   // מקצוע (למשל, מתמטיקה)
-    private String topic;     // נושא (למשל, שברים)
-    private String subTopic;  // תת-נושא (למשל, חיבור שברים)
+    private String subject;
+    private String topic;
+    private String subTopic;
     private String questionText;
     private String answer;
 
-    @ManyToOne
-    @JoinColumn(name = "student_progress_id")
-    private UserProgressEntity userProgressEntity;
+    // Getters and Setters (כמו שיש כבר)
 
-    @ManyToOne
-    @JoinColumn(name = "question_history_id")
-    private QuestionHistoryEntity questionHistory;
-
-    @ManyToOne
-    @JoinColumn(name = "test_id", nullable = true)
-    private TestEntity test;
-
-    public QuestionHistoryEntity getQuestionHistory() {
-        return questionHistory;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public TestEntity getTest() {
-        return test;
-    }
-
-    public void setTest(TestEntity test) {
-        this.test = test;
-    }
-
-    public void setQuestionHistory(QuestionHistoryEntity questionHistory) {
-        this.questionHistory = questionHistory;
+    public QuestionEntity() {
     }
 
     public QuestionEntity(String subject, String topic, String subTopic, String questionText, String answer) {
@@ -55,11 +34,14 @@ public class QuestionEntity {
         this.answer = answer;
     }
 
-    public QuestionEntity() {
-
+    public Long getId() {
+        return id;
     }
 
-    // Getters and Setters
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     public String getSubject() {
         return subject;
     }
@@ -99,38 +81,5 @@ public class QuestionEntity {
     public void setAnswer(String answer) {
         this.answer = answer;
     }
-
-    public UserProgressEntity getUserProgressEntitiy() {
-        return userProgressEntity;
-    }
-
-    public void setUserProgressEntitiy(UserProgressEntity userProgressEntity) {
-        this.userProgressEntity = userProgressEntity;
-    }
-
-    public UserProgressEntity getUserProgressEntity() {
-        return userProgressEntity;
-    }
-
-    public void setUserProgressEntity(UserProgressEntity userProgressEntity) {
-        this.userProgressEntity = userProgressEntity;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    //@Override
-//    public String toString() {
-//        return "QuestionEntity{" +
-//                "id=" + id +
-//                ", subject='" + subject + '\'' +
-//                ", topic='" + topic + '\'' +
-//                ", subTopic='" + subTopic + '\'' +
-//                ", questionText='" + questionText + '\'' +
-//                ", answer='" + answer + '\'' +
-//                ", userProgressEntity=" + userProgressEntity +
-//                ", questionHistory=" + questionHistory +
-//                '}';
-//    }
 }
+

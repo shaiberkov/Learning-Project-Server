@@ -2,21 +2,10 @@ package org.example.learningprojectserver.entities;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
 import java.util.List;
 @Entity
 public class StudentEntity extends UserEntity {
-
-//    private Long id;
-//
-//    private ClassRoomEntity classRoom;
-//
-//    private String classGrade;
-//
-//    private SchoolManagerEntity schoolManager;
-//
-//    private SchoolEntity schoolName;
-//
-//    private List<TeacherEntity> teachers;
 
     @ManyToOne
     @JoinColumn(name = "class_room_id") // עמודה שתצביע על הכיתה
@@ -27,25 +16,44 @@ public class StudentEntity extends UserEntity {
     private SchoolEntity schoolName;
 
     @ManyToMany(mappedBy = "students")  // מיפוי עם TeacherEntity
-    private List<TeacherEntity> teachers;
+    private List<TeacherEntity> teachers=new ArrayList<>();
 
 
 
     @OneToOne(mappedBy = "student", cascade = CascadeType.ALL)
-    private UserProgressEntity studentProgressEntity;
+    private StudentProgressEntity studentProgressEntity;
 
     @OneToOne(mappedBy = "student", cascade = CascadeType.ALL)
-    private QuestionHistoryEntity questionHistoryEntity;
+    private StudentQuestionHistoryEntity studentQuestionHistoryEntity;
+
+    @OneToMany(mappedBy = "student", cascade = CascadeType.ALL,fetch = FetchType.EAGER)
+    private List<PracticeTestResultEntity> practiceTestsResult=new ArrayList<>();
 
     @OneToMany(mappedBy = "student", cascade = CascadeType.ALL)
-    private List<TestResultEntity> studentTestsResult;
-    @OneToMany(mappedBy = "student",fetch = FetchType.EAGER ,cascade = CascadeType.ALL)
-    private List<TestEntity> studentTests;
+    private List<TeacherTestResultEntity> teacherTestsResult=new ArrayList<>();
+
+    @OneToMany(mappedBy = "student", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private List<PracticeTestEntity> practiceTests=new ArrayList<>();
+
+    @ManyToMany(mappedBy = "students")
+    private List<TeacherTestEntity> teacherTests=new ArrayList<>();
 
 
+    public List<PracticeTestResultEntity> getPracticeTestsResult() {
+        return practiceTestsResult;
+    }
 
+    public void setPracticeTestsResult(List<PracticeTestResultEntity> practiceTestsResult) {
+        this.practiceTestsResult = practiceTestsResult;
+    }
 
+    public List<TeacherTestResultEntity> getTeacherTestsResult() {
+        return teacherTestsResult;
+    }
 
+    public void setTeacherTestsResult(List<TeacherTestResultEntity> teacherTestsResult) {
+        this.teacherTestsResult = teacherTestsResult;
+    }
 
     public StudentEntity() {}
 
@@ -74,48 +82,46 @@ public class StudentEntity extends UserEntity {
         this.teachers = teachers;
     }
 
-    public UserProgressEntity getStudentProgressEntity() {
+    public StudentProgressEntity getStudentProgressEntity() {
         return studentProgressEntity;
     }
 
-    public void setStudentProgressEntity(UserProgressEntity studentProgressEntity) {
+    public void setStudentProgressEntity(StudentProgressEntity studentProgressEntity) {
         this.studentProgressEntity = studentProgressEntity;
     }
 
-    public QuestionHistoryEntity getQuestionHistoryEntity() {
-        return questionHistoryEntity;
+    public StudentQuestionHistoryEntity getQuestionHistoryEntity() {
+        return studentQuestionHistoryEntity;
     }
 
-    public void setQuestionHistoryEntity(QuestionHistoryEntity questionHistoryEntity) {
-        this.questionHistoryEntity = questionHistoryEntity;
+    public void setQuestionHistoryEntity(StudentQuestionHistoryEntity studentQuestionHistoryEntity) {
+        this.studentQuestionHistoryEntity = studentQuestionHistoryEntity;
     }
 
-    public List<TestResultEntity> getStudentTestsResult() {
-        return studentTestsResult;
+
+    public StudentQuestionHistoryEntity getStudentQuestionHistoryEntity() {
+        return studentQuestionHistoryEntity;
     }
 
-    public void setStudentTestsResult(List<TestResultEntity> studentTestsResult) {
-        this.studentTestsResult = studentTestsResult;
+    public void setStudentQuestionHistoryEntity(StudentQuestionHistoryEntity studentQuestionHistoryEntity) {
+        this.studentQuestionHistoryEntity = studentQuestionHistoryEntity;
     }
 
-    public List<TestEntity> getStudentTests() {
-        return studentTests;
+    public List<PracticeTestEntity> getPracticeTests() {
+        return practiceTests;
     }
 
-    public void setStudentTests(List<TestEntity> studentTests) {
-        this.studentTests = studentTests;
+    public void setPracticeTests(List<PracticeTestEntity> practiceTests) {
+        this.practiceTests = practiceTests;
     }
 
-    @Override
-    public String toString() {
-        return "StudentEntity{" +
-                "classRoom=" + classRoom +
-                ", schoolName=" + schoolName +
-                ", teachers=" + teachers +
-                ", studentProgressEntity=" + studentProgressEntity +
-                ", questionHistoryEntity=" + questionHistoryEntity +
-                ", studentTestsResult=" + studentTestsResult +
-                ", studentTests=" + studentTests +
-                '}';
+    public List<TeacherTestEntity> getTeacherTests() {
+        return teacherTests;
     }
+
+    public void setTeacherTests(List<TeacherTestEntity> teacherTests) {
+        this.teacherTests = teacherTests;
+    }
+
+
 }

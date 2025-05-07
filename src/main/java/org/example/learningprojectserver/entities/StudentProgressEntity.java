@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Entity
-public class UserProgressEntity {
+public class StudentProgressEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,7 +39,7 @@ public class UserProgressEntity {
     @Column(name = "skill_level")
     private Map<String, Integer> skillLevelsBySubTopic;
 
-    public UserProgressEntity(){
+    public StudentProgressEntity(){
         this.subTopicSuccessStreak = new HashMap<>();
         this.skillLevelsBySubTopic = new HashMap<>();
 

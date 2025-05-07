@@ -3,16 +3,21 @@ package org.example.learningprojectserver.response;
 public class TokenValidationResponse extends BasicResponse{
 
         private boolean isValid;
-        private String username;
+        private String userId;
 
-        public TokenValidationResponse(boolean success, String error, boolean isValid,String username) {
+        private String username;
+        private String role;
+
+        public TokenValidationResponse(boolean success, String error, boolean isValid,String username
+        ) {
             super(success, error);
             this.isValid = isValid;
             this.username = username;
         }
 
-    public TokenValidationResponse() {
-    }
+        public TokenValidationResponse() {
+
+        }
 
     public boolean isValid() {
         return isValid;
@@ -22,11 +27,37 @@ public class TokenValidationResponse extends BasicResponse{
         isValid = valid;
     }
 
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
     public String getUsername() {
         return username;
     }
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
+    @Override
+    public String toString() {
+        return "TokenValidationResponse{" +
+                "isValid=" + isValid +
+                ", userId='" + userId + '\'' +
+                ", username='" + username + '\'' +
+                ", role='" + role + '\'' +
+                '}';
     }
 }

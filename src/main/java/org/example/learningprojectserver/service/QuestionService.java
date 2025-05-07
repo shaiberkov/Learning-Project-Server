@@ -1,40 +1,25 @@
 package org.example.learningprojectserver.service;
 
-import jakarta.annotation.PostConstruct;
 import org.example.learningprojectserver.dto.QuestionDTO;
 import org.example.learningprojectserver.entities.QuestionEntity;
-import org.example.learningprojectserver.entities.QuestionHistoryEntity;
-import org.example.learningprojectserver.entities.UserEntity;
-import org.example.learningprojectserver.entities.UserProgressEntity;
-import org.example.learningprojectserver.repository.QuestionHistoryRepository;
+import org.example.learningprojectserver.repository.StudentQuestionHistoryRepository;
 import org.example.learningprojectserver.repository.QuestionRepository;
-import org.example.learningprojectserver.repository.UserProgressRepository;
-import org.example.learningprojectserver.repository.UserRepository;
-import org.example.learningprojectserver.response.SubmitAnswerResponse;
-import org.example.learningprojectserver.service.QuestionGenerator.QuestionGenerator;
-import org.example.learningprojectserver.service.QuestionGenerator.QuestionGeneratorFactory;
-import org.example.learningprojectserver.service.QuestionGenerator.SubjectQuestionGenerator;
+import org.example.learningprojectserver.repository.StudentProgressRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @Service
 public class QuestionService {
 
     private QuestionRepository questionRepository;
-    private QuestionHistoryRepository questionHistoryRepository;
-    private UserProgressRepository userprogressRepository;
+    private StudentQuestionHistoryRepository studentQuestionHistoryRepository;
+    private StudentProgressRepository userprogressRepository;
 
     @Autowired
-    public QuestionService(QuestionRepository questionRepository, QuestionHistoryRepository questionHistoryRepository, UserProgressRepository UserprogressRepository) {
+    public QuestionService(QuestionRepository questionRepository, StudentQuestionHistoryRepository studentQuestionHistoryRepository, StudentProgressRepository userprogressRepository) {
         this.questionRepository = questionRepository;
-        this.questionHistoryRepository = questionHistoryRepository;
-        this.userprogressRepository = UserprogressRepository;
+        this.studentQuestionHistoryRepository = studentQuestionHistoryRepository;
+        this.userprogressRepository = userprogressRepository;
 
     }
 //    @PostConstruct
@@ -47,18 +32,9 @@ public class QuestionService {
 
 
 
-    private QuestionDTO mapToDTO(QuestionEntity questionEntity) {
-        return new QuestionDTO(
-                questionEntity.getId(),
-                questionEntity.getSubject(),
-                questionEntity.getTopic(),
-                questionEntity.getSubTopic(),
-                questionEntity.getQuestionText()
-        );
-    }
 
 
-//
+
 //    public QuestionDTO generateQuestion(String userName, String subject, String topic, String subTopic) {
 //        // שליפת ההתקדמות של המשתמש (חובה שהרשומה קיימת)
 //        UserProgressEntity userProgressEntity = userprogressRepository.findByUserName(userName);
@@ -85,7 +61,7 @@ public class QuestionService {
 //        QuestionEntity questionEntity = questionGenerator.generateQuestion(level);
 //
 //        // שליפת היסטוריית השאלות של המשתמש
-//        QuestionHistoryEntity historyEntity = questionHistoryRepository.findByUserName(userName);
+//        QuestionHistoryEntity historyEntity = studentQuestionHistoryRepository.findByUserName(userName);
 //
 //        // **עדכון המפתחות הזרים** לפני שמירת השאלה
 //        questionEntity.setQuestionHistory(historyEntity);

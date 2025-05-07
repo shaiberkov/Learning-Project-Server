@@ -14,6 +14,14 @@ public class SubmitAnswerResponse extends BasicResponse {
 
     }
 
+    @Override
+    public String toString() {
+        return "SubmitAnswerResponse{" +
+                "isCorrect=" + isCorrect +
+                ", message='" + message + '\'' +
+                '}';
+    }
+
     public boolean isCorrect() {
         return isCorrect;
     }

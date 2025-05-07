@@ -2,6 +2,7 @@ package org.example.learningprojectserver.entities;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
 import java.util.List;
 @Entity
 public class ClassRoomEntity {
@@ -17,17 +18,27 @@ public class ClassRoomEntity {
     private SchoolGradeEntity grade;
 
     @ManyToMany(mappedBy = "teachingClassRooms")
-    private List<TeacherEntity> teachers;
+    private List<TeacherEntity> teachers=new ArrayList<>();
 
     @OneToMany(mappedBy = "classRoom")
-    private List<StudentEntity> students;
+    private List<StudentEntity> students=new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "school_id")
     private SchoolEntity school;
 
+    @OneToOne(mappedBy = "classRoom", cascade = CascadeType.ALL, orphanRemoval = true)
+    private ScheduleEntity schedule;
     public ClassRoomEntity() {
 
+    }
+
+    public ScheduleEntity getSchedule() {
+        return schedule;
+    }
+
+    public void setSchedule(ScheduleEntity schedule) {
+        this.schedule = schedule;
     }
 
     public String getName() {

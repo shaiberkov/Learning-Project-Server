@@ -9,10 +9,11 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 
 @Component
-public class UserToManagerMapper implements EntityMapper<SchoolManagerEntity> {
+public class UserToManagerMapper implements Mapper<UserEntity,SchoolManagerEntity> {
+
 
     @Override
-    public SchoolManagerEntity map(UserEntity user) {
+    public SchoolManagerEntity apply(UserEntity user) {
         SchoolManagerEntity schoolManager = new SchoolManagerEntity();
 
         schoolManager.setUsername(user.getUsername());
@@ -27,7 +28,6 @@ public class UserToManagerMapper implements EntityMapper<SchoolManagerEntity> {
         schoolManager.setOtpTimestamp(user.getOtpTimestamp());
         schoolManager.setProfilePicture(user.getProfilePicture());
         schoolManager.setRole(Role.SCHOOLMANAGER);
-        schoolManager.setSessionList(new ArrayList<>());
 
         return schoolManager;
     }

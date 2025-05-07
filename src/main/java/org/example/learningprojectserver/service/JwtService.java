@@ -29,9 +29,10 @@ public class JwtService {
 //       System.out.println( extractUserId(generateToken("325256022", String.valueOf(Role.SCHOOLMANAGER))));
 //   }
 
-    public String generateToken(String userId, String role) {
+    public String generateToken(String userId, String username,String role) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("role", role);
+        claims.put("username", username);
 
         return Jwts.builder()
                 .setClaims(claims)
@@ -49,10 +50,15 @@ public class JwtService {
                 .parseClaimsJws(token)
                 .getBody();
     }
+    
+    public String extractUsername(String token) {
+        return extractAllClaims(token).get("username", String.class);
+    }
 
     public String extractUserId(String token) {
         return extractAllClaims(token).getSubject();
     }
+
 
     public String extractRole(String token) {
         return extractAllClaims(token).get("role", String.class);
@@ -66,4 +72,5 @@ public class JwtService {
             return false;
         }
     }
+
 }

@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/Learning-App/User")
 public class userController {
 @Autowired
-private UserService userService;
+private  UserService userService;
 
 
     @PostMapping("/add-user/")

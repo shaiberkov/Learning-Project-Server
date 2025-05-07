@@ -1,13 +1,9 @@
 package org.example.learningprojectserver.service;
 
-import jakarta.annotation.PostConstruct;
 import org.example.learningprojectserver.entities.*;
-import org.example.learningprojectserver.repository.QuestionHistoryRepository;
-import org.example.learningprojectserver.repository.QuestionRepository;
+import org.example.learningprojectserver.repository.StudentQuestionHistoryRepository;
 import org.example.learningprojectserver.repository.SessionRepository;
-import org.example.learningprojectserver.repository.UserProgressRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -18,13 +14,13 @@ import java.util.concurrent.ConcurrentMap;
 public class StatisticsService {
 
    private SessionRepository sessionRepository;
-   private QuestionHistoryRepository questionHistoryRepository;
+   private StudentQuestionHistoryRepository studentQuestionHistoryRepository;
    private ActiveUserService activeUserService;
-   private final ConcurrentMap<String, UserStatisticsEntity> userStats = new ConcurrentHashMap<>();
+   private final ConcurrentMap<String, StudentStatisticsEntity> userStats = new ConcurrentHashMap<>();
 @Autowired
-   private StatisticsService(SessionRepository sessionRepository ,QuestionHistoryRepository questionHistoryRepository ,ActiveUserService activeUserService){
+   private StatisticsService(SessionRepository sessionRepository , StudentQuestionHistoryRepository studentQuestionHistoryRepository, ActiveUserService activeUserService){
        this.sessionRepository = sessionRepository;
-       this.questionHistoryRepository = questionHistoryRepository;
+       this.studentQuestionHistoryRepository = studentQuestionHistoryRepository;
        this.activeUserService = activeUserService;
    }
 
@@ -108,7 +104,7 @@ public class StatisticsService {
 //    return userLearningStatsMap;
 //}
 
-    public UserStatisticsEntity getUserStats(String userName) {
+    public StudentStatisticsEntity getUserStats(String userName) {
         return userStats.get(userName);
     }
 }

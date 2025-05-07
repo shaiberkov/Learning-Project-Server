@@ -1,5 +1,6 @@
 package org.example.learningprojectserver.service;
 
+import jakarta.annotation.PostConstruct;
 import org.example.learningprojectserver.dto.UserDto;
 import org.example.learningprojectserver.entities.*;
 import org.example.learningprojectserver.enums.Role;
@@ -9,7 +10,6 @@ import org.example.learningprojectserver.response.BasicResponse;
 import org.example.learningprojectserver.response.LoginResponse;
 import org.example.learningprojectserver.response.RegisterResponse;
 import org.example.learningprojectserver.response.ResetPasswordResponse;
-import org.example.learningprojectserver.utils.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,16 +25,21 @@ import static org.example.learningprojectserver.utils.SmsSender.sendSms;
 @Service
 public class UserService {
 
-@Autowired
-    private UserRepository userRepository;
 
-@Autowired
-private JwtService jwtService;
+    private final UserRepository userRepository;
+    private final ActiveUserService activeUserService;
+    private final JwtService jwtService;
 
-    @Autowired
-    private SessionRepository sessionRepository;
+
     private static final ConcurrentHashMap<String, String> otpStorage = new ConcurrentHashMap<>();
- public RegisterResponse createUser(String username,String userId, String password, String confirmPassword, String email, String phone) {
+
+    public UserService(UserRepository userRepository, ActiveUserService activeUserService, JwtService jwtService) {
+        this.userRepository = userRepository;
+        this.activeUserService = activeUserService;
+        this.jwtService = jwtService;
+    }
+
+    public RegisterResponse createUser(String username,String userId, String password, String confirmPassword, String email, String phone) {
 //todo להוסיף פונקציה שבודקת תקינות סיסמא
      RegisterResponse registerResponse=new RegisterResponse();
      if (username == null || userId==null || password == null || confirmPassword == null || email == null || phone == null) {
@@ -44,7 +49,7 @@ private JwtService jwtService;
      }
 
      if (!password.equals(confirmPassword)) {
-         registerResponse.setPasswordDontMatch("password doesnt match");
+         registerResponse.setPasswordDontMatch("סיסמאות לא זהות");
          registerResponse.setSuccess(false);
          return registerResponse;
      }
@@ -69,14 +74,14 @@ private JwtService jwtService;
          newUser.setSalt(salt);
          newUser.setPasswordHash(hashedPassword);
 
-         QuestionHistoryEntity questionHistoryEntity = new QuestionHistoryEntity();
-         UserProgressEntity userProgressEntity = new UserProgressEntity();
+         StudentQuestionHistoryEntity studentQuestionHistoryEntity = new StudentQuestionHistoryEntity();
+         StudentProgressEntity studentProgressEntity = new StudentProgressEntity();
 
-         questionHistoryEntity.setStudent(newUser);
-         userProgressEntity.setStudent(newUser);
+         studentQuestionHistoryEntity.setStudent(newUser);
+         studentProgressEntity.setStudent(newUser);
 
-         newUser.setStudentProgressEntity(userProgressEntity);
-         newUser.setQuestionHistoryEntity(questionHistoryEntity);
+         newUser.setStudentProgressEntity(studentProgressEntity);
+         newUser.setQuestionHistoryEntity(studentQuestionHistoryEntity);
 
          String textToSendInMailToUser = generateMailText(username);
          sendEmail(email, "ברוך הבא ל-'מרכז תרגול אישי' – החשבון שלך נוצר בהצלחה!", textToSendInMailToUser);
@@ -107,21 +112,21 @@ private JwtService jwtService;
 //            isValid = false;
 //        }
         if (!isValidPhoneNumber(phoneNumber)){
-            registerResponse.setPhoneTaken("Phone number in not valid");
+            registerResponse.setPhoneTaken("מיספר טלפון זה לא תקין");
 
             isValid = false;
         }
         if(userRepository.existsByPhoneNumber(phoneNumber)){
-            registerResponse.setPhoneTaken("Phone Taken");
+            registerResponse.setPhoneTaken("טלפון זה תפוס");
 
         }
         if (userRepository.existsByEmail(email)){
-            registerResponse.setEmailTaken("Email Taken");
+            registerResponse.setEmailTaken("אימייל זה תפוס");
 
             isValid = false;
         }
         if (!isValidEmail(email)){
-            registerResponse.setEmailTaken("Email is not valid");
+            registerResponse.setEmailTaken("אימייל לא תקין");
 
             isValid = false;
         }
@@ -134,7 +139,7 @@ private JwtService jwtService;
 
         if (userId == null || password == null) {
             basicResponse.setSuccess(false);
-            basicResponse.setErrorCode("username or password is required");
+            basicResponse.setErrorCode("יש להזין שם משתמש וסיסמה");
             return basicResponse;
         }
 
@@ -143,13 +148,13 @@ private JwtService jwtService;
 
             if (userEntity == null) {
                 basicResponse.setSuccess(false);
-                basicResponse.setErrorCode("password/username not found");
+                basicResponse.setErrorCode("שם משתמש או סיסמה אינם נכונים");
                 return basicResponse;
             }
             String hashedPassword = hashPassword(password, userEntity.getSalt());
             if (!hashedPassword.equals(userEntity.getPasswordHash())) {
                 basicResponse.setSuccess(false);
-                basicResponse.setErrorCode("Password isnt correct");
+                basicResponse.setErrorCode("הסיסמה שגויה");
                 return basicResponse;
             }
 
@@ -159,7 +164,7 @@ private JwtService jwtService;
 
         } catch (Exception e) {
             basicResponse.setSuccess(false);
-            basicResponse.setErrorCode("Error occurred during login");
+            basicResponse.setErrorCode("אירעה שגיאה במהלך ההתחברות");
             return basicResponse;
         }
     }
@@ -207,7 +212,7 @@ private JwtService jwtService;
             LoginResponse loginResponse = new LoginResponse();
             if (userId == null || otp == null) {
                 loginResponse.setSuccess(false);
-                loginResponse.setErrorCode("username or otp is required");
+                loginResponse.setErrorCode("יש לספק שם משתמש וקוד אימות");
                 return loginResponse;
             }
             try {
@@ -216,14 +221,14 @@ private JwtService jwtService;
 
                 if (userEntity == null) {
                     loginResponse.setSuccess(false);
-                    loginResponse.setErrorCode("User not found");
+                    loginResponse.setErrorCode("המשתמש לא נמצא");
 
                     return loginResponse;
                 }
 
                 if (userEntity.getOtp() == null || !userEntity.getOtp().equals(otp)) {
                     loginResponse.setSuccess(false);
-                    loginResponse.setErrorCode("verfication code does not match");
+                    loginResponse.setErrorCode("קוד האימות שגוי");
                     return loginResponse;
                 }
 
@@ -231,29 +236,28 @@ private JwtService jwtService;
                 long currentTime = System.currentTimeMillis();
                 if (currentTime - otpTimestamp > 120000) {
                     loginResponse.setSuccess(false);
-                    loginResponse.setErrorCode("2 minutes passed");
+                    loginResponse.setErrorCode("עברו 2 דקות");
                     return loginResponse;
                 }
-                String token = jwtService.generateToken(userId,String.valueOf(userEntity.getRole()));
+                String token = jwtService.generateToken(userId,userEntity.getUsername(),String.valueOf(userEntity.getRole()));
                 loginResponse.setSuccess(true);
-                loginResponse.setErrorCode("code is correct");
+                loginResponse.setErrorCode("הקוד נכון");
                 loginResponse.setToken(token);
                 userEntity.setOtp(null);
                 userEntity.setOtpTimestamp(null);
                 Session session = new Session();
                 session.setUser(userEntity);
                 session.setLastActivity(new Date());
-
+                activeUserService.connectUser(userId);
                 userEntity.getSessionList().add(session);
 
-                sessionRepository.save(session);
                 userRepository.save(userEntity);
                 return loginResponse;
 
             } catch (Exception e) {
 
                 loginResponse.setSuccess(false);
-                loginResponse.setErrorCode("Error occurred during verify otp");
+                loginResponse.setErrorCode("אירעה שגיאה במהלך אימות הקוד");
                 return loginResponse;
             }
         }
@@ -320,10 +324,12 @@ private JwtService jwtService;
 
     public UserDto getUserPhoneNumber(String userId) {
         UserDto userDto=new UserDto();
-        String userPhoneNumber= userRepository.findPhoneNumberByUsername(userId);
+        String userPhoneNumber= userRepository.findPhoneNumberByUserId(userId);
         userDto.setPhoneNumber(userPhoneNumber);
         return userDto;
     }
+
+
 }
 
 

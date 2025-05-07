@@ -3,38 +3,60 @@ package org.example.learningprojectserver.entities;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Inheritance(strategy = InheritanceType.JOINED)
+@DiscriminatorColumn(name = "testResult_type")
 public class TestResultEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "student_id") // קשר Many-to-One (רבים ליחיד)
-    private StudentEntity student;
+    private int score;
+    private int correctAnswersCount;
+    private int incorrectAnswersCount;
+
+    private String finishTime;
 
     @ManyToOne
     @JoinColumn(name = "test_id")
     private TestEntity test;
-    private int score;
-    private int correctAnswers;
-    private int incorrectAnswers;
-    @OneToMany(cascade = CascadeType.ALL)
-    private List<QuestionEntity> correctQuestions;
-    @OneToMany(cascade = CascadeType.ALL)
-    private List<QuestionEntity> incorrectQuestions;
 
 
-//    public UserEntity getUser() {
-//        return user;
+    @OneToMany
+    private List<TestQuestionEntity> correctQuestions=new ArrayList<>();
+    @OneToMany
+    private List<TestQuestionEntity> incorrectQuestions=new ArrayList<>();
+
+
+//
+//
+//    @ManyToOne
+//    @JoinColumn(name = "student_id") // קשר Many-to-One (רבים ליחיד)
+//    private StudentEntity student;
+
+//    public TestEntity getTest() {
+//        return test;
 //    }
 //
-//    public void setUser(UserEntity user) {
-//        this.user = user;
+//    public void setTest(TestEntity test) {
+//        this.test = test;
 //    }
+
+    public String getFinishTime() {
+        return finishTime;
+    }
+
+    public void setFinishTime(String finishTime) {
+        this.finishTime = finishTime;
+    }
+
+    public void setScore(int score) {
+        this.score = score;
+    }
 
     public TestEntity getTest() {
         return test;
@@ -44,25 +66,53 @@ public class TestResultEntity {
         this.test = test;
     }
 
-    public void setScore(int score) {
-        this.score = score;
+    public void setCorrectAnswersCount(int correctAnswers) {
+        this.correctAnswersCount = correctAnswers;
     }
 
-    public void setCorrectAnswers(int correctAnswers) {
-        this.correctAnswers = correctAnswers;
+    public void setIncorrectAnswersCount(int incorrectAnswers) {
+        this.incorrectAnswersCount = incorrectAnswers;
     }
 
-    public void setIncorrectAnswers(int incorrectAnswers) {
-        this.incorrectAnswers = incorrectAnswers;
+    public List<TestQuestionEntity> getCorrectQuestions() {
+        return correctQuestions;
     }
 
-    public void setCorrectQuestions(List<QuestionEntity> correctQuestions) {
+    public void setCorrectQuestions(List<TestQuestionEntity> correctQuestions) {
         this.correctQuestions = correctQuestions;
     }
 
-    public void setIncorrectQuestions(List<QuestionEntity> incorrectQuestions) {
+    public List<TestQuestionEntity> getIncorrectQuestions() {
+        return incorrectQuestions;
+    }
+
+    public void setIncorrectQuestions(List<TestQuestionEntity> incorrectQuestions) {
         this.incorrectQuestions = incorrectQuestions;
     }
+
+    //    public void setCorrectQuestions(List<QuestionEntity> correctQuestions) {
+//        this.correctQuestions = correctQuestions;
+//    }
+//
+//    public void setIncorrectQuestions(List<QuestionEntity> incorrectQuestions) {
+//        this.incorrectQuestions = incorrectQuestions;
+//    }
+
+//    public List<QuestionEntity> getCorrectQuestions() {
+//        return correctQuestions;
+//    }
+//
+//    public void setCorrectQuestions(List<QuestionEntity> correctQuestions) {
+//        this.correctQuestions = correctQuestions;
+//    }
+//
+//    public List<QuestionEntity> getIncorrectQuestions() {
+//        return incorrectQuestions;
+//    }
+//
+//    public void setIncorrectQuestions(List<QuestionEntity> incorrectQuestions) {
+//        this.incorrectQuestions = incorrectQuestions;
+//    }
 
     public TestResultEntity() {
 
@@ -72,33 +122,33 @@ public class TestResultEntity {
         return score;
     }
 
-    public int getCorrectAnswers() {
-        return correctAnswers;
+    public int getCorrectAnswersCount() {
+        return correctAnswersCount;
     }
 
-    public int getIncorrectAnswers() {
-        return incorrectAnswers;
+    public int getIncorrectAnswersCount() {
+        return incorrectAnswersCount;
     }
 
-    public List<QuestionEntity> getCorrectQuestions() {
-        return correctQuestions;
-    }
-
-    public List<QuestionEntity> getIncorrectQuestions() {
-        return incorrectQuestions;
-    }
+//    public List<QuestionEntity> getCorrectQuestions() {
+//        return correctQuestions;
+//    }
+//
+//    public List<QuestionEntity> getIncorrectQuestions() {
+//        return incorrectQuestions;
+//    }
 
     public void setId(Long id) {
         this.id = id;
     }
 
-    public StudentEntity getStudent() {
-        return student;
-    }
-
-    public void setStudent(StudentEntity student) {
-        this.student = student;
-    }
+//    public StudentEntity getStudent() {
+//        return student;
+//    }
+//
+//    public void setStudent(StudentEntity student) {
+//        this.student = student;
+//    }
 
     public Long getId() {
         return id;

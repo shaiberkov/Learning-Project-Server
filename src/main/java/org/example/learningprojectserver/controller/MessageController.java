@@ -2,10 +2,7 @@ package org.example.learningprojectserver.controller;
 
 import org.example.learningprojectserver.response.BasicResponse;
 import org.example.learningprojectserver.service.MessageService;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -32,4 +29,11 @@ private final MessageService messageService;
         return messageService.sendMessage(senderId, recipientType, recipientValue, title, content);
     }
 
-}
+    @GetMapping("/get-all-recived-messages")
+    public BasicResponse getAllRecivedMessages(@RequestParam String userId) {
+        return messageService.getAllRecivedMessages(userId);
+    }
+
+
+    }
+

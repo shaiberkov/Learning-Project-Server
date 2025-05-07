@@ -1,6 +1,8 @@
 package org.example.learningprojectserver.entities;
 
 import jakarta.persistence.*;
+
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -14,7 +16,7 @@ public class SchoolGradeEntity {
     private String gradeName; // למשל: "א'", "ז'", "י"ב"
 
     @OneToMany(mappedBy = "grade", cascade = CascadeType.ALL)
-    private List<ClassRoomEntity> classes;
+    private List<ClassRoomEntity> classes=new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "school_id")

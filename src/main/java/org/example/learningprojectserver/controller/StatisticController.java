@@ -1,6 +1,6 @@
 package org.example.learningprojectserver.controller;
 
-import org.example.learningprojectserver.entities.UserStatisticsEntity;
+import org.example.learningprojectserver.entities.StudentStatisticsEntity;
 import org.example.learningprojectserver.service.StatisticsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,7 +16,7 @@ public class StatisticController {
   }
 
     @GetMapping("/get-User-Statistic")
-    public UserStatisticsEntity getUserStatistic(  @RequestParam String userName) {
+    public StudentStatisticsEntity getUserStatistic(@RequestParam String userName) {
         System.out.println("getUserStatistic");
          return statisticsService.getUserStats(userName);
     }

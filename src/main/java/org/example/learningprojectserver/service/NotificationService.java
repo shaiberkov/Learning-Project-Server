@@ -1,5 +1,6 @@
 package org.example.learningprojectserver.service;
 
+import org.example.learningprojectserver.dto.MessageDTO;
 import org.example.learningprojectserver.entities.MessageEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -22,11 +23,13 @@ public class NotificationService {
         return emitter;
     }
 
-    public void sendNotification(String userId,String message) {
+    public void sendNotification(String userId, MessageDTO message) {
         SseEmitter emitter = emitters.get(userId);
         if (emitter != null) {
             try {
-                emitter.send(SseEmitter.event().name("message").data(message));
+                emitter.send(SseEmitter.event()
+                        .name("message")
+                        .data(message));
             } catch (Exception e) {
                 emitters.remove(userId);
             }

@@ -2,13 +2,11 @@ package org.example.learningprojectserver.entities;
 
 import jakarta.persistence.*;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Entity
-public class QuestionHistoryEntity {
+public class StudentQuestionHistoryEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,7 +24,7 @@ public class QuestionHistoryEntity {
     @Column(name = "is_answered_correct")
     private Map<QuestionEntity, Boolean> answeredQuestions;
 
-     public QuestionHistoryEntity() {
+     public StudentQuestionHistoryEntity() {
          this.answeredQuestions = new HashMap<>();
 
      }

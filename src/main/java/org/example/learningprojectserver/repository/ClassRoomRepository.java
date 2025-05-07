@@ -17,4 +17,8 @@ public interface ClassRoomRepository extends JpaRepository<ClassRoomEntity, Long
     @Query("SELECT c FROM ClassRoomEntity c WHERE c.school.schoolCode = :schoolCode AND c.grade.gradeName = :gradeName")
     List<ClassRoomEntity> findClassRoomsBySchoolCodeAndGradeName(@Param("schoolCode") String schoolCode, @Param("gradeName") String gradeName);
 
-}
+    @Query("SELECT c FROM ClassRoomEntity c WHERE c.name = :name")
+    ClassRoomEntity findClassRoomByName(@Param("name") String name);
+
+    @Query("SELECT s.classRoom FROM StudentEntity s WHERE s.userId = :userId")
+    ClassRoomEntity findClassRoomOfUserByUserId(@Param("userId") String userId);}

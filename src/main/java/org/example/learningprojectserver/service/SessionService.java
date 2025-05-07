@@ -11,20 +11,32 @@ import org.springframework.stereotype.Service;
 public class SessionService {
 
     private final SessionRepository sessionRepository;
+    private final JwtService jwtService;
 
     @Autowired
-    public SessionService(SessionRepository sessionRepository) {
+    public SessionService(SessionRepository sessionRepository, JwtService jwtService) {
         this.sessionRepository = sessionRepository;
+        this.jwtService = jwtService;
     }
 
     public TokenValidationResponse validateToken(String cleanToken) {
-        boolean isValid = JwtUtils.isTokenValid(cleanToken);
+        boolean isValid = jwtService.isTokenValid(cleanToken);
         String username = "";
-        if (isValid){
-            username = JwtUtils.extractUsername(cleanToken);
+        String userId = "";
+        String role = "";
+        if (isValid) {
+            username = jwtService.extractUsername(cleanToken);
+            userId = jwtService.extractUserId(cleanToken);
+            role = jwtService.extractRole(cleanToken);
         }
 
-        return new TokenValidationResponse(isValid, isValid ? "Token is valid" : "Token is invalid", isValid,username);
+        TokenValidationResponse tokenValidationResponse = new TokenValidationResponse();
+        tokenValidationResponse.setValid(isValid);
+        tokenValidationResponse.setUsername(username);
+        tokenValidationResponse.setUserId(userId);
+        tokenValidationResponse.setRole(role);
+        return tokenValidationResponse;
     }
+
 
 }

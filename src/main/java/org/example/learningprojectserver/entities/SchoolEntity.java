@@ -2,6 +2,7 @@ package org.example.learningprojectserver.entities;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
 import java.util.List;
 @Entity
 public class SchoolEntity {
@@ -16,16 +17,16 @@ public class SchoolEntity {
     private String schoolCode;
 
     @OneToMany(mappedBy = "teachingSchool")
-    private List<TeacherEntity> teachers;
+    private List<TeacherEntity> teachers=new ArrayList<>();
 
     @OneToMany(mappedBy = "schoolName")
-    private List<StudentEntity> students;
+    private List<StudentEntity> students=new ArrayList<>();
 
     @OneToMany(mappedBy = "school")
-    private List<ClassRoomEntity> classRooms;
+    private List<ClassRoomEntity> classRooms=new ArrayList<>();
 
     @OneToMany(mappedBy = "school", cascade = CascadeType.ALL)
-    private List<SchoolGradeEntity> schoolGrades;
+    private List<SchoolGradeEntity> schoolGrades=new ArrayList<>();
 
 
     @OneToOne(mappedBy = "school")
