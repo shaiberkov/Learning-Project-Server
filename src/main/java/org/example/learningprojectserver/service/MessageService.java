@@ -117,6 +117,8 @@ public class MessageService {
             return basicResponse;
         }
 
+        //TODO TO to test git
+
         List<MessageEntity> messages = user.getSentMessages();
         List<MessageDTO> messageDTOS= messages.stream()
                 .map(messageEntityToMessageDTOMapper)
