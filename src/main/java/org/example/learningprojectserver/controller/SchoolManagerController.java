@@ -28,6 +28,12 @@ private final ClassRoomService classRoomService;
         this.teacherService = teacherService;
     }
 
+    @GetMapping("/get-school-code")
+    public BasicResponse getSchoolCode(@RequestParam String userId){
+        return schoolManagerService.getSchoolCode(userId);
+
+    }
+
 @GetMapping("/get-all-lessons-for-classRoom")
 public BasicResponse getAllLessonsForClassRoom(@RequestParam String schoolCode , @RequestParam String classRoomName) {
         return classRoomService.getAllLessonsForClassRoom(schoolCode, classRoomName);
@@ -105,13 +111,13 @@ public BasicResponse getAllLessonsForClassRoom(@RequestParam String schoolCode ,
     }
 
     @PostMapping("/add-teaching-subject-to-teacher")
-    public BasicResponse addTeachingSubjectToTeacher(@RequestBody String teacherId, @RequestParam List<String> subjects) {
+    public BasicResponse addTeachingSubjectToTeacher(@RequestParam String teacherId, @RequestBody List<String> subjects) {
         return teacherService.addTeachingSubjectToTeacher(teacherId, subjects);
 
     }
 
     @PostMapping("/remove-teaching-subject-from-teacher")
-    public BasicResponse removeTeachingSubjectFromTeacher(@RequestBody String teacherId, @RequestParam String subjectToRemove) {
+    public BasicResponse removeTeachingSubjectFromTeacher(@RequestParam String teacherId, @RequestParam String subjectToRemove) {
         return teacherService.removeTeachingSubjectFromTeacher(teacherId, subjectToRemove);
     }
 
@@ -134,15 +140,22 @@ public BasicResponse getAllLessonsForClassRoom(@RequestParam String schoolCode ,
     ) {
         return schoolManagerService.changeStudentClass(schoolCode, studentId, gradeName, newClassName);
     }
-    @GetMapping("/Learning-App/School-Manager/get-all-teachers")
+    @GetMapping("/get-all-teachers")
     public BasicResponse getAllTeachers(@RequestParam String schoolCode) {
         return schoolManagerService.getAllTeachers(schoolCode);
     }
 
-    @GetMapping("/Learning-App/School-Manager/get-all-students")
+    @GetMapping("/get-all-students")
     public BasicResponse getAllStudents(@RequestParam String schoolCode) {
         return schoolManagerService.getAllStudents(schoolCode);
     }
+
+    @GetMapping("/get-teacher-teaching-subjects")
+    public BasicResponse getTeacherTeachingSubjects(@RequestParam String teacherId) {
+        return teacherService.getTeacherTeachingSubjects(teacherId);
+    }
+
+
 }
 
 

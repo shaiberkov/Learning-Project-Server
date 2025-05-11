@@ -30,9 +30,10 @@ public class SchoolManagerService {
     private final StudentRepository studentRepository;
     private final TeacherEntityToTeacherDTOMapper teacherEntityToTeacherDTOMapper;
     private final StudentEntityToStudentDTOMapper studentEntityToStudentDTOMapper;
+    private final SchoolManagerRepository schoolManagerRepository;
 
     @Autowired
-    public SchoolManagerService(UserRepository userRepository, SchoolRepository schoolRepository, SchoolGradeRepository schoolGradeRepository, UserMapperFactory userMapperFactory, TeacherRepository teacherRepository, ClassRoomRepository classRoomRepository, StudentRepository studentRepository, TeacherEntityToTeacherDTOMapper teacherEntityToTeacherDTOMapper, StudentEntityToStudentDTOMapper studentEntityToStudentDTOMapper) {
+    public SchoolManagerService(UserRepository userRepository, SchoolRepository schoolRepository, SchoolGradeRepository schoolGradeRepository, UserMapperFactory userMapperFactory, TeacherRepository teacherRepository, ClassRoomRepository classRoomRepository, StudentRepository studentRepository, TeacherEntityToTeacherDTOMapper teacherEntityToTeacherDTOMapper, StudentEntityToStudentDTOMapper studentEntityToStudentDTOMapper, SchoolManagerRepository schoolManagerRepository) {
         this.userRepository = userRepository;
         this.schoolRepository = schoolRepository;
         this.schoolGradeRepository = schoolGradeRepository;
@@ -42,8 +43,14 @@ public class SchoolManagerService {
         this.studentRepository = studentRepository;
         this.teacherEntityToTeacherDTOMapper = teacherEntityToTeacherDTOMapper;
         this.studentEntityToStudentDTOMapper = studentEntityToStudentDTOMapper;
+        this.schoolManagerRepository = schoolManagerRepository;
     }
 
+public BasicResponse getSchoolCode(String userId){
+
+   String schoolCode= schoolManagerRepository.findSchoolCodeByUserId(userId);
+return new BasicResponse(true, schoolCode);
+}
 
 
     public BasicResponse assignUserAsSchoolTeacher(String userId, String schoolCode) {
@@ -75,7 +82,6 @@ public class SchoolManagerService {
         return new BasicResponse(true, "המורה " + teacher.getUsername() + " שויך בהצלחה לבית הספר " + school.getSchoolName());
     }
 
-
     public BasicResponse removeTeacherFromSchool(String userId) {
         UserEntity user = userRepository.findUserByUserId(userId);
 
@@ -94,14 +100,52 @@ public class SchoolManagerService {
             return new BasicResponse(false, "המורה " + teacher.getUsername() + " אינו משויך לאף בית ספר");
         }
 
+        // ניתוק המורה מהבית ספר
         school.getTeachers().remove(teacher);
         teacher.setTeachingSchool(null);
-
-        userRepository.save(teacher);
         schoolRepository.save(school);
 
-        return new BasicResponse(true, "המורה " + teacher.getUsername() + " הוסר בהצלחה מהשיוך לבית הספר " + school.getSchoolName());
+        // המרה לסטודנט
+        Mapper<UserEntity, StudentEntity> mapper = userMapperFactory.getMapper(Role.STUDENT);
+        StudentEntity student = mapper.apply(user);
+
+        // הסרה של ה-Teacher ושמירה של ה-Student
+        userRepository.delete(teacher);
+        userRepository.save(student);
+
+        return new BasicResponse(true, "המורה " + teacher.getUsername() + " הוסר בהצלחה" + school.getSchoolName());
     }
+
+
+//    public BasicResponse removeTeacherFromSchool(String userId) {
+//        UserEntity user = userRepository.findUserByUserId(userId);
+//
+//        if (user == null) {
+//            return new BasicResponse(false, "המשתמש לא נמצא במערכת");
+//        }
+//
+//        if (user.getRole() != Role.TEACHER) {
+//            return new BasicResponse(false, "המשתמש " + user.getUsername() + " אינו מורה");
+//        }
+////Todo מורה שהסירו אותו תהפוך אותו בחזרה לסטודנט
+////        Mapper<UserEntity, StudentEntity> mapper = userMapperFactory.getMapper(Role.STUDENT);
+//
+//        TeacherEntity teacher = (TeacherEntity) user;
+//        SchoolEntity school = teacher.getTeachingSchool();
+//
+//        if (school == null) {
+//            return new BasicResponse(false, "המורה " + teacher.getUsername() + " אינו משויך לאף בית ספר");
+//        }
+//
+//
+//        school.getTeachers().remove(teacher);
+//        teacher.setTeachingSchool(null);
+//
+//        userRepository.save(teacher);
+//        schoolRepository.save(school);
+//
+//        return new BasicResponse(true, "המורה " + teacher.getUsername() + " הוסר בהצלחה מהשיוך לבית הספר " + school.getSchoolName());
+//    }
     public BasicResponse addSchoolGrades(String schoolCode, List<String> gradeNames) {
         SchoolEntity school = schoolRepository.findBySchoolCode(schoolCode);
         if (school == null) {
@@ -141,7 +185,7 @@ public class SchoolManagerService {
         }
 
         UserEntity user = userRepository.findUserByUserId(teacherId);
-        if (user == null || !(user instanceof TeacherEntity)) {
+        if (user == null ) {
             return new BasicResponse(false, "המורה לא נמצא או שאינו מורה תקין");
         }
         TeacherEntity teacher = (TeacherEntity) user;

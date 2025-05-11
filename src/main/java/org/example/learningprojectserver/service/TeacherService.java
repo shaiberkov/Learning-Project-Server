@@ -82,6 +82,7 @@ public class TeacherService {
             return new BasicResponse(false, "המשתמש אינו מורה");
         }
         TeacherEntity teacher = (TeacherEntity) user;
+
         List<String> subjectsOfTeacher=teacher.getTeachingSubjects();
         if (!Collections.disjoint(subjectsOfTeacher, subjects)) {
             return new BasicResponse(false,"לא ניתן להוסיף את המקצועות משום שחלק מהם כבר נמצאים ברשימה של המורה: " + String.join(", ", subjectsOfTeacher));
@@ -126,7 +127,9 @@ public class TeacherService {
         }
 
         TeacherEntity teacher = (TeacherEntity) user;
-
+        ///////////////////
+teacher.getTeachingClassRooms();
+///////////////////////////
         if (!teacher.getTeachingSubjects().contains(dto.getSubject())) {
             return new BasicResponse(false, "המורה אינו מוסמך ללמד את המקצוע '" + dto.getSubject() + "'");
         }
@@ -159,7 +162,6 @@ public class TeacherService {
             }
         }
 
-        // בדיקה אם קיים שיעור חופף אצל הכיתה
         for (LessonEntity existingLesson : schedule.getLessons()) {
             if (existingLesson.getDayOfWeek() == dayOfWeek) {
                 boolean overlaps = !(endTime.isBefore(existingLesson.getStartTime()) || startTime.isAfter(existingLesson.getEndTime()));
@@ -325,6 +327,25 @@ public class TeacherService {
 
         BasicResponse response = new BasicResponse(true, null);
         response.setData(lessonsByDay);
+        return response;
+    }
+
+    public BasicResponse getTeacherTeachingSubjects(String teacherId) {
+
+        UserEntity user = userRepository.findUserByUserId(teacherId);
+        if (user == null) {
+            return new BasicResponse(false, "המורה לא נמצא");
+        }
+
+        if (user.getRole() != Role.TEACHER) {
+            return new BasicResponse(false, "המשתמש לא מורה");
+        }
+
+        TeacherEntity teacher = (TeacherEntity) user;
+
+        List<String> subjects=teacher.getTeachingSubjects();
+        BasicResponse response = new BasicResponse(true, null);
+        response.setData(subjects);
         return response;
     }
 

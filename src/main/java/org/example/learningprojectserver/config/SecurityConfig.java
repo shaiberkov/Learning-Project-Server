@@ -1,6 +1,7 @@
 package org.example.learningprojectserver.config;
 
 import org.example.learningprojectserver.filter.JwtAuthenticationFilter;
+import org.example.learningprojectserver.filter.LoggingFilter;
 import org.example.learningprojectserver.service.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -22,10 +23,13 @@ import java.util.List;
 public class SecurityConfig {
 
     private final JwtService jwtService;
-
+//    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+//    private final LoggingFilter loggingFilter;
     @Autowired
-    public SecurityConfig(JwtService jwtService) {
+    public SecurityConfig(JwtService jwtService, JwtAuthenticationFilter jwtAuthenticationFilter, LoggingFilter loggingFilter) {
         this.jwtService = jwtService;
+//        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+//        this.loggingFilter = loggingFilter;
     }
 
     @Bean
@@ -57,6 +61,7 @@ public class SecurityConfig {
                         .requestMatchers("/Learning-App/Schedule/**").permitAll()
                         .anyRequest().authenticated()
                 )
+//                .addFilterBefore(new LoggingFilter(jwtService), JwtAuthenticationFilter.class) // Logging Filter לפני Jwt
                 .addFilterBefore(new JwtAuthenticationFilter(jwtService), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

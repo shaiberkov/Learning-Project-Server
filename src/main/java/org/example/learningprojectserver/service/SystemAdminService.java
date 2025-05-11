@@ -1,5 +1,6 @@
 package org.example.learningprojectserver.service;
 
+import jakarta.annotation.PostConstruct;
 import org.example.learningprojectserver.entities.SchoolEntity;
 import org.example.learningprojectserver.entities.SchoolManagerEntity;
 import org.example.learningprojectserver.entities.UserEntity;
@@ -70,6 +71,10 @@ private final UserMapperFactory userMapperFactory;
     }
 
 
+@PostConstruct
+public void init() {
+    assignSchoolManagerToSchool("55","10");
+}
 
     public BasicResponse assignSchoolManagerToSchool(String userId, String schoolCode) {
         SchoolEntity school = schoolRepository.findBySchoolCode(schoolCode);
