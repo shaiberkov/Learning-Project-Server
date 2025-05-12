@@ -2,6 +2,7 @@ package org.example.learningprojectserver.service;
 
 import jakarta.transaction.Transactional;
 import org.example.learningprojectserver.dto.LessonDTO;
+import org.example.learningprojectserver.dto.TeacherDTO;
 import org.example.learningprojectserver.dto.TestDTO;
 import org.example.learningprojectserver.entities.*;
 import org.example.learningprojectserver.enums.Role;
@@ -32,9 +33,10 @@ public class TeacherService {
     private final LessonEntityToLessonDTOMapper lessonEntityToLessonDTOMapper;
     private final QuestionEntityToTestQuestionMapper questionEntityToTestQuestionMapper;
     private final TestEntityToTestDTOMapper testEntityToTestDTOMapper;
-
+    private final TeacherEntityToTeacherDTOMapper teacherEntityToTeacherDTOMapper;
+    private final SchoolRepository schoolRepository;
     @Autowired
-    public TeacherService(LessonRepository lessonRepository, UserRepository userRepository, ClassRoomRepository classRoomRepository, ScheduleRepository scheduleRepository, StudentRepository studentRepository, TeacherTestRepository teacherTestRepository, QuestionRepository questionRepository, QuestionEntityToQuestionDTOMapper questionEntityToQuestionDTOMapper, LessonEntityToLessonDTOMapper lessonEntityToLessonDTOMapper, QuestionEntityToTestQuestionMapper questionEntityToTestQuestionMapper, TestEntityToTestDTOMapper testEntityToTestDTOMapper) {
+    public TeacherService(LessonRepository lessonRepository, UserRepository userRepository, ClassRoomRepository classRoomRepository, ScheduleRepository scheduleRepository, StudentRepository studentRepository, TeacherTestRepository teacherTestRepository, QuestionRepository questionRepository, QuestionEntityToQuestionDTOMapper questionEntityToQuestionDTOMapper, LessonEntityToLessonDTOMapper lessonEntityToLessonDTOMapper, QuestionEntityToTestQuestionMapper questionEntityToTestQuestionMapper, TestEntityToTestDTOMapper testEntityToTestDTOMapper, TeacherEntityToTeacherDTOMapper teacherEntityToTeacherDTOMapper, SchoolRepository schoolRepository) {
         this.lessonRepository = lessonRepository;
         this.userRepository = userRepository;
         this.classRoomRepository = classRoomRepository;
@@ -46,7 +48,11 @@ public class TeacherService {
         this.lessonEntityToLessonDTOMapper = lessonEntityToLessonDTOMapper;
         this.questionEntityToTestQuestionMapper = questionEntityToTestQuestionMapper;
         this.testEntityToTestDTOMapper = testEntityToTestDTOMapper;
+        this.teacherEntityToTeacherDTOMapper = teacherEntityToTeacherDTOMapper;
+
+        this.schoolRepository = schoolRepository;
     }
+
 
     public BasicResponse getLessonsForTeacher(String teacherId) {
 
@@ -68,6 +74,33 @@ public class TeacherService {
 
         BasicResponse basicResponse = new BasicResponse(true, null);
         basicResponse.setData(lessonDTOs);
+        return basicResponse;
+    }
+
+    public BasicResponse getTeacherDTO(String teacherId,String schoolCode) {
+
+        UserEntity user = userRepository.findUserByUserId(teacherId);
+        SchoolEntity  school=schoolRepository.findBySchoolCode(schoolCode);
+        if (school == null) {
+            return new BasicResponse(false,"אין בית ספר כזה");
+        }
+        if (user == null) {
+            return new BasicResponse(false, "המורה לא נמצא במערכת");
+
+        }
+        if (user.getRole() != Role.TEACHER) {
+            return new BasicResponse(false, "המשתמש אינו מורה");
+
+        }
+        if (!school.getTeachers().contains(user)) {
+            return new BasicResponse(false, "המורה לא שייך לבית הספר ");
+
+        }
+        TeacherEntity teacher = (TeacherEntity) user;
+        BasicResponse basicResponse = new BasicResponse(true, null);
+
+        TeacherDTO teacherDTO = teacherEntityToTeacherDTOMapper.apply(teacher);
+        basicResponse.setData(teacherDTO);
         return basicResponse;
     }
 
@@ -112,36 +145,47 @@ public class TeacherService {
         return new BasicResponse(true, "המקצוע הוסר בהצלחה מהמורה.");
     }
 
-//TODO לסיים לעבור על זה ליראות שהכל עובד
+
+
     @Transactional
     public BasicResponse addLessonToTeacher(LessonDTO dto, String teacherId) {
         UserEntity user = userRepository.findUserByUserId(teacherId);
-
         if (user == null) {
             return new BasicResponse(false, "מורה לא נמצא");
         }
-//לתקן כי לפי קוד ולפי של בית ספר ושל שם כיתה
+
         ClassRoomEntity classRoom = classRoomRepository.findClassRoomByName(dto.getClassRoomName());
         if (classRoom == null) {
             return new BasicResponse(false, "כיתה לא נמצאה");
         }
 
         TeacherEntity teacher = (TeacherEntity) user;
-        ///////////////////
-teacher.getTeachingClassRooms();
-///////////////////////////
+        if (!teacher.getTeachingClassRooms().contains(classRoom)) {
+            return new BasicResponse(false, "המורה אינו משויך לכיתה '" + dto.getClassRoomName() + "'");
+        }
+
         if (!teacher.getTeachingSubjects().contains(dto.getSubject())) {
             return new BasicResponse(false, "המורה אינו מוסמך ללמד את המקצוע '" + dto.getSubject() + "'");
         }
-        // ניתוח נתונים מתוך DTO
+
         DayOfWeek dayOfWeek = dto.getDayOfWeek();
+        if (dayOfWeek == DayOfWeek.SATURDAY) {
+            return new BasicResponse(false, "לא ניתן לשבץ לשיעור ביום שבת");
+        }
+
         LocalTime startTime = LocalTime.parse(dto.getStartTime());
         LocalTime endTime = LocalTime.parse(dto.getEndTime());
 
-        if (DayOfWeek.SATURDAY==dayOfWeek) {
-            return new BasicResponse(false,"לא ניתן לשבץ לשיעור ביום שבת");
-        }
+        LessonEntity tempLesson = new LessonEntity();
+        tempLesson.setDayOfWeek(dayOfWeek);
+        tempLesson.setStartTime(startTime);
+        tempLesson.setEndTime(endTime);
 
+        for (LessonEntity existingLesson : teacher.getLessons()) {
+            if (isOverlapping(tempLesson, existingLesson)) {
+                return new BasicResponse(false, "קיים כבר שיעור אחר למורה בזמן זה");
+            }
+        }
 
         ScheduleEntity schedule = classRoom.getSchedule();
         if (schedule == null) {
@@ -152,22 +196,9 @@ teacher.getTeachingClassRooms();
             classRoomRepository.save(classRoom);
         }
 
-
-        for (LessonEntity existingLesson : teacher.getLessons()) {
-            if (existingLesson.getDayOfWeek() == dayOfWeek) {
-                boolean overlaps = !(endTime.isBefore(existingLesson.getStartTime()) || startTime.isAfter(existingLesson.getEndTime()));
-                if (overlaps) {
-                    return new BasicResponse(false, "קיים כבר שיעור אחר למורה בזמן זה");
-                }
-            }
-        }
-
         for (LessonEntity existingLesson : schedule.getLessons()) {
-            if (existingLesson.getDayOfWeek() == dayOfWeek) {
-                boolean overlaps = !(endTime.isBefore(existingLesson.getStartTime()) || startTime.isAfter(existingLesson.getEndTime()));
-                if (overlaps) {
-                    return new BasicResponse(false, "קיים כבר שיעור אחר בכיתה בזמן זה");
-                }
+            if (isOverlapping(tempLesson, existingLesson)) {
+                return new BasicResponse(false, "קיים כבר שיעור אחר בכיתה בזמן זה");
             }
         }
 
@@ -184,6 +215,25 @@ teacher.getTeachingClassRooms();
 
         return new BasicResponse(true, "השיעור נוסף בהצלחה");
     }
+
+
+    public boolean isOverlapping(LessonEntity newLesson, LessonEntity existingLesson) {
+        if (newLesson.getDayOfWeek() != existingLesson.getDayOfWeek()) {
+            return false;
+        }
+
+        LocalTime startTime = newLesson.getStartTime();
+        LocalTime endTime = newLesson.getEndTime();
+        LocalTime existingStart = existingLesson.getStartTime();
+        LocalTime existingEnd = existingLesson.getEndTime();
+
+        boolean isExactEdge = startTime.equals(existingEnd) || endTime.equals(existingStart);
+
+        boolean overlaps = startTime.isBefore(existingEnd) && endTime.isAfter(existingStart);
+
+        return overlaps && !isExactEdge;
+    }
+
 
 
 

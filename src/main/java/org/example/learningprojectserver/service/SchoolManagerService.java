@@ -178,39 +178,93 @@ return new BasicResponse(true, schoolCode);
         return new BasicResponse(true, "השכבות הבאות נוספו בהצלחה לבית הספר " + school.getSchoolName() + ": " + String.join(", ", addedGrades));
     }
 
-    public BasicResponse assignTeacherToClass(String schoolCode, String teacherId, String className) {
+//    public BasicResponse assignTeacherToClass(String schoolCode, String teacherId, String className) {
+//        SchoolEntity school = schoolRepository.findBySchoolCode(schoolCode);
+//        if (school == null) {
+//            return new BasicResponse(false, "בית הספר לא נמצא לפי הקוד שסופק");
+//        }
+//
+//        UserEntity user = userRepository.findUserByUserId(teacherId);
+//        if (user == null ) {
+//            return new BasicResponse(false, "המורה לא נמצא או שאינו מורה תקין");
+//        }
+//        TeacherEntity teacher = (TeacherEntity) user;
+//
+//        if (teacher.getTeachingSchool() == null || !teacher.getTeachingSchool().getId().equals(school.getId())) {
+//            return new BasicResponse(false, "המורה אינו שייך לבית ספר זה");
+//        }
+//
+//        ClassRoomEntity targetClass = classRoomRepository.findBySchoolCodeAndClassName(schoolCode, className);
+//        if (targetClass == null) {
+//            return new BasicResponse(false, "כיתה בשם " + className + " לא נמצאה בבית ספר זה");
+//        }
+//
+//        if (targetClass.getTeachers().contains(teacher)) {
+//            return new BasicResponse(false, "המורה " + teacher.getUsername() + " כבר משויך לכיתה " + targetClass.getName());
+//        }
+//
+//        targetClass.getTeachers().add(teacher);
+//        teacher.getTeachingClassRooms().add(targetClass);
+//
+//        classRoomRepository.save(targetClass);
+//
+//        return new BasicResponse(true, "המורה " + teacher.getUsername() + " שובץ בהצלחה לכיתה " + className);
+//    }
+//
+
+
+
+    public BasicResponse assignTeacherToClasses(String schoolCode, String teacherId, List<String> classNames) {
         SchoolEntity school = schoolRepository.findBySchoolCode(schoolCode);
         if (school == null) {
             return new BasicResponse(false, "בית הספר לא נמצא לפי הקוד שסופק");
         }
 
         UserEntity user = userRepository.findUserByUserId(teacherId);
-        if (user == null ) {
+        if (user == null||user.getRole() != Role.TEACHER) {
             return new BasicResponse(false, "המורה לא נמצא או שאינו מורה תקין");
         }
+
         TeacherEntity teacher = (TeacherEntity) user;
 
         if (teacher.getTeachingSchool() == null || !teacher.getTeachingSchool().getId().equals(school.getId())) {
             return new BasicResponse(false, "המורה אינו שייך לבית ספר זה");
         }
 
-        ClassRoomEntity targetClass = classRoomRepository.findBySchoolCodeAndClassName(schoolCode, className);
-        if (targetClass == null) {
-            return new BasicResponse(false, "כיתה בשם " + className + " לא נמצאה בבית ספר זה");
+        List<ClassRoomEntity> targetClasses = classRoomRepository.findBySchoolCodeAndClassNames(schoolCode, classNames);
+        if (targetClasses == null || targetClasses.isEmpty()) {
+            return new BasicResponse(false, "לא נמצאו כיתות תואמות בבית הספר המבוקש");
         }
 
-        if (targetClass.getTeachers().contains(teacher)) {
-            return new BasicResponse(false, "המורה " + teacher.getUsername() + " כבר משויך לכיתה " + targetClass.getName());
+        List<String> newlyAssigned = new ArrayList<>();
+        List<String> alreadyAssigned = new ArrayList<>();
+
+        for (ClassRoomEntity classRoom : targetClasses) {
+            if (classRoom.getTeachers().contains(teacher)) {
+                alreadyAssigned.add(classRoom.getName());
+            } else {
+                classRoom.getTeachers().add(teacher);
+                teacher.getTeachingClassRooms().add(classRoom);
+                newlyAssigned.add(classRoom.getName());
+            }
         }
 
-        targetClass.getTeachers().add(teacher);
-        teacher.getTeachingClassRooms().add(targetClass);
+        if (!newlyAssigned.isEmpty()) {
+            teacherRepository.save(teacher);
+        }
 
-        classRoomRepository.save(targetClass);
+        String message = "המורה " + teacher.getUsername();
 
-        return new BasicResponse(true, "המורה " + teacher.getUsername() + " שובץ בהצלחה לכיתה " + className);
+        if (!newlyAssigned.isEmpty()) {
+            message += " שובץ בהצלחה לכיתות: " + String.join(", ", newlyAssigned);
+        }
+
+        if (!alreadyAssigned.isEmpty()) {
+            message += ". לא שובץ לכיתות: " + String.join(", ", alreadyAssigned) + " כיוון שכבר היה משויך אליהן";
+        }
+
+        return new BasicResponse(true, message);
     }
-
 
     public BasicResponse removeTeacherFromClass(String schoolCode, String teacherId, String className) {
         // שלב 1: מציאת בית הספר

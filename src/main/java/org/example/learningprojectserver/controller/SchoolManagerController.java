@@ -28,6 +28,16 @@ private final ClassRoomService classRoomService;
         this.teacherService = teacherService;
     }
 
+    @GetMapping("/get-teacher-DTO")
+    public BasicResponse getTeacherDTO(@RequestParam String teacherId,@RequestParam String schoolCode) {
+        return teacherService.getTeacherDTO(teacherId,schoolCode);
+    }
+
+    @GetMapping("/get-all-classes-name-by-school-name")
+    public BasicResponse getAllClassesNameBySchoolName(@RequestParam String schoolCode) {
+        return schoolService.getAllClassesNameBySchoolName(schoolCode);
+    }
+
     @GetMapping("/get-school-code")
     public BasicResponse getSchoolCode(@RequestParam String userId){
         return schoolManagerService.getSchoolCode(userId);
@@ -79,12 +89,12 @@ public BasicResponse getAllLessonsForClassRoom(@RequestParam String schoolCode ,
 
     }
 
-    @PostMapping("/assign-teacher")
-    public BasicResponse assignTeacherToClass(
+    @PostMapping("/assign-teacher-to-classes")
+    public BasicResponse assignTeacherToClasses(
             @RequestParam String schoolCode,
             @RequestParam String teacherId,
-            @RequestParam String className) {
-        return schoolManagerService.assignTeacherToClass(schoolCode, teacherId, className);
+            @RequestBody List<String> classNames) {
+        return schoolManagerService.assignTeacherToClasses(schoolCode, teacherId, classNames);
     }
 
     @PostMapping("/remove-teacher-from-class")

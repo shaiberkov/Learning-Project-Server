@@ -21,4 +21,11 @@ public interface ClassRoomRepository extends JpaRepository<ClassRoomEntity, Long
     ClassRoomEntity findClassRoomByName(@Param("name") String name);
 
     @Query("SELECT s.classRoom FROM StudentEntity s WHERE s.userId = :userId")
-    ClassRoomEntity findClassRoomOfUserByUserId(@Param("userId") String userId);}
+    ClassRoomEntity findClassRoomOfUserByUserId(@Param("userId") String userId);
+
+    @Query("SELECT c FROM ClassRoomEntity c WHERE c.school.schoolCode = :schoolCode AND c.name IN :classNames")
+    List<ClassRoomEntity> findBySchoolCodeAndClassNames(@Param("schoolCode") String schoolCode, @Param("classNames") List<String> classNames);
+}
+
+
+

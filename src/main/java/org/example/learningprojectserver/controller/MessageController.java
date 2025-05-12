@@ -17,6 +17,11 @@ private final MessageService messageService;
         this.messageService = messageService;
     }
 
+    @GetMapping("/recipient-types")
+    public BasicResponse getRecipientTypes(@RequestParam String userId) {
+    return messageService.getRecipientTypes(userId);
+    }
+
 
     @PostMapping("/send-message")
     public BasicResponse sendMessage(

@@ -11,6 +11,7 @@ import org.example.learningprojectserver.strategy.message.MessageRecipientStrate
 import org.example.learningprojectserver.strategy.message.MessageRecipientStrategyFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -36,6 +37,37 @@ public class MessageService {
         this.notificationService = notificationService;
         this.messageEntityToMessageDTOMapper = messageEntityToMessageDTOMapper;
     }
+
+    public BasicResponse getRecipientTypes(String userId) {
+        UserEntity user = userRepository.findUserByUserId(userId);
+        if (user == null) {
+            return new BasicResponse(false, "משתמש לא נימצא");
+        }
+
+        List<String> recipientTypes;
+        switch (user.getRole()) {
+            case SYSTEM_ADMIN:
+                recipientTypes = List.of("כל מנהלי בית ספר");
+                break;
+            case SCHOOLMANAGER:
+                recipientTypes = List.of("כיתה", "שכבה", "מורי-שכבה", "כל-המורים", "כל-התלמידים");
+                break;
+            case TEACHER:
+                recipientTypes = List.of("כיתה", "שכבה", "כל-התלמידים");
+                break;
+            case STUDENT:
+                recipientTypes = List.of();
+                break;
+            default:
+                recipientTypes = List.of();
+                break;
+        }
+
+        BasicResponse basicResponse = new BasicResponse(true, null);
+        basicResponse.setData(recipientTypes);
+        return basicResponse;
+    }
+
 
 
     public BasicResponse sendMessage(String senderId,String recipientType,String recipientValue, String title, String content) {
@@ -69,8 +101,6 @@ public class MessageService {
             message.setContent(content);
             message.setSentAt(LocalDateTime.now());
 
-            sender.getSentMessages().add(message);
-            receiver.getReceivedMessages().add(message);
 
             messages.add(message);
 
@@ -86,7 +116,8 @@ public class MessageService {
         String smsMessage = "קיבלת הודעה חדשה במערכת. לצפייה היכנס: https://your-app.com/messages";
 
         sendSms(smsMessage,recipientsPhoneNumber);
-        userRepository.saveAll(recipients);
+
+        messageRepository.saveAll(messages);
 
         return new BasicResponse(true, "ההודעה נשלחה בהצלחה ל־" + messages.size() + " נמענים");
     }
