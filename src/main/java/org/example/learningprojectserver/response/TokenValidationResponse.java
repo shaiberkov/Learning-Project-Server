@@ -7,6 +7,7 @@ public class TokenValidationResponse extends BasicResponse{
 
         private String username;
         private String role;
+        private String SchoolCode;
 
         public TokenValidationResponse(boolean success, String error, boolean isValid,String username
         ) {
@@ -15,7 +16,15 @@ public class TokenValidationResponse extends BasicResponse{
             this.username = username;
         }
 
-        public TokenValidationResponse() {
+    public String getSchoolCode() {
+        return SchoolCode;
+    }
+
+    public void setSchoolCode(String schoolCode) {
+        SchoolCode = schoolCode;
+    }
+
+    public TokenValidationResponse() {
 
         }
 

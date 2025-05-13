@@ -15,7 +15,8 @@ public interface StudentRepository extends JpaRepository<StudentEntity, Long> {
     @Query("SELECT s FROM StudentEntity s WHERE s.userId IN :userIds")
     List<StudentEntity> findStudentsByUserIds(@Param("userIds") List<String> userIds);
 
-
+    @Query("SELECT s.schoolName.schoolCode FROM StudentEntity s WHERE s.userId = :userId")
+    String findSchoolCodeByUserId(@Param("userId") String userId);
 
 
 }
