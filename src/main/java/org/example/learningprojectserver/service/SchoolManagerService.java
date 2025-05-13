@@ -245,6 +245,16 @@ return new BasicResponse(true, schoolCode);
             } else {
                 classRoom.getTeachers().add(teacher);
                 teacher.getTeachingClassRooms().add(classRoom);
+
+                for (StudentEntity student : classRoom.getStudents()) {
+                    if (!teacher.getStudents().contains(student)) {
+                        teacher.getStudents().add(student);
+                    }
+                    if (!student.getTeachers().contains(teacher)) {
+                        student.getTeachers().add(teacher);
+                    }
+                }
+
                 newlyAssigned.add(classRoom.getName());
             }
         }
@@ -265,7 +275,7 @@ return new BasicResponse(true, schoolCode);
 
         return new BasicResponse(true, message);
     }
-
+    //TODO ליראות שעובד והכל נישמר נכון
     public BasicResponse removeTeacherFromClass(String schoolCode, String teacherId, String className) {
         // שלב 1: מציאת בית הספר
         SchoolEntity school = schoolRepository.findBySchoolCode(schoolCode);
@@ -422,7 +432,7 @@ return new BasicResponse(true, schoolCode);
         return new BasicResponse(true, "כיתה " + className + " נוספה בהצלחה לשכבה " + gradeName);
     }
 
-    public BasicResponse assignStudentToClass(String schoolCode, String studentId, String gradeName, String className) {
+    public BasicResponse assignStudentToClass(String schoolCode, String studentId, String className) {
 
         SchoolEntity school = schoolRepository.findBySchoolCode(schoolCode);
         if (school == null) {
@@ -430,35 +440,37 @@ return new BasicResponse(true, schoolCode);
         }
 
         UserEntity user = userRepository.findUserByUserId(studentId);
+
         if (user == null || user.getRole() != Role.STUDENT) {
             return new BasicResponse(false, "המשתמש לא נמצא או שאינו תלמיד");
         }
         StudentEntity student = (StudentEntity) user;
 
-        SchoolGradeEntity grade = school.getSchoolGrades().stream()
-                .filter(g -> g.getGradeName().equalsIgnoreCase(gradeName))
-                .findFirst()
-                .orElse(null);
-        if (grade == null) {
-            return new BasicResponse(false, "השכבה " + gradeName + " לא קיימת בבית הספר");
+        if (student.getClassRoom() != null && student.getClassRoom().getName().equals(className)) {
+            return new BasicResponse(false, "הסטודנט כבר משויך לכיתה זו");
         }
 
-        ClassRoomEntity targetClass = grade.getClasses().stream()
-                .filter(c -> c.getName().equalsIgnoreCase(className))
-                .findFirst()
-                .orElse(null);
+        ClassRoomEntity targetClass = classRoomRepository.findBySchoolCodeAndClassName(schoolCode, className);
+
         if (targetClass == null) {
-            return new BasicResponse(false, "כיתה בשם " + className + " לא נמצאה בשכבה " + gradeName);
+            return new BasicResponse(false, "כיתה בשם " + className + " לא נמצאה");
         }
 
-        if (student.getClassRoom() != null && student.getClassRoom().getGrade().equals(grade)) {
-            return new BasicResponse(false, "הסטודנט כבר משויך לכיתה בשכבה זו");
+        for (TeacherEntity teacher : targetClass.getTeachers()) {
+            if (!teacher.getStudents().contains(student)) {
+                teacher.getStudents().add(student);
+            }
+
+            if (!student.getTeachers().contains(teacher)) {
+                student.getTeachers().add(teacher);
+            }
         }
         targetClass.getStudents().add(student);
         student.setClassRoom(targetClass);
+        student.setSchoolName(school);
         studentRepository.save(student);
 
-        return new BasicResponse(true, "התלמיד " + student.getUsername() + " שויך בהצלחה לכיתה " + className + " בשכבה " + gradeName);
+        return new BasicResponse(true, "התלמיד " + student.getUsername() + " שויך בהצלחה לכיתה " + className);
     }
 
 

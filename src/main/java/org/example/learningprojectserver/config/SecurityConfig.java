@@ -22,18 +22,19 @@ import java.util.List;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    private final JwtService jwtService;
-//    private final JwtAuthenticationFilter jwtAuthenticationFilter;
-//    private final LoggingFilter loggingFilter;
-    @Autowired
-    public SecurityConfig(JwtService jwtService, JwtAuthenticationFilter jwtAuthenticationFilter, LoggingFilter loggingFilter) {
-        this.jwtService = jwtService;
-//        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
-//        this.loggingFilter = loggingFilter;
+
+    @Bean
+    public JwtAuthenticationFilter jwtAuthenticationFilter(JwtService jwtService) {
+        return new JwtAuthenticationFilter(jwtService);
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public LoggingFilter loggingFilter(JwtService jwtService) {
+        return new LoggingFilter(jwtService);
+    }
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http,JwtAuthenticationFilter jwtAuthenticationFilter,
+                                                   LoggingFilter loggingFilter) throws Exception {
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
@@ -49,7 +50,7 @@ public class SecurityConfig {
                         .requestMatchers("/Learning-App/System-Admin/**").hasRole("SYSTEM_ADMIN")
                         .requestMatchers("/Learning-App/School-Manager/**").permitAll()    //hasAnyRole("SCHOOLMANAGER", "SYSTEM_ADMIN")
                         .requestMatchers("/Learning-App/Teacher/**").permitAll()    //hasAnyRole("TEACHER", "SCHOOLMANAGER", "SYSTEM_ADMIN")//todo  לבודד את ההרשאות
-                        .requestMatchers("/Learning-App/Student/**").hasAnyRole("STUDENT")
+                        .requestMatchers("/Learning-App/Student/**").permitAll()//hasRole("STUDENT")//hasAnyRole("STUDENT")
                         .requestMatchers("/Learning-App/Active-User/**").hasAnyRole("SYSTEM_ADMIN","TEACHER", "SCHOOLMANAGER","STUDENT")
                         .requestMatchers("/Learning-App/Chat/**").hasAnyRole("SYSTEM_ADMIN","TEACHER", "SCHOOLMANAGER","STUDENT" )
                         .requestMatchers("/Learning-App/Question/**").hasAnyRole("TEACHER", "SCHOOLMANAGER","STUDENT")
@@ -61,8 +62,9 @@ public class SecurityConfig {
                         .requestMatchers("/Learning-App/Schedule/**").permitAll()
                         .anyRequest().authenticated()
                 )
-//                .addFilterBefore(new LoggingFilter(jwtService), JwtAuthenticationFilter.class) // Logging Filter לפני Jwt
-                .addFilterBefore(new JwtAuthenticationFilter(jwtService), UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(loggingFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+
 
         return http.build();
     }

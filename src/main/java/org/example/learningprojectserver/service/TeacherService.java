@@ -35,8 +35,10 @@ public class TeacherService {
     private final TestEntityToTestDTOMapper testEntityToTestDTOMapper;
     private final TeacherEntityToTeacherDTOMapper teacherEntityToTeacherDTOMapper;
     private final SchoolRepository schoolRepository;
+    private final LessonsToScheduleMapper lessonsToScheduleMapper;
+
     @Autowired
-    public TeacherService(LessonRepository lessonRepository, UserRepository userRepository, ClassRoomRepository classRoomRepository, ScheduleRepository scheduleRepository, StudentRepository studentRepository, TeacherTestRepository teacherTestRepository, QuestionRepository questionRepository, QuestionEntityToQuestionDTOMapper questionEntityToQuestionDTOMapper, LessonEntityToLessonDTOMapper lessonEntityToLessonDTOMapper, QuestionEntityToTestQuestionMapper questionEntityToTestQuestionMapper, TestEntityToTestDTOMapper testEntityToTestDTOMapper, TeacherEntityToTeacherDTOMapper teacherEntityToTeacherDTOMapper, SchoolRepository schoolRepository) {
+    public TeacherService(LessonRepository lessonRepository, UserRepository userRepository, ClassRoomRepository classRoomRepository, ScheduleRepository scheduleRepository, StudentRepository studentRepository, TeacherTestRepository teacherTestRepository, QuestionRepository questionRepository, QuestionEntityToQuestionDTOMapper questionEntityToQuestionDTOMapper, LessonEntityToLessonDTOMapper lessonEntityToLessonDTOMapper, QuestionEntityToTestQuestionMapper questionEntityToTestQuestionMapper, TestEntityToTestDTOMapper testEntityToTestDTOMapper, TeacherEntityToTeacherDTOMapper teacherEntityToTeacherDTOMapper, SchoolRepository schoolRepository, LessonsToScheduleMapper lessonsToScheduleMapper) {
         this.lessonRepository = lessonRepository;
         this.userRepository = userRepository;
         this.classRoomRepository = classRoomRepository;
@@ -49,8 +51,8 @@ public class TeacherService {
         this.questionEntityToTestQuestionMapper = questionEntityToTestQuestionMapper;
         this.testEntityToTestDTOMapper = testEntityToTestDTOMapper;
         this.teacherEntityToTeacherDTOMapper = teacherEntityToTeacherDTOMapper;
-
         this.schoolRepository = schoolRepository;
+        this.lessonsToScheduleMapper = lessonsToScheduleMapper;
     }
 
 
@@ -237,20 +239,6 @@ public class TeacherService {
 
 
 
-
-
-
-    //@PostConstruct()
-    //public void init() {
-//        addTeachingSubjectToTeacher("310594015",List.of("מתמטיקה","עיברית"));
-//        LessonDTO dto = new LessonDTO("מתמללללטיקה", DayOfWeek.THURSDAY.toString(), "10:00", "11:00");
-//        dto.setClassRoomName("ג'1");
-//        System.out.println(addLessonToTeacher(dto, "310594015"));
-
-    //}
-
-
-
 //    @PostConstruct()
 //    public void init() {
 //
@@ -361,18 +349,7 @@ public class TeacherService {
             return new BasicResponse(false,"אין כרגע שיעורים");
         }
 
-        Map<DayOfWeek, List<LessonDTO>> lessonsByDay = teacher.getLessons().stream()
-                .map(lessonEntityToLessonDTOMapper)
-                .collect(Collectors.groupingBy(
-                        LessonDTO::getDayOfWeek,
-                        TreeMap::new,
-                        Collectors.collectingAndThen(
-                                Collectors.toList(),
-                                (List<LessonDTO> list) -> list.stream()
-                                        .sorted(Comparator.comparing(LessonDTO::getStartTime))
-                                        .collect(Collectors.toList())
-                        )
-                ));
+        Map<DayOfWeek, List<LessonDTO>> lessonsByDay = lessonsToScheduleMapper.apply(teacher.getLessons());
 
 
         BasicResponse response = new BasicResponse(true, null);

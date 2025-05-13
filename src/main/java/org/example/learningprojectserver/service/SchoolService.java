@@ -43,7 +43,7 @@ public class SchoolService {
         return response;
     }
 
-    public BasicResponse getAllClassesNameBySchoolName(String schoolCode) {
+    public BasicResponse getAllClassesNameBySchoolCode(String schoolCode) {
 
          if (schoolCode == null ) {
              return new BasicResponse(false, "אין בית ספר כזה ");

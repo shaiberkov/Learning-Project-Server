@@ -33,13 +33,13 @@ public class TeacherEntity extends UserEntity {
     private List<String> teachingSubjects=new ArrayList<>();
 
 
-    @OneToMany(mappedBy = "teacher", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "teacher")
     private List<TeacherTestEntity> tests = new ArrayList<>();
 
-    @OneToMany(mappedBy = "teacher", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "teacher",fetch = FetchType.EAGER)
     private List<LessonEntity> lessons = new ArrayList<>();
 
-    @OneToMany(mappedBy = "teacher", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "teacher")
     private List<TeacherTestResultEntity> testResults=new ArrayList<>();
 
     public List<TeacherTestResultEntity> getTestResults() {

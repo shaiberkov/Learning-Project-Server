@@ -15,6 +15,8 @@ public class LessonEntityToLessonDTOMapper implements Mapper<LessonEntity, Lesso
         dto.setStartTime(lesson.getStartTime().toString());
         dto.setEndTime(lesson.getEndTime().toString());
         dto.setClassRoomName(lesson.getSchedule().getClassRoom().getName());
+        dto.setTeacherName(lesson.getTeacher().getUsername());
+
         return dto;
     }
 }

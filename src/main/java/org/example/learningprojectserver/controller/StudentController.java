@@ -24,6 +24,12 @@ private final TestResultService testResultService;
         this.testResultService = testResultService;
     }
 
+
+    @GetMapping("/get-student-schedule")
+    public BasicResponse getStudentSchedule(@RequestParam String schoolCode,@RequestParam String studentId){
+        return studentService.getStudentSchedule(schoolCode,studentId);
+    }
+
     @GetMapping("/generate-question")
     public BasicResponse generateQuestionForPractice(
             @RequestParam String userId,

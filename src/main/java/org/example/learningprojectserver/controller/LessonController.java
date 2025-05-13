@@ -15,16 +15,16 @@ import org.springframework.web.bind.annotation.RestController;
 public class LessonController {
 
 
-    private final TeacherService teacherService;
-@Autowired
-    public LessonController(TeacherService teacherService) {
-        this.teacherService = teacherService;
-    }
+//    private final TeacherService teacherService;
+//@Autowired
+//    public LessonController(TeacherService teacherService) {
+//        this.teacherService = teacherService;
+//    }
 
-    @GetMapping("/teacher/lessons")
-    public BasicResponse getLessonsForTeacher(@RequestParam String teacherId) {
-    return teacherService.getLessonsForTeacher(teacherId);
-    }
+//    @GetMapping("/teacher/lessons")
+//    public BasicResponse getLessonsForTeacher(@RequestParam String teacherId) {
+//    return teacherService.getLessonsForTeacher(teacherId);
+   //}
 
 
 

@@ -13,12 +13,12 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.time.LocalDateTime;
 
-@Component
+
 public class LoggingFilter extends OncePerRequestFilter {
 
 
     private final JwtService jwtService;
-@Autowired
+
     public LoggingFilter(JwtService jwtService) {
         this.jwtService = jwtService;
     }

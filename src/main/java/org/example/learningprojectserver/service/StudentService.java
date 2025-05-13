@@ -1,6 +1,8 @@
 package org.example.learningprojectserver.service;
 
+import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
+import org.example.learningprojectserver.dto.LessonDTO;
 import org.example.learningprojectserver.dto.MessageDTO;
 import org.example.learningprojectserver.dto.QuestionDTO;
 import org.example.learningprojectserver.dto.TestDTO;
@@ -16,6 +18,7 @@ import org.example.learningprojectserver.service.QuestionGenerator.SubjectQuesti
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -36,9 +39,11 @@ private final QuestionEntityToTestQuestionMapper questionEntityToTestQuestionMap
 private final TestEntityToTestDTOMapper testEntityToTestDTOMapper;
 private final QuestionEntityToQuestionDTOMapper questionEntityToQuestionDTOMapper;
 private final QuestionEntityToPracticeQuestionMapper questionEntityToPracticeQuestionMapper;
+private final SchoolRepository schoolRepository;
+private final LessonsToScheduleMapper lessonsToScheduleMapper;
 
 @Autowired
-    public StudentService(StudentProgressRepository studentProgressRepository, StudentQuestionHistoryRepository studentQuestionHistoryRepository, QuestionRepository questionRepository, UserRepository userRepository, PracticeTestRepository practiceTestRepository, ClassRoomRepository classRoomRepository, QuestionEntityToTestQuestionMapper questionEntityToTestQuestionMapper, QuestionEntityToQuestionDTOMapper questionEntityToQuestionDTOMapper, TestEntityToTestDTOMapper testEntityToTestDTOMapper, QuestionEntityToQuestionDTOMapper questionEntityToQuestionDTOMapper1, QuestionEntityToPracticeQuestionMapper questionEntityToPracticeQuestionMapper) {
+    public StudentService(StudentProgressRepository studentProgressRepository, StudentQuestionHistoryRepository studentQuestionHistoryRepository, QuestionRepository questionRepository, UserRepository userRepository, PracticeTestRepository practiceTestRepository, ClassRoomRepository classRoomRepository, QuestionEntityToTestQuestionMapper questionEntityToTestQuestionMapper, QuestionEntityToQuestionDTOMapper questionEntityToQuestionDTOMapper, TestEntityToTestDTOMapper testEntityToTestDTOMapper, QuestionEntityToQuestionDTOMapper questionEntityToQuestionDTOMapper1, QuestionEntityToPracticeQuestionMapper questionEntityToPracticeQuestionMapper, SchoolRepository schoolRepository, LessonsToScheduleMapper lessonsToScheduleMapper) {
         this.studentProgressRepository = studentProgressRepository;
         this.studentQuestionHistoryRepository = studentQuestionHistoryRepository;
         this.questionRepository = questionRepository;
@@ -49,8 +54,36 @@ private final QuestionEntityToPracticeQuestionMapper questionEntityToPracticeQue
     this.testEntityToTestDTOMapper = testEntityToTestDTOMapper;
     this.questionEntityToQuestionDTOMapper = questionEntityToQuestionDTOMapper1;
     this.questionEntityToPracticeQuestionMapper = questionEntityToPracticeQuestionMapper;
+    this.schoolRepository = schoolRepository;
+    this.lessonsToScheduleMapper = lessonsToScheduleMapper;
 }
 
+//@PostConstruct
+//public void init() {
+//    System.out.println(getStudentSchedule("10","325256017"));
+//}
+
+public BasicResponse getStudentSchedule(String schoolCode, String studentId){
+
+    SchoolEntity school = schoolRepository.findBySchoolCode(schoolCode);
+    if (school == null) {
+        return new BasicResponse(false, "בית הספר לא נמצא לפי הקוד שסופק");
+    }
+
+    UserEntity user = userRepository.findUserByUserId(studentId);
+    if (user == null || user.getRole() != Role.STUDENT) {
+        return new BasicResponse(false, "המשתמש לא נמצא או שאינו תלמיד");
+    }
+    StudentEntity student = (StudentEntity) user;
+
+    List<LessonEntity> studentsLessons=student.getClassRoom().getSchedule().getLessons();
+
+    Map<DayOfWeek, List<LessonDTO>> lessonsByDay = lessonsToScheduleMapper.apply(studentsLessons);
+
+    BasicResponse response = new BasicResponse(true, null);
+    response.setData(lessonsByDay);
+return response;
+}
 
 
 //    @PostConstruct

@@ -33,9 +33,9 @@ private final ClassRoomService classRoomService;
         return teacherService.getTeacherDTO(teacherId,schoolCode);
     }
 
-    @GetMapping("/get-all-classes-name-by-school-name")
-    public BasicResponse getAllClassesNameBySchoolName(@RequestParam String schoolCode) {
-        return schoolService.getAllClassesNameBySchoolName(schoolCode);
+    @GetMapping("/get-all-classes-name-by-school-code")
+    public BasicResponse getAllClassesNameBySchoolCode(@RequestParam String schoolCode) {
+        return schoolService.getAllClassesNameBySchoolCode(schoolCode);
     }
 
     @GetMapping("/get-school-code")
@@ -44,9 +44,9 @@ private final ClassRoomService classRoomService;
 
     }
 
-@GetMapping("/get-all-lessons-for-classRoom")
+@GetMapping("/get-schedule-for-classRoom")
 public BasicResponse getAllLessonsForClassRoom(@RequestParam String schoolCode , @RequestParam String classRoomName) {
-        return classRoomService.getAllLessonsForClassRoom(schoolCode, classRoomName);
+        return classRoomService.getScheduleForClassRoom(schoolCode, classRoomName);
 
 }
 
@@ -131,17 +131,16 @@ public BasicResponse getAllLessonsForClassRoom(@RequestParam String schoolCode ,
         return teacherService.removeTeachingSubjectFromTeacher(teacherId, subjectToRemove);
     }
 
-    @PostMapping("/assign")
+    @PostMapping("/assign-student-to-class")
     public BasicResponse assignStudentToClass(
             @RequestParam String schoolCode,
             @RequestParam String studentId,
-            @RequestParam String gradeName,
             @RequestParam String className
     ) {
-        return schoolManagerService.assignStudentToClass(schoolCode, studentId, gradeName, className);
+        return schoolManagerService.assignStudentToClass(schoolCode, studentId, className);
     }
 
-    @PostMapping("/change-class")
+    @PostMapping("/change-student-class")
     public BasicResponse changeStudentClass(
             @RequestParam String schoolCode,
             @RequestParam String studentId,

@@ -8,10 +8,19 @@ public class LessonDTO {
     private String startTime;
     private String endTime;
     private String classRoomName;
+    private String teacherName;
 
 
 
     public LessonDTO() {
+    }
+
+    public String getTeacherName() {
+        return teacherName;
+    }
+
+    public void setTeacherName(String teacherName) {
+        this.teacherName = teacherName;
     }
 
     public String getSubject() {
@@ -52,5 +61,17 @@ public class LessonDTO {
 
     public void setEndTime(String endTime) {
         this.endTime = endTime;
+    }
+
+    @Override
+    public String toString() {
+        return "LessonDTO{" +
+                "subject='" + subject + '\'' +
+                ", dayOfWeek=" + dayOfWeek +
+                ", startTime='" + startTime + '\'' +
+                ", endTime='" + endTime + '\'' +
+                ", classRoomName='" + classRoomName + '\'' +
+                ", teacherName='" + teacherName + '\'' +
+                '}';
     }
 }
