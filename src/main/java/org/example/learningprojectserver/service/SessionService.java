@@ -10,6 +10,9 @@ import org.example.learningprojectserver.utils.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 @Service
 public class SessionService {
 
@@ -18,6 +21,9 @@ public class SessionService {
     private final SchoolManagerRepository schoolManagerRepository;
     private final TeacherRepository teacherRepository;
     private final StudentRepository studentRepository;
+    //todo לנקות את המטמון
+    private final Map<String, TokenValidationResponse> tokenCache = new ConcurrentHashMap<>();
+
 
 
     @Autowired
@@ -30,6 +36,10 @@ public class SessionService {
     }
 
     public TokenValidationResponse validateToken(String cleanToken) {
+
+        if (tokenCache.containsKey(cleanToken)) {
+            return tokenCache.get(cleanToken);
+        }
         boolean isValid = jwtService.isTokenValid(cleanToken);
         String username = "";
         String userId = "";
@@ -64,7 +74,11 @@ public class SessionService {
         tokenValidationResponse.setRole(role);
         if (!"SYSTEM_ADMIN".equals(role)) {
             tokenValidationResponse.setSchoolCode(schoolCode);
-        }        return tokenValidationResponse;
+        }
+
+        tokenCache.put(cleanToken, tokenValidationResponse);
+
+        return tokenValidationResponse;
     }
 
 

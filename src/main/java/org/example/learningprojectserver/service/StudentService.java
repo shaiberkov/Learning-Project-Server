@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+
 @Service
 public class StudentService {
 
@@ -41,9 +42,11 @@ private final QuestionEntityToQuestionDTOMapper questionEntityToQuestionDTOMappe
 private final QuestionEntityToPracticeQuestionMapper questionEntityToPracticeQuestionMapper;
 private final SchoolRepository schoolRepository;
 private final LessonsToScheduleMapper lessonsToScheduleMapper;
+private final ChatGptService chatGptService;
+
 
 @Autowired
-    public StudentService(StudentProgressRepository studentProgressRepository, StudentQuestionHistoryRepository studentQuestionHistoryRepository, QuestionRepository questionRepository, UserRepository userRepository, PracticeTestRepository practiceTestRepository, ClassRoomRepository classRoomRepository, QuestionEntityToTestQuestionMapper questionEntityToTestQuestionMapper, QuestionEntityToQuestionDTOMapper questionEntityToQuestionDTOMapper, TestEntityToTestDTOMapper testEntityToTestDTOMapper, QuestionEntityToQuestionDTOMapper questionEntityToQuestionDTOMapper1, QuestionEntityToPracticeQuestionMapper questionEntityToPracticeQuestionMapper, SchoolRepository schoolRepository, LessonsToScheduleMapper lessonsToScheduleMapper) {
+    public StudentService(StudentProgressRepository studentProgressRepository, StudentQuestionHistoryRepository studentQuestionHistoryRepository, QuestionRepository questionRepository, UserRepository userRepository, PracticeTestRepository practiceTestRepository, ClassRoomRepository classRoomRepository, QuestionEntityToTestQuestionMapper questionEntityToTestQuestionMapper, QuestionEntityToQuestionDTOMapper questionEntityToQuestionDTOMapper, TestEntityToTestDTOMapper testEntityToTestDTOMapper, QuestionEntityToQuestionDTOMapper questionEntityToQuestionDTOMapper1, QuestionEntityToPracticeQuestionMapper questionEntityToPracticeQuestionMapper, SchoolRepository schoolRepository, LessonsToScheduleMapper lessonsToScheduleMapper, ChatGptService chatGptService) {
         this.studentProgressRepository = studentProgressRepository;
         this.studentQuestionHistoryRepository = studentQuestionHistoryRepository;
         this.questionRepository = questionRepository;
@@ -56,6 +59,7 @@ private final LessonsToScheduleMapper lessonsToScheduleMapper;
     this.questionEntityToPracticeQuestionMapper = questionEntityToPracticeQuestionMapper;
     this.schoolRepository = schoolRepository;
     this.lessonsToScheduleMapper = lessonsToScheduleMapper;
+    this.chatGptService = chatGptService;
 }
 
 //@PostConstruct
@@ -91,8 +95,26 @@ return response;
 //        System.out.println(generateQuestionForPractice("325256022","מתמטיקה","מספרים שלמים","חיבור מספרים שלמים"));
 //        System.out.println(submitAnswer("325256022", 1L,"מתמטיקה","מספרים שלמים","חיבור מספרים שלמים","6+7","1"));
 //    }
+public void sendJobMessage(String userId,String subject,String subTopic) {
+    String job = String.format("""
+            אתה מורה פרטי ל%s שמדבר עברית ורק עברית.
+            אתה מסביר בצורה פשוטה וברורה, כך שגם ילדים יוכלו להבין אותך בקלות.
+            אם תקבל שאלה לפתרון מהסוג: "%s",
+            אתה תסביר לתלמיד איך לחשוב על הפתרון,
+            אבל בשום פנים ואופן **לא תגלה לו את התשובה!**
+            רק תדריך אותו צעד-צעד איך לגשת לפתרון בצורה קלה להבנה.
+            תשתמש בדוגמאות פשוטות ותסביר במילים ברורות, בלי מונחים מסובכים,
+            וכל הודעה שלך תישלח רק דרך פתרון אחת כדי שהתלמיד לא יקבל הודעה ארוכה ולא מובנת.
+            אם התלמיד לא מבין, תסביר שוב בדרך אחרת, אפילו עם דוגמה מהחיים האמיתיים.
+            כל שאלה שלא קשורה למה שעכשיו ציינתי – אל תענה,
+            ותזכיר לתלמיד שאתה מורה ל%s שבא לעזור לו בשאלות מהסוג שקיבלת בפורמט הזה.
+        """, subject, subTopic, subject);
+    chatGptService.initializeConversationWithJob(userId, job);
+
+}
 
     public BasicResponse generateQuestionForPractice(String userId, String subject, String topic, String subTopic) {
+        sendJobMessage(userId,subject,subTopic);
 
        UserEntity user= userRepository.findUserByUserId(userId);
        if(user == null) {
