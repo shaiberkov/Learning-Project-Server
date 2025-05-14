@@ -61,11 +61,11 @@ private final TestResultService testResultService;
 
     @PostMapping("/check-practice-test")
     public BasicResponse checkPracticeTest(
-            @RequestParam String userid,
+            @RequestParam String userId,
             @RequestParam Long testId,
             @RequestBody Map<Long, String> userAnswers) {
 
-        return testResultService.checkPracticeTest(userid, testId, userAnswers);
+        return testResultService.checkPracticeTest(userId, testId, userAnswers);
     }
 
 

@@ -10,9 +10,7 @@ import java.io.File;
 @EnableScheduling
 public class LearningProjectServerApplication {
 
-    public static void main(String[] args) {
-        SpringApplication.run(LearningProjectServerApplication.class, args);
-
+   public static void main(String[] args) {
+      SpringApplication.run(LearningProjectServerApplication.class, args);
     }
-
 }
