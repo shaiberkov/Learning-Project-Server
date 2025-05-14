@@ -127,10 +127,7 @@ public class GptMassenger {
         }
         return null;
     }
-//    public static void clearConversation(String userId) {
-//        if (userConversations.containsKey(userId)) {
-//            userConversations.get(userId).clear();
-//        }
+
     }
 
 
