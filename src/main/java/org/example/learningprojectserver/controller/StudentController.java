@@ -1,6 +1,7 @@
 package org.example.learningprojectserver.controller;
 
 import org.example.learningprojectserver.dto.QuestionDTO;
+import org.example.learningprojectserver.dto.UserTestStatusDTO;
 import org.example.learningprojectserver.response.BasicResponse;
 import org.example.learningprojectserver.response.SubmitAnswerResponse;
 import org.example.learningprojectserver.service.StudentService;
@@ -8,6 +9,7 @@ import org.example.learningprojectserver.service.TestResultService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -66,6 +68,27 @@ private final TestResultService testResultService;
             @RequestBody Map<Long, String> userAnswers) {
 
         return testResultService.checkPracticeTest(userId, testId, userAnswers);
+    }
+
+    @PostMapping("/check-teacher-test")
+    public BasicResponse checkTeacherTest(
+            @RequestParam String userId,
+            @RequestParam Long testId,
+            @RequestBody Map<Long, String> userAnswers) {
+
+        return testResultService.checkTeacherTest(userId,testId, userAnswers);
+    }
+
+    @PostMapping("/start-test")
+    public BasicResponse startTest(
+            @RequestParam String userId,
+            @RequestParam Long testId) {
+        return testResultService.startTest(testId,userId);
+    }
+
+    @GetMapping("/get-student-tests-status")
+    public List<UserTestStatusDTO> getStudentTestsStatus(@RequestParam String studentId){
+        return studentService.getStudentTestsStatus(studentId);
     }
 
 

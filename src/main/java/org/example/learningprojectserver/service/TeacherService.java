@@ -294,6 +294,7 @@ public class TeacherService {
         // קביעת התלמידים במבחן
         testEntity.setStudents(students);
 
+
         // שמירה של המבחן במאגר
         teacherTestRepository.save(testEntity);
 
@@ -318,8 +319,14 @@ public class TeacherService {
             questions.add(testQuestionEntity);
         }
 
+
         testEntity.setQuestions(questions);
+
+        for (StudentEntity student : students) {
+            student.getTeacherTests().add(testEntity);
+        }
         teacherTestRepository.save(testEntity);
+
 
 
 

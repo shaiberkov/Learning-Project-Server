@@ -29,13 +29,13 @@ public class StudentEntity extends UserEntity {
     @OneToMany(mappedBy = "student", cascade = CascadeType.ALL,fetch = FetchType.EAGER)
     private List<PracticeTestResultEntity> practiceTestsResult=new ArrayList<>();
 
-    @OneToMany(mappedBy = "student", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<TeacherTestResultEntity> teacherTestsResult=new ArrayList<>();
 
     @OneToMany(mappedBy = "student", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<PracticeTestEntity> practiceTests=new ArrayList<>();
 
-    @ManyToMany(mappedBy = "students")
+    @ManyToMany(mappedBy = "students", fetch = FetchType.EAGER)
     private List<TeacherTestEntity> teacherTests=new ArrayList<>();
 
 

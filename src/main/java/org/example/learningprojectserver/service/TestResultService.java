@@ -1,6 +1,7 @@
 package org.example.learningprojectserver.service;
 
 
+import jakarta.annotation.PostConstruct;
 import org.example.learningprojectserver.dto.QuestionDTO;
 import org.example.learningprojectserver.dto.TestDTO;
 import org.example.learningprojectserver.entities.*;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -29,6 +31,7 @@ public class TestResultService {
     private final PracticeTestRepository practiceTestRepository;
     private final TeacherTestResultRepository teacherTestResultRepository;
     private final TeacherTestRepository teacherTestRepository;
+
 
     @Autowired
     public TestResultService(QuestionRepository questionRepository
@@ -67,13 +70,42 @@ public class TestResultService {
 
 
 
-//@PostConstruct
-//public void init() {
-//        Map<Long,String> u=new HashMap<>();
-//        u.put(25L,"8");
-//        u.put(26L,"0");
-//    System.out.println(checkPracticeTest("325256022", 13L,u));
-//}
+
+
+
+    public BasicResponse startTest(Long testId,String userId) {
+        TeacherTestEntity testEntity = teacherTestRepository.findTeacherTestByTestId(testId);
+
+        if (testEntity == null) {
+            return new BasicResponse(false, "מבחן לא קיים");
+        }
+
+
+        String testStartTime = testEntity.getStartTime();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+        LocalDateTime testStartDateTime = LocalDateTime.parse(testStartTime, formatter);
+        LocalDateTime now = LocalDateTime.now();
+
+        if (!now.toLocalDate().isEqual(testStartDateTime.toLocalDate())) {
+            return new BasicResponse(false, "התאריך הנוכחי לא תואם לתאריך המבחן");
+        }
+
+
+        if (now.isBefore(testStartDateTime)) {
+            return new BasicResponse(false, "הזמן טרם הגיע להתחלת המבחן");
+        }
+
+        if (now.isAfter(testStartDateTime.plusMinutes(15))) {
+            Map<Long,String> userAnswers= new HashMap<>();
+            for (QuestionEntity questionEntity : testEntity.getQuestions()) {
+                userAnswers.put(questionEntity.getId(),"");
+            }
+                checkTeacherTest(userId,testId,userAnswers);
+            return new BasicResponse(false, "המבחן לא יכול להתחיל אחרי 15 דקות מתחילת הזמן לכן ציון 0");
+        }
+        return new BasicResponse(true, "המבחן התחיל בהצלחה");
+    }
+
 
     public BasicResponse checkPracticeTest(String userid, Long testId, Map<Long, String> userAnswers) {
 
@@ -147,66 +179,21 @@ public class TestResultService {
     }
 
 
-//    public TestResultResponse getTestResultResponse(String userName, Long testId, Map<Long, String> userAnswers) {
-//        TestResultEntity testResultEntity = checkTest(userName, testId, userAnswers);
-//
-//        if (testResultEntity == null) {
-//            return null;
-//        }
-//
-//        TestResultResponse response = new TestResultResponse();
-//        response.setScore(testResultEntity.getScore());
-//        response.setCorrectAnswers(testResultEntity.getCorrectAnswers());
-//        response.setIncorrectAnswers(testResultEntity.getIncorrectAnswers());
-//        response.setCorrectAnswerList(testResultEntity.getCorrectQuestions().stream().map(QuestionEntity::getQuestionText).collect(Collectors.toList()));
-//        response.setIncorrectAnswerList(testResultEntity.getIncorrectQuestions().stream().map(QuestionEntity::getQuestionText).collect(Collectors.toList()));
-//
-//        return response;
-//    }
 
-
-    // פונקציה שמחזירה את רשימת תתי הנושאים עבור נושא מסוים
-    public static List<String> getSubTopics(String topic) {
-        switch (topic.toLowerCase()) {
-            case "מספרים שלמים":
-                return List.of(
-                        "חיבור מספרים שלמים",
-                        "חיסור מספרים שלמים",
-                        "כפל מספרים שלמים",
-                        "חילוק מספרים שלמים"
-                );
-            default:
-                throw new IllegalArgumentException("נושא לא נתמך: ");
-        }
-    }
-
-    private static int[] getDifficultyLevels(String difficulty) {
-        return switch (difficulty.toLowerCase()) {
-            case "קל" -> new int[]{1, 2};
-            case "בינוני" -> new int[]{3, 4};
-            case "קשה" -> new int[]{4, 5};
-            default -> throw new IllegalArgumentException("רמת קושי לא נתמכת: " + difficulty);
-        };
-    }
-
-    //todo לשים בקונטרולר וגם לשנות שממקבלים רשימת אי די של תלמידים
-    public BasicResponse checkTeacherTest(String userId,String teacherId, Long testId, Map<Long, String> userAnswers) {
+    public BasicResponse checkTeacherTest(String userId, Long testId, Map<Long, String> userAnswers) {
 
             UserEntity user1 = UserRepository.findUserByUserId(userId);
-            UserEntity user2 = UserRepository.findUserByUserId(teacherId);
 
-
-            if (user1.getRole() != Role.STUDENT) {
-                return new BasicResponse(false, "אין הרשאה ליצירת מיבחנים לתירגול אישי");
-            }
-
-            if (user2.getRole() != Role.TEACHER) {
-                return new BasicResponse(false, "אין לו מורה ");
-            }
+        if (user1.getRole() != Role.STUDENT) {
+            return new BasicResponse(false, "אין הרשאה ליצירת מיבחנים לתירגול אישי");
+        }
+        TeacherTestEntity test = teacherTestRepository.findById(testId).orElse(null);
+        if (test == null) {
+            return new BasicResponse(false,"לא קיים מיבחן כזה");
+        }
+        TeacherEntity teacher =test.getTeacher();
 
             StudentEntity student = (StudentEntity) user1;
-            TeacherEntity teacher = (TeacherEntity) user2;
-            TeacherTestEntity test = teacherTestRepository.findById(testId).orElse(null);
 
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
             LocalDateTime now = LocalDateTime.now();

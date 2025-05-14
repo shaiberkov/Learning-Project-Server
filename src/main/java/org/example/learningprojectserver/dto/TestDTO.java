@@ -6,9 +6,15 @@ public class TestDTO {
     private Long id;
 
     private List<QuestionDTO> questions;
+
+    private String teacherId;
+
+
+
     public TestDTO() {
 
     }
+
     public TestDTO(Long id, List<QuestionDTO> questions) {
         this.id = id;
         this.questions = questions;

@@ -57,7 +57,7 @@ public class SecurityConfig {
                         .requestMatchers("/Learning-App/Chat/**").permitAll()//hasAnyRole("SYSTEM_ADMIN","TEACHER", "SCHOOLMANAGER","STUDENT" )
                         .requestMatchers("/Learning-App/Question/**").hasAnyRole("TEACHER", "SCHOOLMANAGER","STUDENT")
                         .requestMatchers("/Learning-App/User-Statistic/**").hasAnyRole("TEACHER", "SCHOOLMANAGER","STUDENT")
-                        .requestMatchers("/Learning-App/Self-Practice-Test/**").hasAnyRole("STUDENT")
+                        .requestMatchers("/Learning-App/Test/**").permitAll()//hasAnyRole("STUDENT")
                         .requestMatchers("/Learning-App/Message/**").permitAll()//hasAnyRole("TEACHER", "SCHOOLMANAGER", "SYSTEM_ADMIN")
                         .requestMatchers("/Learning-App/notifications/**").permitAll()
                         .requestMatchers("/Learning-App/Lesson/**").permitAll()

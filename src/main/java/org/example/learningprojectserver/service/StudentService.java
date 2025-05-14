@@ -2,10 +2,7 @@ package org.example.learningprojectserver.service;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
-import org.example.learningprojectserver.dto.LessonDTO;
-import org.example.learningprojectserver.dto.MessageDTO;
-import org.example.learningprojectserver.dto.QuestionDTO;
-import org.example.learningprojectserver.dto.TestDTO;
+import org.example.learningprojectserver.dto.*;
 import org.example.learningprojectserver.entities.*;
 import org.example.learningprojectserver.enums.Role;
 import org.example.learningprojectserver.mappers.*;
@@ -43,10 +40,11 @@ private final QuestionEntityToPracticeQuestionMapper questionEntityToPracticeQue
 private final SchoolRepository schoolRepository;
 private final LessonsToScheduleMapper lessonsToScheduleMapper;
 private final ChatGptService chatGptService;
+private final UserEntityToUserTestStatusDTOMapper userEntityToUserTestStatusDTOMapper;
 
 
 @Autowired
-    public StudentService(StudentProgressRepository studentProgressRepository, StudentQuestionHistoryRepository studentQuestionHistoryRepository, QuestionRepository questionRepository, UserRepository userRepository, PracticeTestRepository practiceTestRepository, ClassRoomRepository classRoomRepository, QuestionEntityToTestQuestionMapper questionEntityToTestQuestionMapper, QuestionEntityToQuestionDTOMapper questionEntityToQuestionDTOMapper, TestEntityToTestDTOMapper testEntityToTestDTOMapper, QuestionEntityToQuestionDTOMapper questionEntityToQuestionDTOMapper1, QuestionEntityToPracticeQuestionMapper questionEntityToPracticeQuestionMapper, SchoolRepository schoolRepository, LessonsToScheduleMapper lessonsToScheduleMapper, ChatGptService chatGptService) {
+    public StudentService(StudentProgressRepository studentProgressRepository, StudentQuestionHistoryRepository studentQuestionHistoryRepository, QuestionRepository questionRepository, UserRepository userRepository, PracticeTestRepository practiceTestRepository, ClassRoomRepository classRoomRepository, QuestionEntityToTestQuestionMapper questionEntityToTestQuestionMapper, QuestionEntityToQuestionDTOMapper questionEntityToQuestionDTOMapper, TestEntityToTestDTOMapper testEntityToTestDTOMapper, QuestionEntityToQuestionDTOMapper questionEntityToQuestionDTOMapper1, QuestionEntityToPracticeQuestionMapper questionEntityToPracticeQuestionMapper, SchoolRepository schoolRepository, LessonsToScheduleMapper lessonsToScheduleMapper, ChatGptService chatGptService, UserEntityToUserTestStatusDTOMapper userEntityToUserTestStatusDTOMapper) {
         this.studentProgressRepository = studentProgressRepository;
         this.studentQuestionHistoryRepository = studentQuestionHistoryRepository;
         this.questionRepository = questionRepository;
@@ -60,12 +58,24 @@ private final ChatGptService chatGptService;
     this.schoolRepository = schoolRepository;
     this.lessonsToScheduleMapper = lessonsToScheduleMapper;
     this.chatGptService = chatGptService;
+    this.userEntityToUserTestStatusDTOMapper = userEntityToUserTestStatusDTOMapper;
 }
 
 //@PostConstruct
 //public void init() {
-//    System.out.println(getStudentSchedule("10","325256017"));
+//    System.out.println(getStudentTestsStatus("325256017"));
 //}
+
+    public List<UserTestStatusDTO> getStudentTestsStatus(String userId) {
+        UserEntity user= userRepository.findUserByUserId(userId);
+        if (!(user.getRole()== Role.STUDENT)){
+            return new ArrayList();
+        }
+        StudentEntity student = (StudentEntity) user;
+
+        return userEntityToUserTestStatusDTOMapper.apply(student);
+
+    }
 
 public BasicResponse getStudentSchedule(String schoolCode, String studentId){
 
@@ -199,13 +209,6 @@ public void sendJobMessage(String userId,String subject,String subTopic) {
         // חיפוש נתוני התקדמות של המשתמש
         StudentProgressEntity studentProgressEntity = studentProgressRepository.findStudentProgressByUserId(userId);
 
-        // אם נתוני המשתמש או היסטוריית השאלות לא נמצאו, החזר תשובה מתאימה
-//        if (questionHistoryEntity == null || userProgressEntity == null) {
-//            return new SubmitAnswerResponse(false, "User data not found.");
-//        }
-
-
-        // חיפוש השאלה במסד הנתונים
 
         QuestionEntity questionEntity = questionRepository.findQuestionById(id);
         if (questionEntity == null) {
