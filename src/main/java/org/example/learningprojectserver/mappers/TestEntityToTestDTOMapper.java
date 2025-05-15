@@ -1,9 +1,7 @@
 package org.example.learningprojectserver.mappers;
 
-import org.example.learningprojectserver.dto.MessageDTO;
 import org.example.learningprojectserver.dto.QuestionDTO;
 import org.example.learningprojectserver.dto.TestDTO;
-import org.example.learningprojectserver.entities.MessageEntity;
 import org.example.learningprojectserver.entities.TestEntity;
 import org.example.learningprojectserver.entities.TestQuestionEntity;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -2,11 +2,16 @@ package org.example.learningprojectserver.service;
 
 import jakarta.transaction.Transactional;
 import org.example.learningprojectserver.dto.LessonDTO;
+import org.example.learningprojectserver.dto.StudentTestStatusDTO;
 import org.example.learningprojectserver.dto.TeacherDTO;
 import org.example.learningprojectserver.dto.TestDTO;
 import org.example.learningprojectserver.entities.*;
 import org.example.learningprojectserver.enums.Role;
 import org.example.learningprojectserver.mappers.*;
+import org.example.learningprojectserver.notification.NotificationType;
+import org.example.learningprojectserver.notification.dto.NewTestMessageDTO;
+import org.example.learningprojectserver.notification.dto.NotificationDTO;
+import org.example.learningprojectserver.notification.dto.SystemMessageDTO;
 import org.example.learningprojectserver.repository.*;
 import org.example.learningprojectserver.response.BasicResponse;
 import org.example.learningprojectserver.service.QuestionGenerator.QuestionGenerator;
@@ -18,7 +23,6 @@ import org.springframework.stereotype.Service;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class TeacherService {
@@ -36,9 +40,11 @@ public class TeacherService {
     private final TeacherEntityToTeacherDTOMapper teacherEntityToTeacherDTOMapper;
     private final SchoolRepository schoolRepository;
     private final LessonsToScheduleMapper lessonsToScheduleMapper;
+    private final StudentEntityToStudentTestStatusDTOMapper studentEntityToStudentTestStatusDTOMapper;
+    private final NotificationService notificationService;
 
     @Autowired
-    public TeacherService(LessonRepository lessonRepository, UserRepository userRepository, ClassRoomRepository classRoomRepository, ScheduleRepository scheduleRepository, StudentRepository studentRepository, TeacherTestRepository teacherTestRepository, QuestionRepository questionRepository, QuestionEntityToQuestionDTOMapper questionEntityToQuestionDTOMapper, LessonEntityToLessonDTOMapper lessonEntityToLessonDTOMapper, QuestionEntityToTestQuestionMapper questionEntityToTestQuestionMapper, TestEntityToTestDTOMapper testEntityToTestDTOMapper, TeacherEntityToTeacherDTOMapper teacherEntityToTeacherDTOMapper, SchoolRepository schoolRepository, LessonsToScheduleMapper lessonsToScheduleMapper) {
+    public TeacherService(LessonRepository lessonRepository, UserRepository userRepository, ClassRoomRepository classRoomRepository, ScheduleRepository scheduleRepository, StudentRepository studentRepository, TeacherTestRepository teacherTestRepository, QuestionRepository questionRepository, QuestionEntityToQuestionDTOMapper questionEntityToQuestionDTOMapper, LessonEntityToLessonDTOMapper lessonEntityToLessonDTOMapper, QuestionEntityToTestQuestionMapper questionEntityToTestQuestionMapper, TestEntityToTestDTOMapper testEntityToTestDTOMapper, TeacherEntityToTeacherDTOMapper teacherEntityToTeacherDTOMapper, SchoolRepository schoolRepository, LessonsToScheduleMapper lessonsToScheduleMapper, StudentEntityToStudentTestStatusDTOMapper studentEntityToStudentTestStatusDTOMapper, NotificationService notificationService) {
         this.lessonRepository = lessonRepository;
         this.userRepository = userRepository;
         this.classRoomRepository = classRoomRepository;
@@ -53,31 +59,33 @@ public class TeacherService {
         this.teacherEntityToTeacherDTOMapper = teacherEntityToTeacherDTOMapper;
         this.schoolRepository = schoolRepository;
         this.lessonsToScheduleMapper = lessonsToScheduleMapper;
+        this.studentEntityToStudentTestStatusDTOMapper = studentEntityToStudentTestStatusDTOMapper;
+        this.notificationService = notificationService;
     }
 
 
-    public BasicResponse getLessonsForTeacher(String teacherId) {
-
-        UserEntity teacher = userRepository.findUserByUserId(teacherId);
-        if (teacher == null) {
-
-            return new BasicResponse(false, "מורה לא נימצא");
-        }
-
-        List<LessonEntity> lessonEntities = lessonRepository.findLessonsByTeacherId(teacherId);
-
-        if (lessonEntities.isEmpty()) {
-            return new BasicResponse(false, "אין שיעורים למורה זה");
-        }
-
-
-        List<LessonDTO> lessonDTOs = lessonEntities.stream()
-                .map(lessonEntityToLessonDTOMapper).toList();
-
-        BasicResponse basicResponse = new BasicResponse(true, null);
-        basicResponse.setData(lessonDTOs);
-        return basicResponse;
-    }
+//    public BasicResponse getLessonsForTeacher(String teacherId) {
+//
+//        UserEntity teacher = userRepository.findUserByUserId(teacherId);
+//        if (teacher == null) {
+//
+//            return new BasicResponse(false, "מורה לא נימצא");
+//        }
+//
+//        List<LessonEntity> lessonEntities = lessonRepository.findLessonsByTeacherId(teacherId);
+//
+//        if (lessonEntities.isEmpty()) {
+//            return new BasicResponse(false, "אין שיעורים למורה זה");
+//        }
+//
+//
+//        List<LessonDTO> lessonDTOs = lessonEntities.stream()
+//                .map(lessonEntityToLessonDTOMapper).toList();
+//
+//        BasicResponse basicResponse = new BasicResponse(true, null);
+//        basicResponse.setData(lessonDTOs);
+//        return basicResponse;
+//    }
 
     public BasicResponse getTeacherDTO(String teacherId,String schoolCode) {
 
@@ -322,8 +330,17 @@ public class TeacherService {
 
         testEntity.setQuestions(questions);
 
+
         for (StudentEntity student : students) {
             student.getTeacherTests().add(testEntity);
+
+           List<StudentTestStatusDTO> studentTestStatusDTOS=studentEntityToStudentTestStatusDTOMapper.apply(student);
+            StudentTestStatusDTO studentTestStatusDTO=studentTestStatusDTOS.get(studentTestStatusDTOS.size() - 1);
+            ;
+
+            NotificationDTO<NewTestMessageDTO> dto =
+                    new NotificationDTO<>(NotificationType.NEW_TEST, new NewTestMessageDTO(studentTestStatusDTO));
+            notificationService.sendNotification(student.getUserId(), dto);
         }
         teacherTestRepository.save(testEntity);
 

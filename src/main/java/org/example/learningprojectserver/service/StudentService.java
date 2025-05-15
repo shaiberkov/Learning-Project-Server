@@ -1,6 +1,5 @@
 package org.example.learningprojectserver.service;
 
-import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import org.example.learningprojectserver.dto.*;
 import org.example.learningprojectserver.entities.*;
@@ -40,11 +39,11 @@ private final QuestionEntityToPracticeQuestionMapper questionEntityToPracticeQue
 private final SchoolRepository schoolRepository;
 private final LessonsToScheduleMapper lessonsToScheduleMapper;
 private final ChatGptService chatGptService;
-private final UserEntityToUserTestStatusDTOMapper userEntityToUserTestStatusDTOMapper;
+private final StudentEntityToStudentTestStatusDTOMapper studentEntityToStudentTestStatusDTOMapper;
 
 
 @Autowired
-    public StudentService(StudentProgressRepository studentProgressRepository, StudentQuestionHistoryRepository studentQuestionHistoryRepository, QuestionRepository questionRepository, UserRepository userRepository, PracticeTestRepository practiceTestRepository, ClassRoomRepository classRoomRepository, QuestionEntityToTestQuestionMapper questionEntityToTestQuestionMapper, QuestionEntityToQuestionDTOMapper questionEntityToQuestionDTOMapper, TestEntityToTestDTOMapper testEntityToTestDTOMapper, QuestionEntityToQuestionDTOMapper questionEntityToQuestionDTOMapper1, QuestionEntityToPracticeQuestionMapper questionEntityToPracticeQuestionMapper, SchoolRepository schoolRepository, LessonsToScheduleMapper lessonsToScheduleMapper, ChatGptService chatGptService, UserEntityToUserTestStatusDTOMapper userEntityToUserTestStatusDTOMapper) {
+    public StudentService(StudentProgressRepository studentProgressRepository, StudentQuestionHistoryRepository studentQuestionHistoryRepository, QuestionRepository questionRepository, UserRepository userRepository, PracticeTestRepository practiceTestRepository, ClassRoomRepository classRoomRepository, QuestionEntityToTestQuestionMapper questionEntityToTestQuestionMapper, QuestionEntityToQuestionDTOMapper questionEntityToQuestionDTOMapper, TestEntityToTestDTOMapper testEntityToTestDTOMapper, QuestionEntityToQuestionDTOMapper questionEntityToQuestionDTOMapper1, QuestionEntityToPracticeQuestionMapper questionEntityToPracticeQuestionMapper, SchoolRepository schoolRepository, LessonsToScheduleMapper lessonsToScheduleMapper, ChatGptService chatGptService, StudentEntityToStudentTestStatusDTOMapper studentEntityToStudentTestStatusDTOMapper) {
         this.studentProgressRepository = studentProgressRepository;
         this.studentQuestionHistoryRepository = studentQuestionHistoryRepository;
         this.questionRepository = questionRepository;
@@ -58,7 +57,7 @@ private final UserEntityToUserTestStatusDTOMapper userEntityToUserTestStatusDTOM
     this.schoolRepository = schoolRepository;
     this.lessonsToScheduleMapper = lessonsToScheduleMapper;
     this.chatGptService = chatGptService;
-    this.userEntityToUserTestStatusDTOMapper = userEntityToUserTestStatusDTOMapper;
+    this.studentEntityToStudentTestStatusDTOMapper = studentEntityToStudentTestStatusDTOMapper;
 }
 
 //@PostConstruct
@@ -66,14 +65,14 @@ private final UserEntityToUserTestStatusDTOMapper userEntityToUserTestStatusDTOM
 //    System.out.println(getStudentTestsStatus("325256017"));
 //}
 
-    public List<UserTestStatusDTO> getStudentTestsStatus(String userId) {
+    public List<StudentTestStatusDTO> getStudentTestsStatus(String userId) {
         UserEntity user= userRepository.findUserByUserId(userId);
         if (!(user.getRole()== Role.STUDENT)){
             return new ArrayList();
         }
         StudentEntity student = (StudentEntity) user;
 
-        return userEntityToUserTestStatusDTOMapper.apply(student);
+        return studentEntityToStudentTestStatusDTOMapper.apply(student);
 
     }
 

@@ -7,7 +7,7 @@ public class TestDTO {
 
     private List<QuestionDTO> questions;
 
-    private String teacherId;
+
 
 
 

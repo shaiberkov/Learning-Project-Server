@@ -1,14 +1,14 @@
 package org.example.learningprojectserver.mappers;
 
-import org.example.learningprojectserver.dto.MessageDTO;
+import org.example.learningprojectserver.notification.dto.SystemMessageDTO;
 import org.example.learningprojectserver.entities.MessageEntity;
 import org.springframework.stereotype.Component;
 
 @Component
-public class MessageEntityToMessageDTOMapper implements Mapper<MessageEntity, MessageDTO> {
+public class MessageEntityToMessageDTOMapper implements Mapper<MessageEntity, SystemMessageDTO> {
     @Override
-    public MessageDTO apply(MessageEntity messageEntity) {
-        MessageDTO dto = new MessageDTO();
+    public SystemMessageDTO apply(MessageEntity messageEntity) {
+        SystemMessageDTO dto = new SystemMessageDTO();
         dto.setTitle(messageEntity.getTitle());
         dto.setContent(messageEntity.getContent());
         dto.setSentAt(messageEntity.getSentAt());

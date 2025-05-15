@@ -1,15 +1,10 @@
 package org.example.learningprojectserver.mappers;
 
 
-import org.example.learningprojectserver.dto.MessageDTO;
-import org.example.learningprojectserver.entities.MessageEntity;
-import org.example.learningprojectserver.entities.SchoolEntity;
 import org.example.learningprojectserver.entities.TeacherEntity;
 import org.example.learningprojectserver.entities.UserEntity;
 import org.example.learningprojectserver.enums.Role;
 import org.springframework.stereotype.Component;
-
-import java.util.ArrayList;
 
 @Component
 public class UserToTeacherMapper implements Mapper<UserEntity, TeacherEntity> {

@@ -1,9 +1,7 @@
 package org.example.learningprojectserver.controller;
 
-import org.example.learningprojectserver.dto.QuestionDTO;
-import org.example.learningprojectserver.dto.UserTestStatusDTO;
+import org.example.learningprojectserver.dto.StudentTestStatusDTO;
 import org.example.learningprojectserver.response.BasicResponse;
-import org.example.learningprojectserver.response.SubmitAnswerResponse;
 import org.example.learningprojectserver.service.StudentService;
 import org.example.learningprojectserver.service.TestResultService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,7 +85,7 @@ private final TestResultService testResultService;
     }
 
     @GetMapping("/get-student-tests-status")
-    public List<UserTestStatusDTO> getStudentTestsStatus(@RequestParam String studentId){
+    public List<StudentTestStatusDTO> getStudentTestsStatus(@RequestParam String studentId){
         return studentService.getStudentTestsStatus(studentId);
     }
 

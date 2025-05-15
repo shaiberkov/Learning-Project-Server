@@ -1,6 +1,6 @@
 package org.example.learningprojectserver.dto;
 
-public class UserTestStatusDTO {
+public class StudentTestStatusDTO {
     private Long testId;
     private String subject;
     private String Topic;
@@ -9,7 +9,7 @@ public class UserTestStatusDTO {
     private String startTime;       // פורמט: "yyyy-MM-dd HH:mm"
 
 
-    public UserTestStatusDTO() {
+    public StudentTestStatusDTO() {
     }
 
     public int getTimeLimitMinutes() {

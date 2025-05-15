@@ -1,6 +1,8 @@
 package org.example.learningprojectserver.service;
 
-import org.example.learningprojectserver.dto.MessageDTO;
+import org.example.learningprojectserver.notification.NotificationType;
+import org.example.learningprojectserver.notification.dto.NotificationDTO;
+import org.example.learningprojectserver.notification.dto.SystemMessageDTO;
 import org.example.learningprojectserver.entities.MessageEntity;
 import org.example.learningprojectserver.entities.UserEntity;
 import org.example.learningprojectserver.mappers.MessageEntityToMessageDTOMapper;
@@ -11,7 +13,6 @@ import org.example.learningprojectserver.strategy.message.MessageRecipientStrate
 import org.example.learningprojectserver.strategy.message.MessageRecipientStrategyFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -104,14 +105,16 @@ public class MessageService {
 
             messages.add(message);
 
-            MessageDTO messageDTO = new MessageDTO();
-            messageDTO.setTitle(title);
-            messageDTO.setContent(content);
-            messageDTO.setSentAt(LocalDateTime.now());
-            messageDTO.setSenderName(sender.getUsername());
+            SystemMessageDTO systemMessageDTO = new SystemMessageDTO();
+            systemMessageDTO.setTitle(title);
+            systemMessageDTO.setContent(content);
+            systemMessageDTO.setSentAt(LocalDateTime.now());
+            systemMessageDTO.setSenderName(sender.getUsername());
 
-            notificationService.sendNotification(receiver.getUserId(),messageDTO);
 
+            NotificationDTO<SystemMessageDTO> dto =
+                    new NotificationDTO<>(NotificationType.SYSTEM_MESSAGE, systemMessageDTO);
+            notificationService.sendNotification(receiver.getUserId(), dto);
         }
         String smsMessage = "קיבלת הודעה חדשה במערכת. לצפייה היכנס: https://your-app.com/messages";
 
@@ -131,11 +134,11 @@ public class MessageService {
         }
 
         List<MessageEntity> messages = user.getReceivedMessages();
-        List<MessageDTO> messageDTOS= messages.stream()
+        List<SystemMessageDTO> systemMessageDTOS = messages.stream()
                 .map(messageEntityToMessageDTOMapper)
                 .toList();
         basicResponse.setSuccess(true);
-        basicResponse.setData(messageDTOS);
+        basicResponse.setData(systemMessageDTOS);
         return basicResponse;
 
     }
@@ -150,11 +153,11 @@ public class MessageService {
 
 
         List<MessageEntity> messages = user.getSentMessages();
-        List<MessageDTO> messageDTOS= messages.stream()
+        List<SystemMessageDTO> systemMessageDTOS = messages.stream()
                 .map(messageEntityToMessageDTOMapper)
                 .toList();
         basicResponse.setSuccess(true);
-        basicResponse.setData(messageDTOS);
+        basicResponse.setData(systemMessageDTOS);
         return basicResponse;
 
     }
