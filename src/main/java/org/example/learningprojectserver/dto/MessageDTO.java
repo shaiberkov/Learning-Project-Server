@@ -1,21 +1,21 @@
-package org.example.learningprojectserver.notification.dto;
+package org.example.learningprojectserver.dto;
 
 import java.time.LocalDateTime;
 
-public class SystemMessageDTO {
+public class MessageDTO {
 
     private String title;
     private String content;
      private LocalDateTime sentAt;
     private String senderName;
 
-    public SystemMessageDTO(String title, String senderName, LocalDateTime sentAt, String content) {
+    public MessageDTO(String title, String senderName, LocalDateTime sentAt, String content) {
         this.title = title;
         this.senderName = senderName;
         this.sentAt = sentAt;
         this.content = content;
     }
-    public SystemMessageDTO() {}
+    public MessageDTO() {}
 
     public String getTitle() {
         return title;

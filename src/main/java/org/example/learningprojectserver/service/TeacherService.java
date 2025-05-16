@@ -11,7 +11,6 @@ import org.example.learningprojectserver.mappers.*;
 import org.example.learningprojectserver.notification.NotificationType;
 import org.example.learningprojectserver.notification.dto.NewTestMessageDTO;
 import org.example.learningprojectserver.notification.dto.NotificationDTO;
-import org.example.learningprojectserver.notification.dto.SystemMessageDTO;
 import org.example.learningprojectserver.repository.*;
 import org.example.learningprojectserver.response.BasicResponse;
 import org.example.learningprojectserver.service.QuestionGenerator.QuestionGenerator;

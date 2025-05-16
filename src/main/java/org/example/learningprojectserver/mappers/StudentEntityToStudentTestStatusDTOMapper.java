@@ -1,5 +1,6 @@
 package org.example.learningprojectserver.mappers;
 
+
 import org.example.learningprojectserver.dto.StudentTestStatusDTO;
 import org.example.learningprojectserver.entities.*;
 import org.springframework.stereotype.Component;
@@ -7,7 +8,7 @@ import org.springframework.stereotype.Component;
 import java.util.*;
 
 @Component
-public class StudentEntityToStudentTestStatusDTOMapper implements Mapper<StudentEntity, List<StudentTestStatusDTO>>{
+public class StudentEntityToStudentTestStatusDTOMapper implements Mapper<StudentEntity, List<StudentTestStatusDTO>> {
     @Override
     public List<StudentTestStatusDTO> apply(StudentEntity student) {
 

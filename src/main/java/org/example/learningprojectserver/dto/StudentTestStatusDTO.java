@@ -6,7 +6,7 @@ public class StudentTestStatusDTO {
     private String Topic;
     private int score;
     private int timeLimitMinutes;
-    private String startTime;       // פורמט: "yyyy-MM-dd HH:mm"
+    private String startTime;
 
 
     public StudentTestStatusDTO() {
