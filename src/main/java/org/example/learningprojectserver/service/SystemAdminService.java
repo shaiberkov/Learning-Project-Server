@@ -1,11 +1,13 @@
 package org.example.learningprojectserver.service;
 
 import jakarta.annotation.PostConstruct;
+import org.example.learningprojectserver.dto.SchoolDTO;
 import org.example.learningprojectserver.entities.SchoolEntity;
 import org.example.learningprojectserver.entities.SchoolManagerEntity;
 import org.example.learningprojectserver.entities.UserEntity;
 import org.example.learningprojectserver.enums.Role;
 import org.example.learningprojectserver.mappers.Mapper;
+import org.example.learningprojectserver.mappers.SchoolEntityToSchoolDTOMapper;
 import org.example.learningprojectserver.mappers.UserMapperFactory;
 import org.example.learningprojectserver.repository.SchoolRepository;
 import org.example.learningprojectserver.repository.UserRepository;
@@ -14,28 +16,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class SystemAdminService {
 
 private final UserRepository userRepository;
-
 private final SchoolRepository schoolRepository;
-
 private final UserMapperFactory userMapperFactory;
+private final SchoolEntityToSchoolDTOMapper schoolEntityToSchoolDTOMapper;
 @Autowired
-    public SystemAdminService(UserRepository userRepository, SchoolRepository schoolRepository, UserMapperFactory userMapperFactory) {
+    public SystemAdminService(UserRepository userRepository, SchoolRepository schoolRepository, UserMapperFactory userMapperFactory, SchoolEntityToSchoolDTOMapper schoolEntityToSchoolDTOMapper) {
         this.userRepository = userRepository;
     this.schoolRepository = schoolRepository;
     this.userMapperFactory = userMapperFactory;
+    this.schoolEntityToSchoolDTOMapper = schoolEntityToSchoolDTOMapper;
 }
-
-//    @PostConstruct()
-//        public void init() {
-//         assignUserAsSchoolManager("325256022");
-//
-//
-//    }
 
 
 
@@ -71,11 +67,6 @@ private final UserMapperFactory userMapperFactory;
     }
 
 
-@PostConstruct
-public void init() {
-    assignSchoolManagerToSchool("55","10");
-}
-
     public BasicResponse assignSchoolManagerToSchool(String userId, String schoolCode) {
         SchoolEntity school = schoolRepository.findBySchoolCode(schoolCode);
         UserEntity user = userRepository.findUserByUserId(userId);
@@ -110,7 +101,6 @@ public void init() {
 
         return new BasicResponse(true, "המשתמש " + schoolManager.getUsername() + " מונה בהצלחה כמנהל של בית הספר " + school.getSchoolName());
     }
-    //הוספת סתטיסטיקה בהמשך
 
     public BasicResponse removeSchoolManagerFromSchool(String userId) {
         UserEntity user = userRepository.findUserByUserId(userId);
@@ -136,5 +126,24 @@ public void init() {
     }
 
 
+
+public BasicResponse getAllSchoolsDTO() {
+
+    List<SchoolEntity> schools = schoolRepository.findAll();
+
+    if (schools.isEmpty()) {
+        return new BasicResponse(true,"לא קיימים בתי ספר רשומים במערכת");
+    }
+
+    List<SchoolDTO> schoolDTOs = schools.stream()
+            .map(schoolEntityToSchoolDTOMapper)
+            .toList();
+
+    BasicResponse basicResponse = new BasicResponse(true,null);
+    basicResponse.setData(schoolDTOs);
+    return basicResponse;
+
+
+}
 
 }

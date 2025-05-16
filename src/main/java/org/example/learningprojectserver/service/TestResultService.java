@@ -216,7 +216,7 @@ public class TestResultService {
 
             int score = (int) (((double) correctCount / test.getQuestions().size()) * 100);
 
-            TeacherTestResultEntity testResult = new  TeacherTestResultEntity();
+            TeacherTestResultEntity testResult = new TeacherTestResultEntity();
             testResult.setStudent(student);
             testResult.setTeacher(teacher);
             testResult.setTest(test);

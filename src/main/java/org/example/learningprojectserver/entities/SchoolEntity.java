@@ -16,16 +16,16 @@ public class SchoolEntity {
     @Column(nullable = false)
     private String schoolCode;
 
-    @OneToMany(mappedBy = "teachingSchool")
+    @OneToMany(mappedBy = "teachingSchool",fetch = FetchType.EAGER)
     private List<TeacherEntity> teachers=new ArrayList<>();
 
-    @OneToMany(mappedBy = "schoolName")
+    @OneToMany(mappedBy = "schoolName",fetch = FetchType.EAGER)
     private List<StudentEntity> students=new ArrayList<>();
 
-    @OneToMany(mappedBy = "school")
+    @OneToMany(mappedBy = "school",fetch = FetchType.EAGER)
     private List<ClassRoomEntity> classRooms=new ArrayList<>();
 
-    @OneToMany(mappedBy = "school", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "school", cascade = CascadeType.ALL,fetch = FetchType.EAGER)
     private List<SchoolGradeEntity> schoolGrades=new ArrayList<>();
 
 

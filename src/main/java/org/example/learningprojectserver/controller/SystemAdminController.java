@@ -36,4 +36,9 @@ public class SystemAdminController {
     public BasicResponse removeSchoolManagerFromSchool(@RequestParam String userId) {
         return systemAdminService.removeSchoolManagerFromSchool(userId);
     }
+
+    @GetMapping("/get-all-schools")
+    public BasicResponse getAllSchools() {
+        return systemAdminService.getAllSchoolsDTO();
+    }
 }

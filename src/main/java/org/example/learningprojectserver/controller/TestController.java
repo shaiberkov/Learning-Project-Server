@@ -18,7 +18,7 @@ public class TestController {
         this.testService = testService;
     }
     @GetMapping("/get-test")
-    public TestDTO findTest(@RequestParam Long testId) {
+    public TestDTO getTest(@RequestParam Long testId) {
         return testService.getTestDto(testId);
     }
 

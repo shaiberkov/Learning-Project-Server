@@ -4,7 +4,6 @@ public class TokenValidationResponse extends BasicResponse{
 
         private boolean isValid;
         private String userId;
-
         private String username;
         private String role;
         private String SchoolCode;

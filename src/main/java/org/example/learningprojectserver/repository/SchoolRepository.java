@@ -16,6 +16,9 @@ public interface SchoolRepository extends JpaRepository<SchoolEntity, Long> {
     @Query("SELECT s FROM SchoolEntity s WHERE s.schoolCode = :schoolCode")
     SchoolEntity findBySchoolCode(@Param("schoolCode") String schoolCode);
 
+    @Query("SELECT s FROM SchoolEntity s WHERE s.schoolManager.userId = :schoolManagerId")
+    SchoolEntity findBySchoolManagerId(@Param("schoolManagerId") String schoolManagerId);
+
     @Query("SELECT t FROM SchoolEntity s JOIN s.teachers t WHERE s.schoolManager.userId = :userId")
     List<UserEntity> findTeachersByUserId(@Param("userId") String userId);
 

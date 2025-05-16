@@ -297,22 +297,16 @@ public class TeacherService {
         testEntity.setTopic(topic);
         testEntity.setDifficulty(difficulty);
         testEntity.setQuestionCount(questionCount);
-
-        // קביעת התלמידים במבחן
         testEntity.setStudents(students);
 
-
-        // שמירה של המבחן במאגר
         teacherTestRepository.save(testEntity);
 
-        // יצירת שאלות למבחן
         Random random = new Random();
         SubjectQuestionGenerator generatorFactory = QuestionGeneratorFactory.getSubjectQuestionGenerator(subject);
         List<TestQuestionEntity> questions = new ArrayList<>();
         List<String> subTopics = getSubTopics(topic);
         int[] difficultyLevels = getDifficultyLevels(difficulty);
 
-        // יצירת שאלות עבור המבחן
         for (int i = 0; i < questionCount; i++) {
             int level = difficultyLevels[random.nextInt(difficultyLevels.length)];
             String subTopic = subTopics.get(random.nextInt(subTopics.size()));
@@ -335,7 +329,6 @@ public class TeacherService {
 
            List<StudentTestStatusDTO> studentTestStatusDTOS=studentEntityToStudentTestStatusDTOMapper.apply(student);
             StudentTestStatusDTO studentTestStatusDTO=studentTestStatusDTOS.get(studentTestStatusDTOS.size() - 1);
-            ;
 
             NotificationDTO<NewTestMessageDTO> dto =
                     new NotificationDTO<>(NotificationType.NEW_TEST, new NewTestMessageDTO(studentTestStatusDTO));

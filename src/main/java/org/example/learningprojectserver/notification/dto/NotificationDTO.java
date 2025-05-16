@@ -6,7 +6,7 @@ public class NotificationDTO<T> {
     private NotificationType type;
     private T payload;
 
-    public NotificationDTO() {}  // דרוש ל-Jackson
+    public NotificationDTO() {}
 
     public NotificationDTO(NotificationType type, T payload) {
         this.type = type;

@@ -17,7 +17,6 @@ public class QuestionDTO {
     }
     public QuestionDTO() {}
 
-    // Getters and Setters
     public String getSubject() {
         return subject;
     }

@@ -164,7 +164,10 @@ public BasicResponse getAllLessonsForClassRoom(@RequestParam String schoolCode ,
         return teacherService.getTeacherTeachingSubjects(teacherId);
     }
 
-
+    @GetMapping("/get-school")
+    public BasicResponse getSchool(@RequestParam String schoolManagerId) {
+        return schoolService.getSchoolDTO(schoolManagerId);
+    }
 }
 
 

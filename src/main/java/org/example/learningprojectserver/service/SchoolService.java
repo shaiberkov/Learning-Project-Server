@@ -1,9 +1,12 @@
 package org.example.learningprojectserver.service;
 
+import jakarta.annotation.PostConstruct;
 import jakarta.persistence.Entity;
+import org.example.learningprojectserver.dto.SchoolDTO;
 import org.example.learningprojectserver.entities.ClassRoomEntity;
 import org.example.learningprojectserver.entities.SchoolEntity;
 import org.example.learningprojectserver.entities.SchoolGradeEntity;
+import org.example.learningprojectserver.mappers.SchoolEntityToSchoolDTOMapper;
 import org.example.learningprojectserver.repository.SchoolRepository;
 import org.example.learningprojectserver.response.BasicResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,11 +17,27 @@ import java.util.List;
 @Service
 public class SchoolService {
     private final SchoolRepository schoolRepository;
+    private final SchoolEntityToSchoolDTOMapper schoolEntityToSchoolDTOMapper;
     @Autowired
-    public SchoolService(SchoolRepository schoolRepository) {
+    public SchoolService(SchoolRepository schoolRepository, SchoolEntityToSchoolDTOMapper schoolEntityToSchoolDTOMapper) {
 
         this.schoolRepository = schoolRepository;
+        this.schoolEntityToSchoolDTOMapper = schoolEntityToSchoolDTOMapper;
     }
+
+
+
+    public BasicResponse getSchoolDTO(String SchoolManagerId){
+
+        SchoolEntity schoolEntity=schoolRepository.findBySchoolManagerId(SchoolManagerId);
+        SchoolDTO schoolDTO=schoolEntityToSchoolDTOMapper.apply(schoolEntity);
+        BasicResponse basicResponse=new BasicResponse(true,null);
+        basicResponse.setData(schoolDTO);
+        return basicResponse;
+
+    }
+
+
     public BasicResponse getGradesBySchoolCode(String schoolCode) {
         if (schoolCode == null || schoolCode.isEmpty()) {
             return new BasicResponse(false, "קוד בית הספר לא יכול להיות ריק");

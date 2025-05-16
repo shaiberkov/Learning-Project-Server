@@ -13,7 +13,7 @@ public class NotificationService {
 
     public SseEmitter connect(String userId) {
         SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
-        emitters.put(userId, emitter);
+        emitters.put(userId,emitter);
 
         emitter.onCompletion(() -> emitters.remove(userId));
         emitter.onTimeout(() -> emitters.remove(userId));
