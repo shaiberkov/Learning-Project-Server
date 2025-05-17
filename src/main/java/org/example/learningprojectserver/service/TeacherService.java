@@ -20,7 +20,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 
 @Service
@@ -262,14 +266,35 @@ public class TeacherService {
         }
 
 
+
         if (user.getRole() != Role.TEACHER) {
             return new BasicResponse(false, "המשתמש לא מורה");
+        }
+
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        LocalDateTime start;
+
+        try {
+            start = LocalDateTime.parse(testStartTime, fmt);   // המרה
+        } catch (DateTimeParseException e) {
+            return new BasicResponse(false, "פורמט תאריך לא חוקי — פורמט נדרש: yyyy-MM-dd HH:mm");
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+        if (start.isBefore(now)) {
+            return new BasicResponse(false,
+                    "לא ניתן לקבוע מבחן לזמן שכבר עבר");
+        }
+        long minutesDiff  = Duration.between(now, start).toMinutes();
+
+        if (minutesDiff < 120) {
+            return new BasicResponse(false, "יש לקבוע את מועד המבחן לפחות שעתיים מראש");
         }
         TeacherEntity teacher = (TeacherEntity) user;
 
         List<StudentEntity> students = studentRepository.findStudentsByUserIds(usersIds);
         if (students.isEmpty()) {
-            return new BasicResponse(false, "לא נמצאו תלמידים עם ה-IDים שסופקו");
+            return new BasicResponse(false, "לא נמצאו תלמידים עם ה-תעודות הזהות שנרשמו");
         }
 
         if (subject == null || subject.isEmpty()) {
@@ -341,7 +366,7 @@ public class TeacherService {
 
         Map<TestEntity, List<TestQuestionEntity>> testMap = Map.of(testEntity, questions);
         TestDTO testDTO = testEntityToTestDTOMapper.apply(testMap);
-        BasicResponse basicResponse = new BasicResponse(true, null);
+        BasicResponse basicResponse = new BasicResponse(true, "המבחן נוצר בהצלחה ונישלח לתלמידים");
         basicResponse.setData(testDTO);
         return basicResponse;
     }
