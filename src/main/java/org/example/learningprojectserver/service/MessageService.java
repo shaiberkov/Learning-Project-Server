@@ -7,11 +7,13 @@ import org.example.learningprojectserver.entities.MessageEntity;
 import org.example.learningprojectserver.entities.UserEntity;
 import org.example.learningprojectserver.mappers.MessageEntityToMessageDTOMapper;
 import org.example.learningprojectserver.notification.dto.SystemMessageDTO;
+import org.example.learningprojectserver.notification.publisher.NotificationEventPublisher;
 import org.example.learningprojectserver.repository.MessageRepository;
 import org.example.learningprojectserver.repository.UserRepository;
 import org.example.learningprojectserver.response.BasicResponse;
 import org.example.learningprojectserver.strategy.message.MessageRecipientStrategy;
 import org.example.learningprojectserver.strategy.message.MessageRecipientStrategyFactory;
+import org.example.learningprojectserver.utils.SmsSender;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -29,15 +31,17 @@ public class MessageService {
     private final MessageRecipientStrategyFactory strategyFactory;
     private final NotificationService notificationService;
     private final MessageEntityToMessageDTOMapper messageEntityToMessageDTOMapper;
+    private final NotificationEventPublisher notificationEventPublisher;
 
 
     @Autowired
-    public MessageService(UserRepository userRepository, MessageRepository messageRepository, MessageRecipientStrategyFactory strategyFactory, NotificationService notificationService, MessageEntityToMessageDTOMapper messageEntityToMessageDTOMapper) {
+    public MessageService(UserRepository userRepository, MessageRepository messageRepository, MessageRecipientStrategyFactory strategyFactory, NotificationService notificationService, MessageEntityToMessageDTOMapper messageEntityToMessageDTOMapper, NotificationEventPublisher notificationEventPublisher) {
         this.userRepository = userRepository;
         this.messageRepository = messageRepository;
         this.strategyFactory = strategyFactory;
         this.notificationService = notificationService;
         this.messageEntityToMessageDTOMapper = messageEntityToMessageDTOMapper;
+        this.notificationEventPublisher = notificationEventPublisher;
     }
 
     public BasicResponse getRecipientTypes(String userId) {
@@ -71,15 +75,13 @@ public class MessageService {
         basicResponse.setData(recipientTypes);
         return basicResponse;
     }
-
-
-
-    public BasicResponse sendMessage(String senderId,String recipientType,String recipientValue, String title, String content) {
+    public BasicResponse sendMessage(String senderId, String recipientType, String recipientValue, String title, String content) {
         UserEntity sender = userRepository.findUserByUserId(senderId);
 
         if (sender == null) {
             return new BasicResponse(false, "השולח לא קיים");
         }
+
         if (title == null || title.trim().isEmpty()) {
             return new BasicResponse(false, "הכותרת לא יכולה להיות ריקה");
         }
@@ -88,14 +90,29 @@ public class MessageService {
             return new BasicResponse(false, "התוכן לא יכול להיות ריק");
         }
 
-
         MessageRecipientStrategy strategy = strategyFactory.getStrategy(recipientType, recipientValue);
         List<UserEntity> recipients = strategy.getRecipients(senderId);
+
         if (recipients.isEmpty()) {
-            return new BasicResponse(false,"אין נמענים לשליחת ההודעה");
+            return new BasicResponse(false, "אין נמענים לשליחת ההודעה");
         }
-        List<String> recipientsPhoneNumber = recipients.stream().map(UserEntity::getPhoneNumber).toList();
+
+        List<String> recipientsPhoneNumber = recipients.stream()
+                .map(UserEntity::getPhoneNumber)
+                .toList();
+
         List<MessageEntity> messages = new ArrayList<>();
+
+        MessageDTO messageDTO = new MessageDTO();
+        messageDTO.setTitle(title);
+        messageDTO.setContent(content);
+        messageDTO.setSentAt(LocalDateTime.now());
+        messageDTO.setSenderName(sender.getUsername());
+
+        NotificationDTO<SystemMessageDTO> notificationDTO = new NotificationDTO<>(
+                NotificationType.SYSTEM_MESSAGE,
+                new SystemMessageDTO(messageDTO)
+        );
 
         for (UserEntity receiver : recipients) {
             MessageEntity message = new MessageEntity();
@@ -105,28 +122,23 @@ public class MessageService {
             message.setContent(content);
             message.setSentAt(LocalDateTime.now());
 
-
             messages.add(message);
-
-            MessageDTO messageDTO = new MessageDTO();
-            messageDTO.setTitle(title);
-            messageDTO.setContent(content);
-            messageDTO.setSentAt(LocalDateTime.now());
-            messageDTO.setSenderName(sender.getUsername());
-
-
-            NotificationDTO<SystemMessageDTO> dto =
-                    new NotificationDTO<>(NotificationType.SYSTEM_MESSAGE,new SystemMessageDTO(messageDTO));
-            notificationService.sendNotification(receiver.getUserId(), dto);
         }
-        String smsMessage = "קיבלת הודעה חדשה במערכת. לצפייה היכנס: https://your-app.com/messages";
 
-        sendSms(smsMessage,recipientsPhoneNumber);
+        List<String> recipientsIds = recipients.stream()
+                .map(UserEntity::getUserId)
+                .toList();
+
+        notificationEventPublisher.publish(recipientsIds, notificationDTO);
+
+        String smsMessage = "קיבלת הודעה חדשה במערכת. לצפייה היכנס: https://your-app.com/messages";
+        sendSms(smsMessage, recipientsPhoneNumber);
 
         messageRepository.saveAll(messages);
 
         return new BasicResponse(true, "ההודעה נשלחה בהצלחה ל־" + messages.size() + " נמענים");
     }
+
 
     public BasicResponse getAllRecivedMessages(String userId) {
         BasicResponse basicResponse = new BasicResponse();

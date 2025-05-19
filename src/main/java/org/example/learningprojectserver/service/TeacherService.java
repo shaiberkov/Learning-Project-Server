@@ -11,6 +11,7 @@ import org.example.learningprojectserver.mappers.*;
 import org.example.learningprojectserver.notification.NotificationType;
 import org.example.learningprojectserver.notification.dto.NewTestMessageDTO;
 import org.example.learningprojectserver.notification.dto.NotificationDTO;
+import org.example.learningprojectserver.notification.publisher.NotificationEventPublisher;
 import org.example.learningprojectserver.repository.*;
 import org.example.learningprojectserver.response.BasicResponse;
 import org.example.learningprojectserver.service.QuestionGenerator.QuestionGenerator;
@@ -45,9 +46,11 @@ public class TeacherService {
     private final LessonsToScheduleMapper lessonsToScheduleMapper;
     private final StudentEntityToStudentTestStatusDTOMapper studentEntityToStudentTestStatusDTOMapper;
     private final NotificationService notificationService;
+    private final NotificationEventPublisher notificationEventPublisher;
+
 
     @Autowired
-    public TeacherService(LessonRepository lessonRepository, UserRepository userRepository, ClassRoomRepository classRoomRepository, ScheduleRepository scheduleRepository, StudentRepository studentRepository, TeacherTestRepository teacherTestRepository, QuestionRepository questionRepository, QuestionEntityToQuestionDTOMapper questionEntityToQuestionDTOMapper, LessonEntityToLessonDTOMapper lessonEntityToLessonDTOMapper, QuestionEntityToTestQuestionMapper questionEntityToTestQuestionMapper, TestEntityToTestDTOMapper testEntityToTestDTOMapper, TeacherEntityToTeacherDTOMapper teacherEntityToTeacherDTOMapper, SchoolRepository schoolRepository, LessonsToScheduleMapper lessonsToScheduleMapper, StudentEntityToStudentTestStatusDTOMapper studentEntityToStudentTestStatusDTOMapper, NotificationService notificationService) {
+    public TeacherService(LessonRepository lessonRepository, UserRepository userRepository, ClassRoomRepository classRoomRepository, ScheduleRepository scheduleRepository, StudentRepository studentRepository, TeacherTestRepository teacherTestRepository, QuestionRepository questionRepository, QuestionEntityToQuestionDTOMapper questionEntityToQuestionDTOMapper, LessonEntityToLessonDTOMapper lessonEntityToLessonDTOMapper, QuestionEntityToTestQuestionMapper questionEntityToTestQuestionMapper, TestEntityToTestDTOMapper testEntityToTestDTOMapper, TeacherEntityToTeacherDTOMapper teacherEntityToTeacherDTOMapper, SchoolRepository schoolRepository, LessonsToScheduleMapper lessonsToScheduleMapper, StudentEntityToStudentTestStatusDTOMapper studentEntityToStudentTestStatusDTOMapper, NotificationService notificationService, NotificationEventPublisher notificationEventPublisher) {
         this.lessonRepository = lessonRepository;
         this.userRepository = userRepository;
         this.classRoomRepository = classRoomRepository;
@@ -64,6 +67,7 @@ public class TeacherService {
         this.lessonsToScheduleMapper = lessonsToScheduleMapper;
         this.studentEntityToStudentTestStatusDTOMapper = studentEntityToStudentTestStatusDTOMapper;
         this.notificationService = notificationService;
+        this.notificationEventPublisher = notificationEventPublisher;
     }
 
 
@@ -271,14 +275,14 @@ public class TeacherService {
             return new BasicResponse(false, "המשתמש לא מורה");
         }
 
-        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
         LocalDateTime start;
-
-        try {
-            start = LocalDateTime.parse(testStartTime, fmt);   // המרה
-        } catch (DateTimeParseException e) {
-            return new BasicResponse(false, "פורמט תאריך לא חוקי — פורמט נדרש: yyyy-MM-dd HH:mm");
-        }
+        start = LocalDateTime.parse(testStartTime, fmt);
+//        try {
+//            start = LocalDateTime.parse(testStartTime, fmt);   // המרה
+//        } catch (DateTimeParseException e) {
+//            return new BasicResponse(false, "פורמט תאריך לא חוקי — פורמט נדרש: yyyy-MM-dd HH:mm");
+//        }
 
         LocalDateTime now = LocalDateTime.now();
         if (start.isBefore(now)) {
@@ -357,11 +361,12 @@ public class TeacherService {
 
             NotificationDTO<NewTestMessageDTO> dto =
                     new NotificationDTO<>(NotificationType.NEW_TEST, new NewTestMessageDTO(studentTestStatusDTO));
-            notificationService.sendNotification(student.getUserId(), dto);
+            notificationEventPublisher.publish(
+                    List.of(student.getUserId()),
+                    dto
+            );
         }
         teacherTestRepository.save(testEntity);
-
-
 
 
         Map<TestEntity, List<TestQuestionEntity>> testMap = Map.of(testEntity, questions);
