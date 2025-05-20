@@ -2,6 +2,7 @@ package org.example.learningprojectserver.config;
 
 import org.example.learningprojectserver.filter.JwtAuthenticationFilter;
 import org.example.learningprojectserver.filter.LoggingFilter;
+import org.example.learningprojectserver.filter.MetricsFilter;
 import org.example.learningprojectserver.service.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -35,8 +36,14 @@ public class SecurityConfig {
         return new LoggingFilter(jwtService);
     }
     @Bean
+    public MetricsFilter metricsFilter() {
+        return new MetricsFilter();
+    }
+
+    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http,JwtAuthenticationFilter jwtAuthenticationFilter,
-                                                   LoggingFilter loggingFilter) throws Exception {
+                                                   LoggingFilter loggingFilter,
+                                                   MetricsFilter metricsFilter) throws Exception {
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
@@ -64,6 +71,7 @@ public class SecurityConfig {
                         .requestMatchers("/Learning-App/Schedule/**").permitAll()
                         .anyRequest().authenticated()
                 )
+                .addFilterBefore(metricsFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(loggingFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 

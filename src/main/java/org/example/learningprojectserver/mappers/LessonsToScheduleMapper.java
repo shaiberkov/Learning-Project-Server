@@ -22,8 +22,6 @@ public class LessonsToScheduleMapper implements Mapper<List<LessonEntity>,Map<Da
 
     @Override
     public Map<DayOfWeek, List<LessonDTO>> apply(List<LessonEntity> lessons) {
-
-
         return lessons.stream()
                 .map(lessonEntityToLessonDTOMapper)
                 .collect(Collectors.groupingBy(

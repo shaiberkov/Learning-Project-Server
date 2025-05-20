@@ -40,10 +40,12 @@ private final SchoolRepository schoolRepository;
 private final LessonsToScheduleMapper lessonsToScheduleMapper;
 private final ChatGptService chatGptService;
 private final StudentEntityToStudentTestStatusDTOMapper studentEntityToStudentTestStatusDTOMapper;
+private final TestService testService;
+
 
 
 @Autowired
-    public StudentService(StudentProgressRepository studentProgressRepository, StudentQuestionHistoryRepository studentQuestionHistoryRepository, QuestionRepository questionRepository, UserRepository userRepository, PracticeTestRepository practiceTestRepository, ClassRoomRepository classRoomRepository, QuestionEntityToTestQuestionMapper questionEntityToTestQuestionMapper, QuestionEntityToQuestionDTOMapper questionEntityToQuestionDTOMapper, TestEntityToTestDTOMapper testEntityToTestDTOMapper, QuestionEntityToQuestionDTOMapper questionEntityToQuestionDTOMapper1, QuestionEntityToPracticeQuestionMapper questionEntityToPracticeQuestionMapper, SchoolRepository schoolRepository, LessonsToScheduleMapper lessonsToScheduleMapper, ChatGptService chatGptService, StudentEntityToStudentTestStatusDTOMapper studentEntityToStudentTestStatusDTOMapper) {
+    public StudentService(StudentProgressRepository studentProgressRepository, StudentQuestionHistoryRepository studentQuestionHistoryRepository, QuestionRepository questionRepository, UserRepository userRepository, PracticeTestRepository practiceTestRepository, ClassRoomRepository classRoomRepository, QuestionEntityToTestQuestionMapper questionEntityToTestQuestionMapper, QuestionEntityToQuestionDTOMapper questionEntityToQuestionDTOMapper, TestEntityToTestDTOMapper testEntityToTestDTOMapper, QuestionEntityToQuestionDTOMapper questionEntityToQuestionDTOMapper1, QuestionEntityToPracticeQuestionMapper questionEntityToPracticeQuestionMapper, SchoolRepository schoolRepository, LessonsToScheduleMapper lessonsToScheduleMapper, ChatGptService chatGptService, StudentEntityToStudentTestStatusDTOMapper studentEntityToStudentTestStatusDTOMapper, TestService testService) {
         this.studentProgressRepository = studentProgressRepository;
         this.studentQuestionHistoryRepository = studentQuestionHistoryRepository;
         this.questionRepository = questionRepository;
@@ -58,12 +60,8 @@ private final StudentEntityToStudentTestStatusDTOMapper studentEntityToStudentTe
     this.lessonsToScheduleMapper = lessonsToScheduleMapper;
     this.chatGptService = chatGptService;
     this.studentEntityToStudentTestStatusDTOMapper = studentEntityToStudentTestStatusDTOMapper;
+    this.testService = testService;
 }
-
-//@PostConstruct
-//public void init() {
-//    System.out.println(getStudentTestsStatus("325256017"));
-//}
 
     public List<StudentTestStatusDTO> getStudentTestsStatus(String userId) {
         UserEntity user= userRepository.findUserByUserId(userId);
@@ -99,11 +97,7 @@ return response;
 }
 
 
-//    @PostConstruct
-//    public void init() {
-//        System.out.println(generateQuestionForPractice("325256022","מתמטיקה","מספרים שלמים","חיבור מספרים שלמים"));
-//        System.out.println(submitAnswer("325256022", 1L,"מתמטיקה","מספרים שלמים","חיבור מספרים שלמים","6+7","1"));
-//    }
+
 public void sendJobMessage(String userId,String subject,String subTopic) {
     String job = String.format("""
             אתה מורה פרטי ל%s שמדבר עברית ורק עברית.
@@ -139,24 +133,16 @@ public void sendJobMessage(String userId,String subject,String subTopic) {
         }
 
         StudentProgressEntity studentProgressEntity = studentProgressRepository.findStudentProgressByUserId(userId);
-        System.out.println(studentProgressEntity);
-        if (studentProgressEntity == null) {
-            //throw new RuntimeException("User progress record not found for user: " + userName);
-        }
+
 
         Map<String, Integer> skillLevelsBySubTopic = studentProgressEntity.getSkillLevelsBySubTopic();
-        System.out.println(skillLevelsBySubTopic);
 
-        // אם המשתמש אף פעם לא ענה על שאלה מהסוג הזה, נוסיף אותו עם רמה 1
         skillLevelsBySubTopic.putIfAbsent(subTopic, 1);
 
-        // עדכון הנתונים ושמירתם
         studentProgressEntity.setSkillLevelsBySubTopic(skillLevelsBySubTopic);
         studentProgressRepository.save(studentProgressEntity);
 
-        // קבלת הרמה של המשתמש
         int level = skillLevelsBySubTopic.get(subTopic);
-        // יצירת שאלה באמצעות מחולל השאלות המתאים
         SubjectQuestionGenerator generator = QuestionGeneratorFactory.getSubjectQuestionGenerator(subject);
         QuestionGenerator questionGenerator = generator.getQuestionGenerator(topic, subTopic);
 
@@ -164,22 +150,17 @@ public void sendJobMessage(String userId,String subject,String subTopic) {
 
         PracticeQuestionEntity questionEntity=questionEntityToPracticeQuestionMapper.apply(baseQuestion);
 
-        // שליפת היסטוריית השאלות של המשתמש
         StudentQuestionHistoryEntity historyEntity = studentQuestionHistoryRepository.findStudentQuestionHistoryByUserId(userId);
 
-        // **עדכון המפתחות הזרים** לפני שמירת השאלה
         questionEntity.setQuestionHistory(historyEntity);
         questionEntity.setProgressEntity(studentProgressEntity);
 
-        // סינון תווי LRM מטקסט השאלה לפני שמירה
         String questionTextWithoutLRM = questionEntity.getQuestionText().replaceAll("[\u200E\u200F]", "");
         questionEntity.setQuestionText(questionTextWithoutLRM);
 
-        // סינון תווי LRM מהתשובה לפני שמירה
         String answerWithoutLRM = questionEntity.getAnswer().replaceAll("[\u200E\u200F]", "");
         questionEntity.setAnswer(answerWithoutLRM);
 
-        // שמירת השאלה במסד הנתונים
         questionEntity = questionRepository.save(questionEntity);
         BasicResponse basicResponse = new BasicResponse(true, null);
        QuestionDTO questionDTO= questionEntityToQuestionDTOMapper.apply(questionEntity);
@@ -203,9 +184,7 @@ public void sendJobMessage(String userId,String subject,String subTopic) {
         if(classRoom == null){
             return new BasicResponse(false,",תלמיד עוד לא משובץ לכיתה");
         }
-        // חיפוש היסטוריית השאלות של המשתמש
         StudentQuestionHistoryEntity historyEntity = studentQuestionHistoryRepository.findStudentQuestionHistoryByUserId(userId);
-        // חיפוש נתוני התקדמות של המשתמש
         StudentProgressEntity studentProgressEntity = studentProgressRepository.findStudentProgressByUserId(userId);
 
 
@@ -213,17 +192,13 @@ public void sendJobMessage(String userId,String subject,String subTopic) {
         if (questionEntity == null) {
             return new BasicResponse(false, "השאלה לא נמצאה");
         }
-        // בדיקת נכונות התשובה
         boolean isCorrect = questionEntity.getAnswer().equalsIgnoreCase(answer.trim());
         System.out.println(questionEntity.getAnswer() + "  " + answer.trim());
-        // עדכון היסטוריית השאלות של המשתמש
         historyEntity.addAnsweredQuestion(questionEntity, isCorrect);
-        studentQuestionHistoryRepository.save(historyEntity); // שמירת היסטוריית השאלות
+        studentQuestionHistoryRepository.save(historyEntity);
 
-        // עדכון רצף ההצלחה של המשתמש בנושא ספציפי
         Map<String, Integer> subTopicSuccessStreak = studentProgressEntity.getSubTopicSuccessStreak();
         int currentSuccesStreak = subTopicSuccessStreak.getOrDefault(subTopic, 0);
-        // עדכון אם התשובה נכונה או לא
         Map<String, Integer> skillLevelsBySubTopic = studentProgressEntity.getSkillLevelsBySubTopic();;
         Map<String, Integer> subTopicIncorrectStreak = studentProgressEntity.getSubTopicIncorrectStreak();
         int currentIncorrectStreak = subTopicIncorrectStreak.getOrDefault(subTopic, 0);
@@ -251,12 +226,10 @@ public void sendJobMessage(String userId,String subject,String subTopic) {
             }
         }
         studentProgressEntity.setSkillLevelsBySubTopic(skillLevelsBySubTopic);
-        // שמירה של התקדמות המשתמש
         studentProgressEntity.setSubTopicSuccessStreak(subTopicSuccessStreak);
         studentProgressEntity.setSubTopicIncorrectStreak(subTopicIncorrectStreak);
         studentProgressRepository.save(studentProgressEntity);
 
-        // החזרת תשובה ללקוח(true,isCorrect, isCorrect ? "תשובה נכונה" : "Incorrect answer.");
         SubmitAnswerResponse submitAnswerResponse=new SubmitAnswerResponse();
         submitAnswerResponse.setSuccess(true);
         System.out.println(isCorrect);
@@ -267,13 +240,7 @@ public void sendJobMessage(String userId,String subject,String subTopic) {
         return basicResponse;
     }
 
-//    @PostConstruct
-//    public void init() {
-//
-//        System.out.println(generatePracticeTest("325256022","מתמטיקה","מספרים שלמים","קל",2,30));
-//
-//
-//    }
+
 
     @Transactional
     public BasicResponse generatePracticeTest(String userId, String subject, String topic, String difficulty, int questionCount, int timeLimitMinutes) {
@@ -282,33 +249,26 @@ public void sendJobMessage(String userId,String subject,String subTopic) {
             return new BasicResponse(false, "יוזר לא קיים");
         }
 
-        // בדיקה אם המשתמש הוא תלמיד
         if (!(user.getRole() == Role.STUDENT)) {
             return new BasicResponse(false, "יוזר זה אינו תלמיד");
         }
 
-//        // חיפוש כיתה שבה המשתמש משובץ
-//        ClassRoomEntity classRoom = classRoomRepository.findClassRoomOfUserByUserId(userId);
-//        if (classRoom == null) {
-//            return new BasicResponse(false, "תלמיד עוד לא משובץ לכיתה");
+        ClassRoomEntity classRoom = classRoomRepository.findClassRoomOfUserByUserId(userId);
+        if (classRoom == null) {
+            return new BasicResponse(false, "תלמיד עוד לא משובץ לכיתה");
+        }
+//TODO לימצוא דרך איך ליבדוק את זה
+//        List<String> subTopics = getSubTopics(topic);
+//        if (subTopics.isEmpty()) {
+//            return new BasicResponse(false, "לא נמצאו נושאים לתרגול בנושא זה");
+//        }
+//
+//        int[] difficultyLevels = getDifficultyLevels(difficulty);
+//        if (difficultyLevels.length == 0) {
+//            return new BasicResponse(false, "קושי לא תקין");
 //        }
 
-        // בדיקה אם נושא או קושי נתונים נכונים
-        List<String> subTopics = getSubTopics(topic);
-        if (subTopics.isEmpty()) {
-            return new BasicResponse(false, "לא נמצאו נושאים לתרגול בנושא זה");
-        }
-
-        int[] difficultyLevels = getDifficultyLevels(difficulty);
-        if (difficultyLevels.length == 0) {
-            return new BasicResponse(false, "קושי לא תקין");
-        }
-
         StudentEntity studentEntity = (StudentEntity) user;
-        Random random = new Random();
-        SubjectQuestionGenerator generatorFactory = QuestionGeneratorFactory.getSubjectQuestionGenerator(subject);
-
-        List<TestQuestionEntity> questions = new ArrayList<>();
 
         PracticeTestEntity testEntity = new PracticeTestEntity();
 
@@ -326,17 +286,7 @@ public void sendJobMessage(String userId,String subject,String subTopic) {
         testEntity.setQuestionCount(questionCount);
         practiceTestRepository.save(testEntity);
 
-        for (int i = 0; i < questionCount; i++) {
-            int level = difficultyLevels[random.nextInt(difficultyLevels.length)];
-            String subTopic = subTopics.get(random.nextInt(subTopics.size()));
-            QuestionGenerator questionGenerator = generatorFactory.getQuestionGenerator(topic, subTopic);
-            QuestionEntity questionEntity = questionGenerator.generateQuestion(level);
-
-            TestQuestionEntity testQuestionEntity= questionEntityToTestQuestionMapper.apply(questionEntity);
-            testQuestionEntity.setTest(testEntity);
-            questionRepository.save(testQuestionEntity);
-            questions.add(testQuestionEntity);
-        }
+        List<TestQuestionEntity> questions=testService.generateTestQuestions(subject,topic,questionCount,difficulty,testEntity);
 
         testEntity.setQuestions(questions);
         practiceTestRepository.save(testEntity);
@@ -344,32 +294,8 @@ public void sendJobMessage(String userId,String subject,String subTopic) {
         Map<TestEntity, List<TestQuestionEntity>> testMap = Map.of(testEntity, questions);
         TestDTO testDTO = testEntityToTestDTOMapper.apply(testMap);
         BasicResponse basicResponse = new BasicResponse(true,null);
-         basicResponse.setData(testDTO);
-         return basicResponse;
+        basicResponse.setData(testDTO);
+        return basicResponse;
     }
 
-
-
-    public static List<String> getSubTopics(String topic) {
-        switch (topic.toLowerCase()) {
-            case "מספרים שלמים":
-                return List.of(
-                        "חיבור מספרים שלמים",
-                        "חיסור מספרים שלמים",
-                        "כפל מספרים שלמים",
-                        "חילוק מספרים שלמים"
-                );
-            default:
-                throw new IllegalArgumentException("נושא לא נתמך: ");
-        }
-    }
-
-    private static int[] getDifficultyLevels(String difficulty) {
-        return switch (difficulty.toLowerCase()) {
-            case "קל" -> new int[]{1, 2};
-            case "בינוני" -> new int[]{3, 4};
-            case "קשה" -> new int[]{4, 5};
-            default -> throw new IllegalArgumentException("רמת קושי לא נתמכת: " + difficulty);
-        };
-    }
 }

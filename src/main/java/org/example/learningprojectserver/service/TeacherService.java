@@ -47,10 +47,11 @@ public class TeacherService {
     private final StudentEntityToStudentTestStatusDTOMapper studentEntityToStudentTestStatusDTOMapper;
     private final NotificationService notificationService;
     private final NotificationEventPublisher notificationEventPublisher;
+    private final TestService testService;
 
 
     @Autowired
-    public TeacherService(LessonRepository lessonRepository, UserRepository userRepository, ClassRoomRepository classRoomRepository, ScheduleRepository scheduleRepository, StudentRepository studentRepository, TeacherTestRepository teacherTestRepository, QuestionRepository questionRepository, QuestionEntityToQuestionDTOMapper questionEntityToQuestionDTOMapper, LessonEntityToLessonDTOMapper lessonEntityToLessonDTOMapper, QuestionEntityToTestQuestionMapper questionEntityToTestQuestionMapper, TestEntityToTestDTOMapper testEntityToTestDTOMapper, TeacherEntityToTeacherDTOMapper teacherEntityToTeacherDTOMapper, SchoolRepository schoolRepository, LessonsToScheduleMapper lessonsToScheduleMapper, StudentEntityToStudentTestStatusDTOMapper studentEntityToStudentTestStatusDTOMapper, NotificationService notificationService, NotificationEventPublisher notificationEventPublisher) {
+    public TeacherService(LessonRepository lessonRepository, UserRepository userRepository, ClassRoomRepository classRoomRepository, ScheduleRepository scheduleRepository, StudentRepository studentRepository, TeacherTestRepository teacherTestRepository, QuestionRepository questionRepository, QuestionEntityToQuestionDTOMapper questionEntityToQuestionDTOMapper, LessonEntityToLessonDTOMapper lessonEntityToLessonDTOMapper, QuestionEntityToTestQuestionMapper questionEntityToTestQuestionMapper, TestEntityToTestDTOMapper testEntityToTestDTOMapper, TeacherEntityToTeacherDTOMapper teacherEntityToTeacherDTOMapper, SchoolRepository schoolRepository, LessonsToScheduleMapper lessonsToScheduleMapper, StudentEntityToStudentTestStatusDTOMapper studentEntityToStudentTestStatusDTOMapper, NotificationService notificationService, NotificationEventPublisher notificationEventPublisher, TestService testService) {
         this.lessonRepository = lessonRepository;
         this.userRepository = userRepository;
         this.classRoomRepository = classRoomRepository;
@@ -68,6 +69,7 @@ public class TeacherService {
         this.studentEntityToStudentTestStatusDTOMapper = studentEntityToStudentTestStatusDTOMapper;
         this.notificationService = notificationService;
         this.notificationEventPublisher = notificationEventPublisher;
+        this.testService = testService;
     }
 
 
@@ -254,12 +256,7 @@ public class TeacherService {
 
 
 
-//    @PostConstruct()
-//    public void init() {
-//
-//       BasicResponse basicResponse= generateTestForStudents(List.of("325256020"),"325256022","10:30","מתמטיקה","מספרים שלמים","קל",5,30);
-//
-//    }
+
 
     @Transactional
     public BasicResponse generateTestForStudents(List<String> usersIds, String teacherId, String testStartTime,
@@ -330,42 +327,11 @@ public class TeacherService {
 
         teacherTestRepository.save(testEntity);
 
-        Random random = new Random();
-        SubjectQuestionGenerator generatorFactory = QuestionGeneratorFactory.getSubjectQuestionGenerator(subject);
-        List<TestQuestionEntity> questions = new ArrayList<>();
-        List<String> subTopics = getSubTopics(topic);
-        int[] difficultyLevels = getDifficultyLevels(difficulty);
-
-        for (int i = 0; i < questionCount; i++) {
-            int level = difficultyLevels[random.nextInt(difficultyLevels.length)];
-            String subTopic = subTopics.get(random.nextInt(subTopics.size()));
-            QuestionGenerator questionGenerator = generatorFactory.getQuestionGenerator(topic, subTopic);
-            QuestionEntity questionEntity = questionGenerator.generateQuestion(level);
-
-            TestQuestionEntity testQuestionEntity = questionEntityToTestQuestionMapper.apply(questionEntity);
-            testQuestionEntity.setTest(testEntity);
-
-            questionRepository.save(testQuestionEntity);
-            questions.add(testQuestionEntity);
-        }
-
+        List<TestQuestionEntity> questions=testService.generateTestQuestions(subject,topic,questionCount,difficulty,testEntity);
 
         testEntity.setQuestions(questions);
 
-
-        for (StudentEntity student : students) {
-            student.getTeacherTests().add(testEntity);
-
-           List<StudentTestStatusDTO> studentTestStatusDTOS=studentEntityToStudentTestStatusDTOMapper.apply(student);
-            StudentTestStatusDTO studentTestStatusDTO=studentTestStatusDTOS.get(studentTestStatusDTOS.size() - 1);
-
-            NotificationDTO<NewTestMessageDTO> dto =
-                    new NotificationDTO<>(NotificationType.NEW_TEST, new NewTestMessageDTO(studentTestStatusDTO));
-            notificationEventPublisher.publish(
-                    List.of(student.getUserId()),
-                    dto
-            );
-        }
+        notifyStudentsAboutNewTest(students,testEntity);
         teacherTestRepository.save(testEntity);
 
 
@@ -376,6 +342,23 @@ public class TeacherService {
         return basicResponse;
     }
 
+    private void notifyStudentsAboutNewTest(List<StudentEntity> students, TeacherTestEntity test) {
+        for (StudentEntity student : students) {
+            student.getTeacherTests().add(test);
+
+            List<StudentTestStatusDTO> studentTestStatusDTOS = studentEntityToStudentTestStatusDTOMapper.apply(student);
+
+            StudentTestStatusDTO studentTestStatusDTO = studentTestStatusDTOS.get(studentTestStatusDTOS.size() - 1);
+
+            NotificationDTO<NewTestMessageDTO> dto =
+                    new NotificationDTO<>(NotificationType.NEW_TEST, new NewTestMessageDTO(studentTestStatusDTO));
+
+            notificationEventPublisher.publish(
+                    List.of(student.getUserId()),
+                    dto
+            );
+        }
+    }
 
     public BasicResponse getTeacherSchedule(String teacherId) {
 
@@ -420,31 +403,6 @@ public class TeacherService {
         BasicResponse response = new BasicResponse(true, null);
         response.setData(subjects);
         return response;
-    }
-
-
-
-    public static List<String> getSubTopics(String topic) {
-        switch (topic.toLowerCase()) {
-            case "מספרים שלמים":
-                return List.of(
-                        "חיבור מספרים שלמים",
-                        "חיסור מספרים שלמים",
-                        "כפל מספרים שלמים",
-                        "חילוק מספרים שלמים"
-                );
-            default:
-                throw new IllegalArgumentException("נושא לא נתמך: ");
-        }
-    }
-
-    private static int[] getDifficultyLevels(String difficulty) {
-        return switch (difficulty.toLowerCase()) {
-            case "קל" -> new int[]{1, 2};
-            case "בינוני" -> new int[]{3, 4};
-            case "קשה" -> new int[]{4, 5};
-            default -> throw new IllegalArgumentException("רמת קושי לא נתמכת: " + difficulty);
-        };
     }
 
 }
