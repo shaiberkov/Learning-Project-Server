@@ -1,11 +1,8 @@
 package org.example.learningprojectserver.service;
-
 import jakarta.annotation.PostConstruct;
 import jakarta.persistence.Entity;
 import org.example.learningprojectserver.dto.SchoolDTO;
-import org.example.learningprojectserver.entities.ClassRoomEntity;
-import org.example.learningprojectserver.entities.SchoolEntity;
-import org.example.learningprojectserver.entities.SchoolGradeEntity;
+import org.example.learningprojectserver.entities.*;
 import org.example.learningprojectserver.mappers.SchoolEntityToSchoolDTOMapper;
 import org.example.learningprojectserver.repository.SchoolRepository;
 import org.example.learningprojectserver.response.BasicResponse;
@@ -16,11 +13,13 @@ import java.util.List;
 
 @Service
 public class SchoolService {
+
     private final SchoolRepository schoolRepository;
     private final SchoolEntityToSchoolDTOMapper schoolEntityToSchoolDTOMapper;
+
+
     @Autowired
     public SchoolService(SchoolRepository schoolRepository, SchoolEntityToSchoolDTOMapper schoolEntityToSchoolDTOMapper) {
-
         this.schoolRepository = schoolRepository;
         this.schoolEntityToSchoolDTOMapper = schoolEntityToSchoolDTOMapper;
     }
@@ -62,6 +61,12 @@ public class SchoolService {
         return response;
     }
 
+
+    @PostConstruct
+    public void init() {
+        getAllClassesNameBySchoolCode("10");
+    }
+
     public BasicResponse getAllClassesNameBySchoolCode(String schoolCode) {
 
          if (schoolCode == null ) {
@@ -71,10 +76,12 @@ public class SchoolService {
         if (school == null) {
             return new BasicResponse(false, "בית ספר עם הקוד " + schoolCode + " לא נמצא");
         }
-        List<String> classes = school.getClassRooms().stream().map(ClassRoomEntity::getName).toList();
+        List<String> classes = school.getClassRooms().stream().distinct().map(ClassRoomEntity::getName).toList();
+
         if (classes == null || classes.isEmpty()) {
             return new BasicResponse(false, "לא נמצאו כיתות בבית ספר זה");
         }
+
         BasicResponse response = new BasicResponse(true,null);
         response.setData(classes);
         return response;
