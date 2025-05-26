@@ -13,6 +13,8 @@ import org.example.learningprojectserver.repository.SchoolRepository;
 import org.example.learningprojectserver.repository.UserRepository;
 import org.example.learningprojectserver.response.BasicResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -33,8 +35,7 @@ private final SchoolEntityToSchoolDTOMapper schoolEntityToSchoolDTOMapper;
     this.schoolEntityToSchoolDTOMapper = schoolEntityToSchoolDTOMapper;
 }
 
-
-
+    @CacheEvict(value = "allSchools", allEntries = true)
     public BasicResponse assignUserAsSchoolManager(String userId) {
         UserEntity user = userRepository.findUserByUserId(userId);
         if (user == null) {
@@ -52,7 +53,7 @@ private final SchoolEntityToSchoolDTOMapper schoolEntityToSchoolDTOMapper;
         return new BasicResponse(true, "המשתמש " + schoolManager.getUsername() + " שוייך בהצלחה כמנהל בית ספר");
     }
 
-
+    @CacheEvict(value = "allSchools", allEntries = true)
     public BasicResponse addNewSchoolToSystem(String schoolName,String schoolCode) {
         SchoolEntity school =schoolRepository.findBySchoolCode(schoolCode);
         if (school != null) {
@@ -66,7 +67,7 @@ private final SchoolEntityToSchoolDTOMapper schoolEntityToSchoolDTOMapper;
         return new BasicResponse(true,"בית ספר " +schoolName +" נוסף בהצלחה למערכת");
     }
 
-
+    @CacheEvict(value = "allSchools", allEntries = true)
     public BasicResponse assignSchoolManagerToSchool(String userId, String schoolCode) {
         SchoolEntity school = schoolRepository.findBySchoolCode(schoolCode);
         UserEntity user = userRepository.findUserByUserId(userId);
@@ -101,7 +102,7 @@ private final SchoolEntityToSchoolDTOMapper schoolEntityToSchoolDTOMapper;
 
         return new BasicResponse(true, "המשתמש " + schoolManager.getUsername() + " מונה בהצלחה כמנהל של בית הספר " + school.getSchoolName());
     }
-
+    @CacheEvict(value = "allSchools", allEntries = true)
     public BasicResponse removeSchoolManagerFromSchool(String userId) {
         UserEntity user = userRepository.findUserByUserId(userId);
 
@@ -125,9 +126,8 @@ private final SchoolEntityToSchoolDTOMapper schoolEntityToSchoolDTOMapper;
         return new BasicResponse(true, "המנהל " + schoolManager.getUsername() + " הוסר בהצלחה מהשיוך לבית הספר " + school.getSchoolName());
     }
 
-
-
-public BasicResponse getAllSchoolsDTO() {
+    @Cacheable("allSchools")
+    public BasicResponse getAllSchoolsDTO() {
 
     List<SchoolEntity> schools = schoolRepository.findAll();
 

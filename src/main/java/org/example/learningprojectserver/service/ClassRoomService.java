@@ -10,6 +10,7 @@ import org.example.learningprojectserver.mappers.LessonsToScheduleMapper;
 import org.example.learningprojectserver.repository.ClassRoomRepository;
 import org.example.learningprojectserver.response.BasicResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
@@ -62,7 +63,10 @@ public class ClassRoomService {
 //        System.out.println(getAllLessonsForClassRoom("10","ג2"));
 //    }
 
-
+    @Cacheable(
+            value = "classRoomSchedule",
+            key = "#schoolCode + '_' + #classRoomName"
+    )
     public BasicResponse getScheduleForClassRoom(String schoolCode, String classRoomName) {
         ClassRoomEntity classRoom = classRoomRepository.findBySchoolCodeAndClassName(schoolCode, classRoomName);
         if (classRoom == null) {

@@ -15,6 +15,10 @@ import org.example.learningprojectserver.strategy.message.MessageRecipientStrate
 import org.example.learningprojectserver.strategy.message.MessageRecipientStrategyFactory;
 import org.example.learningprojectserver.utils.SmsSender;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -32,16 +36,19 @@ public class MessageService {
     private final NotificationService notificationService;
     private final MessageEntityToMessageDTOMapper messageEntityToMessageDTOMapper;
     private final NotificationEventPublisher notificationEventPublisher;
+    private final CacheManager cacheManager;
+
 
 
     @Autowired
-    public MessageService(UserRepository userRepository, MessageRepository messageRepository, MessageRecipientStrategyFactory strategyFactory, NotificationService notificationService, MessageEntityToMessageDTOMapper messageEntityToMessageDTOMapper, NotificationEventPublisher notificationEventPublisher) {
+    public MessageService(UserRepository userRepository, MessageRepository messageRepository, MessageRecipientStrategyFactory strategyFactory, NotificationService notificationService, MessageEntityToMessageDTOMapper messageEntityToMessageDTOMapper, NotificationEventPublisher notificationEventPublisher, CacheManager cacheManager) {
         this.userRepository = userRepository;
         this.messageRepository = messageRepository;
         this.strategyFactory = strategyFactory;
         this.notificationService = notificationService;
         this.messageEntityToMessageDTOMapper = messageEntityToMessageDTOMapper;
         this.notificationEventPublisher = notificationEventPublisher;
+        this.cacheManager = cacheManager;
     }
 
     public BasicResponse getRecipientTypes(String userId) {
@@ -75,6 +82,7 @@ public class MessageService {
         basicResponse.setData(recipientTypes);
         return basicResponse;
     }
+
     public BasicResponse sendMessage(String senderId, String recipientType, String recipientValue, String title, String content) {
         UserEntity sender = userRepository.findUserByUserId(senderId);
 
@@ -135,11 +143,15 @@ public class MessageService {
         sendSms(smsMessage, recipientsPhoneNumber);
 
         messageRepository.saveAll(messages);
+        recipients.forEach(r ->
+                cacheManager.getCache("receivedMessages").evict(r.getUserId())
+        );
 
         return new BasicResponse(true, "ההודעה נשלחה בהצלחה ל־" + messages.size() + " נמענים");
     }
 
 
+    @Cacheable(value = "receivedMessages", key = "#userId")
     public BasicResponse getAllRecivedMessages(String userId) {
         BasicResponse basicResponse = new BasicResponse();
         UserEntity user = userRepository.findUserByUserId(userId);

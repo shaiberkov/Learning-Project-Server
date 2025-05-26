@@ -5,8 +5,11 @@ import org.example.learningprojectserver.filter.LoggingFilter;
 import org.example.learningprojectserver.filter.MetricsFilter;
 import org.example.learningprojectserver.service.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.cache.jcache.JCacheCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -18,10 +21,14 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import org.springframework.cache.CacheManager;
+
+
 import java.util.List;
 
 @Configuration
 @EnableAsync
+@EnableCaching
 @EnableWebSecurity
 public class SecurityConfig {
 
@@ -69,6 +76,7 @@ public class SecurityConfig {
                         .requestMatchers("/Learning-App/notifications/**").permitAll()
                         .requestMatchers("/Learning-App/Lesson/**").permitAll()
                         .requestMatchers("/Learning-App/Schedule/**").permitAll()
+                        .requestMatchers("/Learning-App/UpcomingEvents/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(metricsFilter, UsernamePasswordAuthenticationFilter.class)
@@ -92,4 +100,17 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
+
+//    @Bean
+//    public EhCacheManagerFactoryBean ehCacheFactory() {
+//        EhCacheManagerFactoryBean factory = new EhCacheManagerFactoryBean();
+//        factory.setConfigLocation(new ClassPathResource("ehcache.xml"));
+//        factory.setShared(true);
+//        return factory;
+//    }
+//
+//    @Bean
+//    public CacheManager cacheManager(EhCacheManagerFactoryBean factory) {
+//        return new EhCacheCacheManager(factory.getObject());
+//    }
 }

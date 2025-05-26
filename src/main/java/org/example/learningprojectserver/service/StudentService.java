@@ -12,6 +12,7 @@ import org.example.learningprojectserver.service.QuestionGenerator.QuestionGener
 import org.example.learningprojectserver.service.QuestionGenerator.QuestionGeneratorFactory;
 import org.example.learningprojectserver.service.QuestionGenerator.SubjectQuestionGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
@@ -63,6 +64,7 @@ private final TestService testService;
     this.testService = testService;
 }
 
+    @Cacheable(value = "studentTestsStatus", key = "#userId")
     public List<StudentTestStatusDTO> getStudentTestsStatus(String userId) {
         UserEntity user= userRepository.findUserByUserId(userId);
         if (!(user.getRole()== Role.STUDENT)){
@@ -74,6 +76,7 @@ private final TestService testService;
 
     }
 
+    @Cacheable(value = "studentSchedule", key = "#studentId")
 public BasicResponse getStudentSchedule(String schoolCode, String studentId){
 
     SchoolEntity school = schoolRepository.findBySchoolCode(schoolCode);

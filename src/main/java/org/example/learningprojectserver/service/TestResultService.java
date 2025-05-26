@@ -10,6 +10,7 @@ import org.example.learningprojectserver.repository.*;
 import org.example.learningprojectserver.response.BasicResponse;
 import org.example.learningprojectserver.response.TestResultResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -179,7 +180,7 @@ public class TestResultService {
     }
 
 
-
+    @CacheEvict(value = "studentTestsStatus", key = "#userId")
     public BasicResponse checkTeacherTest(String userId, Long testId, Map<Long, String> userAnswers) {
 
             UserEntity user1 = UserRepository.findUserByUserId(userId);

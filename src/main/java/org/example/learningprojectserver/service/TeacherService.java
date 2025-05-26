@@ -18,6 +18,10 @@ import org.example.learningprojectserver.service.QuestionGenerator.QuestionGener
 import org.example.learningprojectserver.service.QuestionGenerator.QuestionGeneratorFactory;
 import org.example.learningprojectserver.service.QuestionGenerator.SubjectQuestionGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
@@ -48,10 +52,12 @@ public class TeacherService {
     private final NotificationService notificationService;
     private final NotificationEventPublisher notificationEventPublisher;
     private final TestService testService;
+    private final CacheManager cacheManager;
+
 
 
     @Autowired
-    public TeacherService(LessonRepository lessonRepository, UserRepository userRepository, ClassRoomRepository classRoomRepository, ScheduleRepository scheduleRepository, StudentRepository studentRepository, TeacherTestRepository teacherTestRepository, QuestionRepository questionRepository, QuestionEntityToQuestionDTOMapper questionEntityToQuestionDTOMapper, LessonEntityToLessonDTOMapper lessonEntityToLessonDTOMapper, QuestionEntityToTestQuestionMapper questionEntityToTestQuestionMapper, TestEntityToTestDTOMapper testEntityToTestDTOMapper, TeacherEntityToTeacherDTOMapper teacherEntityToTeacherDTOMapper, SchoolRepository schoolRepository, LessonsToScheduleMapper lessonsToScheduleMapper, StudentEntityToStudentTestStatusDTOMapper studentEntityToStudentTestStatusDTOMapper, NotificationService notificationService, NotificationEventPublisher notificationEventPublisher, TestService testService) {
+    public TeacherService(LessonRepository lessonRepository, UserRepository userRepository, ClassRoomRepository classRoomRepository, ScheduleRepository scheduleRepository, StudentRepository studentRepository, TeacherTestRepository teacherTestRepository, QuestionRepository questionRepository, QuestionEntityToQuestionDTOMapper questionEntityToQuestionDTOMapper, LessonEntityToLessonDTOMapper lessonEntityToLessonDTOMapper, QuestionEntityToTestQuestionMapper questionEntityToTestQuestionMapper, TestEntityToTestDTOMapper testEntityToTestDTOMapper, TeacherEntityToTeacherDTOMapper teacherEntityToTeacherDTOMapper, SchoolRepository schoolRepository, LessonsToScheduleMapper lessonsToScheduleMapper, StudentEntityToStudentTestStatusDTOMapper studentEntityToStudentTestStatusDTOMapper, NotificationService notificationService, NotificationEventPublisher notificationEventPublisher, TestService testService, CacheManager cacheManager) {
         this.lessonRepository = lessonRepository;
         this.userRepository = userRepository;
         this.classRoomRepository = classRoomRepository;
@@ -70,6 +76,7 @@ public class TeacherService {
         this.notificationService = notificationService;
         this.notificationEventPublisher = notificationEventPublisher;
         this.testService = testService;
+        this.cacheManager = cacheManager;
     }
 
 
@@ -165,7 +172,7 @@ public class TeacherService {
     }
 
 
-
+    @CacheEvict(value = "teacherSchedule", key = "#teacherId")
     @Transactional
     public BasicResponse addLessonToTeacher(LessonDTO dto, String teacherId) {
         UserEntity user = userRepository.findUserByUserId(teacherId);
@@ -231,6 +238,13 @@ public class TeacherService {
 
         teacher.getLessons().add(lesson);
         lessonRepository.save(lesson);
+        for (StudentEntity pupil : classRoom.getStudents()) {
+            cacheManager.getCache("studentSchedule")
+                    .evict(pupil.getUserId());
+        }
+        cacheManager.getCache("classRoomSchedule")
+                .evict(classRoom.getSchool().getSchoolCode() + "_" + classRoom.getName());
+
 
         return new BasicResponse(true, "השיעור נוסף בהצלחה");
     }
@@ -334,6 +348,10 @@ public class TeacherService {
         notifyStudentsAboutNewTest(students,testEntity);
         teacherTestRepository.save(testEntity);
 
+        Cache studentTestsCache = cacheManager.getCache("studentTestsStatus");
+            for (String id : usersIds) {
+                studentTestsCache.evict(id);
+        }
 
         Map<TestEntity, List<TestQuestionEntity>> testMap = Map.of(testEntity, questions);
         TestDTO testDTO = testEntityToTestDTOMapper.apply(testMap);
@@ -360,6 +378,7 @@ public class TeacherService {
         }
     }
 
+    @Cacheable(value = "teacherSchedule", key = "#teacherId")
     public BasicResponse getTeacherSchedule(String teacherId) {
 
 

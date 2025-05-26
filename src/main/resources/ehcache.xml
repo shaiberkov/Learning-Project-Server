@@ -1,0 +1,53 @@
+<config xmlns="http://www.ehcache.org/v3"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="http://www.ehcache.org/schema/ehcache-core.xsd">
+
+    <cache alias="upcomingEvents">
+        <expiry>
+            <!-- time-to-live of 24 h -->
+            <ttl unit="hours">24</ttl>
+        </expiry>
+
+        <!-- up to 1000 entries in heap -->
+        <heap>1000</heap>
+    </cache>
+    <cache alias="receivedMessages">
+        <expiry>
+            <ttl unit="hours">24</ttl>
+        </expiry>
+        <heap>1000</heap>
+    </cache>
+    <cache alias="teacherSchedule">
+        <expiry>
+            <ttl unit="hours">24</ttl>
+        </expiry>
+        <heap>500</heap>
+    </cache>
+    <cache alias="schoolDTO">
+        <expiry>
+            <ttl unit="hours">24</ttl>
+        </expiry>
+        <heap>100</heap>
+    </cache>
+    <cache alias="classRoomSchedule">
+        <expiry>
+            <ttl unit="hours">24</ttl>
+        </expiry>
+        <heap>100</heap>
+    </cache>
+    <cache alias="allSchools">
+        <expiry>
+            <ttl unit="hours">24</ttl>
+        </expiry>
+        <heap>100</heap>
+    </cache>
+    <cache alias="studentTestsStatus">
+        <expiry>
+            <ttl unit="hours">24</ttl>
+        </expiry>
+        <heap>1000</heap>
+    </cache>
+
+
+
+</config>

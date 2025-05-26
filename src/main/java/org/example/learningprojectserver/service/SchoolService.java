@@ -7,6 +7,7 @@ import org.example.learningprojectserver.mappers.SchoolEntityToSchoolDTOMapper;
 import org.example.learningprojectserver.repository.SchoolRepository;
 import org.example.learningprojectserver.response.BasicResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,7 +26,7 @@ public class SchoolService {
     }
 
 
-
+    @Cacheable(value = "schoolDTO", key = "#SchoolManagerId")
     public BasicResponse getSchoolDTO(String SchoolManagerId){
 
         SchoolEntity schoolEntity=schoolRepository.findBySchoolManagerId(SchoolManagerId);
