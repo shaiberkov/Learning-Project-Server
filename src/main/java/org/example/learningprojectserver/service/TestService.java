@@ -67,7 +67,7 @@ public class TestService {
         Random random = new Random();
 
         int[] difficultyLevels = getDifficultyLevels(difficulty);
-        int    level    = difficultyLevels[random.nextInt(difficultyLevels.length)];
+        int level = difficultyLevels[random.nextInt(difficultyLevels.length)];
 
         List<String> subTopics = getSubTopics(topic);
         String subTopic = subTopics.get(random.nextInt(subTopics.size()));

@@ -4,11 +4,8 @@
 
     <cache alias="upcomingEvents">
         <expiry>
-            <!-- time-to-live of 24 h -->
             <ttl unit="hours">24</ttl>
         </expiry>
-
-        <!-- up to 1000 entries in heap -->
         <heap>1000</heap>
     </cache>
     <cache alias="receivedMessages">
