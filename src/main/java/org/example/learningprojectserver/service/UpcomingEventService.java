@@ -23,7 +23,7 @@ public class UpcomingEventService {
 
 //    @PostConstruct
 //    public void init() {
-//        System.out.println(getUpcomingEvents(Role.valueOf("STUDENT"),"325256017"));
+//        System.out.println(getUpcomingEvents(Role.valueOf("SYSTEM_ADMIN"),"325256022"));
 //    }
 
 

@@ -33,7 +33,7 @@ public class TeacherEntity extends UserEntity {
     private List<String> teachingSubjects=new ArrayList<>();
 
 
-    @OneToMany(mappedBy = "teacher")
+    @OneToMany(mappedBy = "teacher",fetch = FetchType.EAGER)
     private List<TeacherTestEntity> tests = new ArrayList<>();
 
     @OneToMany(mappedBy = "teacher",fetch = FetchType.EAGER)

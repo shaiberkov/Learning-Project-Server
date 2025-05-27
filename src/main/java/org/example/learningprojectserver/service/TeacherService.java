@@ -271,7 +271,10 @@ public class TeacherService {
 
 
 
-
+    @CacheEvict(
+            value = "upcomingEvents",
+            key = "'TEACHER_' + #teacherId"
+    )
     @Transactional
     public BasicResponse generateTestForStudents(List<String> usersIds, String teacherId, String testStartTime,
                                                  String subject, String topic, String difficulty, int questionCount, int timeLimitMinutes) {
@@ -347,10 +350,11 @@ public class TeacherService {
 
         notifyStudentsAboutNewTest(students,testEntity);
         teacherTestRepository.save(testEntity);
-
+        Cache upcomingEventsCache = cacheManager.getCache("upcomingEvents");
         Cache studentTestsCache = cacheManager.getCache("studentTestsStatus");
             for (String id : usersIds) {
                 studentTestsCache.evict(id);
+                upcomingEventsCache.evict("STUDENT_" + id);
         }
 
         Map<TestEntity, List<TestQuestionEntity>> testMap = Map.of(testEntity, questions);

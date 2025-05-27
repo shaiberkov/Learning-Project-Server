@@ -12,7 +12,7 @@ public class TeacherTestEntity extends TestEntity {
 
 
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "teacher_test_student",
             joinColumns = @JoinColumn(name = "test_id"),
