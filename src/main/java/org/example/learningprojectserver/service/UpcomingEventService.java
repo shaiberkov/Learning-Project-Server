@@ -21,10 +21,6 @@ public class UpcomingEventService {
                 .collect(Collectors.toMap(UpcomingEventStrategy::supports, s -> s));
     }
 
-//    @PostConstruct
-//    public void init() {
-//        System.out.println(getUpcomingEvents(Role.valueOf("SYSTEM_ADMIN"),"325256022"));
-//    }
 
 
     @Cacheable(value = "upcomingEvents", key = "#role + '_' + #userId")

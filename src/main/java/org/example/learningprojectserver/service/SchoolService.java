@@ -63,10 +63,10 @@ public class SchoolService {
     }
 
 
-    @PostConstruct
-    public void init() {
-        getAllClassesNameBySchoolCode("10");
-    }
+//    @PostConstruct
+//    public void init() {
+//        getAllClassesNameBySchoolCode("10");
+//    }
 
     public BasicResponse getAllClassesNameBySchoolCode(String schoolCode) {
 

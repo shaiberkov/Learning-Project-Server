@@ -5,6 +5,9 @@ import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 @Entity
+@Table(name = "school_entity", indexes = {
+        @Index(name = "idx_school_code", columnList = "schoolCode")
+})
 public class SchoolEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

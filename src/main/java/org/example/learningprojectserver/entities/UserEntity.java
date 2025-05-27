@@ -8,6 +8,9 @@ import java.util.List;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
+@Table(name = "user_entity", indexes = {
+        @Index(name = "idx_user_userId", columnList = "userId")
+})
 public abstract class UserEntity {
 
     @Id
