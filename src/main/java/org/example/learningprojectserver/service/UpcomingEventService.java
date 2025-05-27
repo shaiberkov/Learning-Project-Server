@@ -22,7 +22,6 @@ public class UpcomingEventService {
     }
 
 
-
     @Cacheable(value = "upcomingEvents", key = "#role + '_' + #userId")
     public List<UpcomingEventDto> getUpcomingEvents(Role role, String userId) {
         UpcomingEventStrategy strategy = strategyMap.get(role);

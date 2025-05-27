@@ -1,5 +1,6 @@
 package org.example.learningprojectserver.service;
 
+import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import org.example.learningprojectserver.dto.*;
 import org.example.learningprojectserver.entities.*;
@@ -64,6 +65,7 @@ private final TestService testService;
     this.testService = testService;
 }
 
+
     @Cacheable(value = "studentTestsStatus", key = "#userId")
     public List<StudentTestStatusDTO> getStudentTestsStatus(String userId) {
         UserEntity user= userRepository.findUserByUserId(userId);
@@ -72,8 +74,8 @@ private final TestService testService;
         }
         StudentEntity student = (StudentEntity) user;
 
-        return studentEntityToStudentTestStatusDTOMapper.apply(student);
-
+        List<StudentTestStatusDTO> studentTestStatusDTOS = studentEntityToStudentTestStatusDTOMapper.apply(student);
+    return studentTestStatusDTOS;
     }
 
     @Cacheable(value = "studentSchedule", key = "#studentId")
@@ -173,6 +175,7 @@ public void sendJobMessage(String userId,String subject,String subTopic) {
 
 
     //TODO להשאיר רמה מקסימלית ל5
+    @Transactional
     public BasicResponse submitAnswer(String userId, Long id, String subTopic, String answer) {
 
         UserEntity user= userRepository.findUserByUserId(userId);
