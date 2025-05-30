@@ -1,5 +1,6 @@
 package org.example.learningprojectserver.service;
 
+import lombok.RequiredArgsConstructor;
 import org.example.learningprojectserver.entities.ClassRoomEntity;
 import org.example.learningprojectserver.repository.ClassRoomRepository;
 import org.example.learningprojectserver.response.BasicResponse;
@@ -9,13 +10,10 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class SchoolGradeService {
 
   private final ClassRoomRepository classRoomRepository;
-@Autowired
-     public SchoolGradeService(ClassRoomRepository classRoomRepository) {
-    this.classRoomRepository = classRoomRepository;
-}
 
     public BasicResponse getClassNamesBySchoolAndGrade(String schoolCode, String gradeName) {
         if (schoolCode == null || schoolCode.isEmpty()) {

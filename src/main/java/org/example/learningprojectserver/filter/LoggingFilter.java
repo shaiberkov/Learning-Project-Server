@@ -13,6 +13,12 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.time.LocalDateTime;
 
+import static org.example.learningprojectserver.constants.SecurityConstants.JwtAuthenticationFilterConstants.PRINCIPAL_USERNAME_KEY;
+import static org.example.learningprojectserver.constants.SecurityConstants.JwtAuthenticationFilterConstants.PRINCIPAL_USER_ID_KEY;
+import static org.example.learningprojectserver.constants.SecurityConstants.LoggingFilterConstants.*;
+import static org.example.learningprojectserver.constants.SharedConstants.SharedControllerConstants.AUTH_HEADER;
+import static org.example.learningprojectserver.constants.SharedConstants.SharedControllerConstants.BEARER_PREFIX;
+
 
 public class LoggingFilter extends OncePerRequestFilter {
 
@@ -34,14 +40,14 @@ public class LoggingFilter extends OncePerRequestFilter {
         String ip = request.getRemoteAddr();
 
         // נשלוף את הטוקן מה-Header
-        String authHeader = request.getHeader("Authorization");
+        String authHeader = request.getHeader(AUTH_HEADER);
         String token = null;
-        String userId = "UNKNOWN";
-        String username = "UNKNOWN";
-        String role = "UNKNOWN";
+        String userId = UNKNOWN_USER_ID;
+        String username = UNKNOWN_USERNAME;
+        String role = UNKNOWN_ROLE;
 
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            token = authHeader.substring(7);
+        if (authHeader != null && authHeader.startsWith(BEARER_PREFIX)) {
+            token = authHeader.substring(BEARER_PREFIX.length());
             try {
                 if (jwtService.isTokenValid(token)) {
                     userId = jwtService.extractUserId(token);
@@ -49,19 +55,25 @@ public class LoggingFilter extends OncePerRequestFilter {
                     role = jwtService.extractRole(token);
                 }
             } catch (Exception e) {
-                System.out.println("שגיאה בפענוח JWT: " + e.getMessage());
+                System.out.println(JWT_DECODE_ERROR_PREFIX + e.getMessage());
             }
         }
 
         filterChain.doFilter(request, response);
 
         int status = response.getStatus();
+//        String logMessage = String.format(
+//                "[%s] %s %s -> %d | userId: %s | username: %s | role: %s | ip: %s",
+//                LocalDateTime.now(), method, uri, status, userId, username, role, ip
+//        );
         String logMessage = String.format(
-                "[%s] %s %s -> %d | userId: %s | username: %s | role: %s | ip: %s",
-                LocalDateTime.now(), method, uri, status, userId, username, role, ip
+                LOG_FORMAT,
+                LocalDateTime.now(), method, uri, status,
+                PRINCIPAL_USER_ID_KEY, userId,
+                PRINCIPAL_USERNAME_KEY, username,
+                role, ip
         );
 
-        // הדפסה לקונסול
         System.out.println(logMessage);
 
         // אופציונלית: כתיבה לקובץ לוג

@@ -1,6 +1,7 @@
 package org.example.learningprojectserver.service;
 
 import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import org.example.learningprojectserver.dto.LessonDTO;
 import org.example.learningprojectserver.entities.ClassRoomEntity;
 import org.example.learningprojectserver.entities.LessonEntity;
@@ -21,16 +22,11 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class ClassRoomService {
 
     private final ClassRoomRepository classRoomRepository;
     private final LessonsToScheduleMapper lessonsToScheduleMapper;
-
-    @Autowired
-    public ClassRoomService(ClassRoomRepository classRoomRepository, LessonsToScheduleMapper lessonsToScheduleMapper) {
-        this.classRoomRepository = classRoomRepository;
-        this.lessonsToScheduleMapper = lessonsToScheduleMapper;
-    }
 
 //    public BasicResponse getAllLessonsForClassRoom(String schoolCode, String classRoomName) {
 //        ClassRoomEntity classRoom = classRoomRepository.findBySchoolCodeAndClassName(schoolCode, classRoomName);

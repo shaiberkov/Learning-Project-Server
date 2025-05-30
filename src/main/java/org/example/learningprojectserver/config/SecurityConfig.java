@@ -26,6 +26,8 @@ import org.springframework.cache.CacheManager;
 
 import java.util.List;
 
+import static org.example.learningprojectserver.constants.SecurityConstants.SecurityMatcherConstants.*;
+
 @Configuration
 @EnableAsync
 @EnableCaching
@@ -57,26 +59,26 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/v3/api-docs/**",
-                                "/swagger-ui/**",
-                                "/swagger-ui.html"
+                                V3_API_DOCS,
+                                SWAGGER_UI_RESOURCES,
+                                SWAGGER_UI_HTML
                         ).permitAll()
-                        .requestMatchers("/Learning-App/User/**").permitAll()
-                        .requestMatchers("/Learning-App/validateToken/**").hasAnyRole("SYSTEM_ADMIN","TEACHER", "SCHOOLMANAGER","STUDENT")
-                        .requestMatchers("/Learning-App/System-Admin/**").hasRole("SYSTEM_ADMIN")
-                        .requestMatchers("/Learning-App/School-Manager/**").permitAll()    //hasAnyRole("SCHOOLMANAGER", "SYSTEM_ADMIN")
-                        .requestMatchers("/Learning-App/Teacher/**").permitAll()    //hasAnyRole("TEACHER", "SCHOOLMANAGER", "SYSTEM_ADMIN")//todo  לבודד את ההרשאות
-                        .requestMatchers("/Learning-App/Student/**").permitAll()//hasRole("STUDENT")//hasAnyRole("STUDENT")
-                        .requestMatchers("/Learning-App/Active-User/**").hasAnyRole("SYSTEM_ADMIN","TEACHER", "SCHOOLMANAGER","STUDENT")
-                        .requestMatchers("/Learning-App/Chat/**").permitAll()//hasAnyRole("SYSTEM_ADMIN","TEACHER", "SCHOOLMANAGER","STUDENT" )
-                        .requestMatchers("/Learning-App/Question/**").hasAnyRole("TEACHER", "SCHOOLMANAGER","STUDENT")
-                        .requestMatchers("/Learning-App/User-Statistic/**").hasAnyRole("TEACHER", "SCHOOLMANAGER","STUDENT")
-                        .requestMatchers("/Learning-App/Test/**").permitAll()//hasAnyRole("STUDENT")
-                        .requestMatchers("/Learning-App/Message/**").permitAll()//hasAnyRole("TEACHER", "SCHOOLMANAGER", "SYSTEM_ADMIN")
-                        .requestMatchers("/Learning-App/notifications/**").permitAll()
-                        .requestMatchers("/Learning-App/Lesson/**").permitAll()
-                        .requestMatchers("/Learning-App/Schedule/**").permitAll()
-                        .requestMatchers("/Learning-App/UpcomingEvents/**").permitAll()
+                        .requestMatchers(USER_ALL).permitAll()
+                        .requestMatchers(VALIDATE_TOKEN_ALL).permitAll()//.hasAnyRole("SYSTEM_ADMIN","TEACHER", "SCHOOLMANAGER","STUDENT")
+                        .requestMatchers(SYSTEM_ADMIN_ALL).permitAll()//.hasRole("SYSTEM_ADMIN")
+                        .requestMatchers(SCHOOL_MANAGER_ALL).permitAll()    //hasAnyRole("SCHOOLMANAGER", "SYSTEM_ADMIN")
+                        .requestMatchers(TEACHER_ALL).permitAll()    //hasAnyRole("TEACHER", "SCHOOLMANAGER", "SYSTEM_ADMIN")//todo  לבודד את ההרשאות
+                        .requestMatchers(STUDENT_ALL).permitAll()//hasRole("STUDENT")//hasAnyRole("STUDENT")
+                        .requestMatchers(ACTIVE_USER_ALL).permitAll()//.hasAnyRole("SYSTEM_ADMIN","TEACHER", "SCHOOLMANAGER","STUDENT")
+                        .requestMatchers(CHAT_ALL).permitAll()//hasAnyRole("SYSTEM_ADMIN","TEACHER", "SCHOOLMANAGER","STUDENT" )
+                        .requestMatchers(QUESTION_ALL).permitAll()//.hasAnyRole("TEACHER", "SCHOOLMANAGER","STUDENT")
+                        .requestMatchers(USER_STATISTIC_ALL).permitAll()//.hasAnyRole("TEACHER", "SCHOOLMANAGER","STUDENT")
+                        .requestMatchers(TEST_ALL).permitAll()//hasAnyRole("STUDENT")
+                        .requestMatchers(MESSAGE_ALL).permitAll()//hasAnyRole("TEACHER", "SCHOOLMANAGER", "SYSTEM_ADMIN")
+                        .requestMatchers(NOTIFICATION_ALL).permitAll()
+                        .requestMatchers(LESSON_ALL).permitAll()
+                        .requestMatchers(SCHEDULE_ALL).permitAll()
+                        .requestMatchers(UPCOMING_EVENTS_ALL).permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(metricsFilter, UsernamePasswordAuthenticationFilter.class)
@@ -91,26 +93,15 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOrigins(List.of("http://localhost:5173"));
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
-        configuration.setAllowedHeaders(List.of("*"));
+        configuration.setAllowedOrigins(ALLOWED_ORIGINS);
+        configuration.setAllowedMethods(ALLOWED_METHODS);
+        configuration.setAllowedHeaders(ALLOWED_HEADERS);
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
+        source.registerCorsConfiguration(CORS_MAPPING_PATH, configuration);
         return source;
     }
 
-//    @Bean
-//    public EhCacheManagerFactoryBean ehCacheFactory() {
-//        EhCacheManagerFactoryBean factory = new EhCacheManagerFactoryBean();
-//        factory.setConfigLocation(new ClassPathResource("ehcache.xml"));
-//        factory.setShared(true);
-//        return factory;
-//    }
-//
-//    @Bean
-//    public CacheManager cacheManager(EhCacheManagerFactoryBean factory) {
-//        return new EhCacheCacheManager(factory.getObject());
-//    }
+
 }

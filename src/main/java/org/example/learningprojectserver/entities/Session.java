@@ -1,10 +1,18 @@
 package org.example.learningprojectserver.entities;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.Date;
 
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Session {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,36 +25,4 @@ public class Session {
     @Column(nullable = false, updatable = true)
     private Date lastActivity;
 
-    public Session(UserEntity user, Date lastActivity) {
-        this.user = user;
-        this.lastActivity = lastActivity;
-    }
-
-    public Session() {
-
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public UserEntity getUser() {
-        return user;
-    }
-
-    public void setUser(UserEntity user) {
-        this.user = user;
-    }
-
-    public Date getLastActivity() {
-        return lastActivity;
-    }
-
-    public void setLastActivity(Date lastActivity) {
-        this.lastActivity = lastActivity;
-    }
 }

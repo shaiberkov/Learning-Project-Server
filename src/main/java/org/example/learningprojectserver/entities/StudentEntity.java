@@ -1,14 +1,16 @@
 package org.example.learningprojectserver.entities;
 
 import jakarta.persistence.*;
+import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
 @Entity
+@NoArgsConstructor
 public class StudentEntity extends UserEntity {
 
     @ManyToOne
-    @JoinColumn(name = "class_room_id") // עמודה שתצביע על הכיתה
+    @JoinColumn(name = "class_room_id")
     private ClassRoomEntity classRoom;
 
     @ManyToOne
@@ -17,8 +19,6 @@ public class StudentEntity extends UserEntity {
 
     @ManyToMany(mappedBy = "students")  // מיפוי עם TeacherEntity
     private List<TeacherEntity> teachers=new ArrayList<>();
-
-
 
     @OneToOne(mappedBy = "student", cascade = CascadeType.ALL)
     private StudentProgressEntity studentProgressEntity;
@@ -55,8 +55,8 @@ public class StudentEntity extends UserEntity {
         this.teacherTestsResult = teacherTestsResult;
     }
 
-    public StudentEntity() {}
-
+//    public StudentEntity() {}
+//
 
     public ClassRoomEntity getClassRoom() {
         return classRoom;

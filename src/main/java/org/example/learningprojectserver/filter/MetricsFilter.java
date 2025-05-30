@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
+import static org.example.learningprojectserver.constants.SecurityConstants.MetricsFilterConstants.PRINT_FORMAT;
+
 
 public class MetricsFilter extends OncePerRequestFilter {
 
@@ -38,7 +40,9 @@ public class MetricsFilter extends OncePerRequestFilter {
             long count = requestCountMap.get(path).get();
             long avg = total / count;
 
-            System.out.printf("Path: %s | Time: %dms | Total Requests: %d | Avg Response Time: %dms%n",
+//            System.out.printf("Path: %s | Time: %dms | Total Requests: %d | Avg Response Time: %dms%n",
+//                    path, duration, count, avg);
+            System.out.printf(PRINT_FORMAT,
                     path, duration, count, avg);
         }
     }

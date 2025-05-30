@@ -1,5 +1,6 @@
 package org.example.learningprojectserver.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.example.learningprojectserver.dto.LessonDTO;
 import org.example.learningprojectserver.dto.UserDto;
 import org.example.learningprojectserver.response.BasicResponse;
@@ -9,8 +10,11 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import static org.example.learningprojectserver.constants.ControllerConstants.SchoolManager.*;
+
 @RestController
-@RequestMapping("/Learning-App/School-Manager")
+@RequestMapping(SCHOOL_MANAGER_BASE_PATH)
+@RequiredArgsConstructor
 public class SchoolManagerController {
 private final ClassRoomService classRoomService;
     private final SchoolGradeService schoolGradeService;
@@ -19,58 +23,49 @@ private final ClassRoomService classRoomService;
     private final TeacherService teacherService;
 
 
-    @Autowired
-    public SchoolManagerController(ClassRoomService classRoomService, SchoolGradeService schoolGradeService, SchoolManagerService schoolManagerService, SchoolService schoolService, TeacherService teacherService) {
-        this.classRoomService = classRoomService;
-        this.schoolGradeService = schoolGradeService;
-        this.schoolManagerService = schoolManagerService;
-        this.schoolService = schoolService;
-        this.teacherService = teacherService;
-    }
-
-    @GetMapping("/get-teacher-DTO")
+    @GetMapping(GET_TEACHER_DTO)
     public BasicResponse getTeacherDTO(@RequestParam String teacherId,@RequestParam String schoolCode) {
         return teacherService.getTeacherDTO(teacherId,schoolCode);
     }
 
-    @GetMapping("/get-all-classes-name-by-school-code")
+    @GetMapping(GET_ALL_CLASSES_BY_SCHOOL_CODE)
     public BasicResponse getAllClassesNameBySchoolCode(@RequestParam String schoolCode) {
         return schoolService.getAllClassesNameBySchoolCode(schoolCode);
     }
 
-    @GetMapping("/get-school-code")
+    @GetMapping(GET_SCHOOL_CODE)
     public BasicResponse getSchoolCode(@RequestParam String userId){
         return schoolManagerService.getSchoolCode(userId);
 
     }
 
-@GetMapping("/get-schedule-for-classRoom")
+@GetMapping(GET_SCHEDULE_FOR_CLASSROOM)
 public BasicResponse getAllLessonsForClassRoom(@RequestParam String schoolCode , @RequestParam String classRoomName) {
         return classRoomService.getScheduleForClassRoom(schoolCode, classRoomName);
 
 }
 
-    @PostMapping("/assign-user-as-school-teacher")
+    @PostMapping(ASSIGN_USER_AS_SCHOOL_TEACHER)
     public BasicResponse assignUserAsSchoolTeacher(@RequestParam String userId, @RequestParam String schoolCode) {
         return schoolManagerService.assignUserAsSchoolTeacher(userId, schoolCode);
     }
 
-    @PostMapping("/remove-teacher-from-school")
+    @PostMapping(REMOVE_TEACHER_FROM_SCHOOL)
     public BasicResponse removeTeacherFromSchool(@RequestParam String userId) {
         return schoolManagerService.removeTeacherFromSchool(userId);
     }
 
-    @PostMapping("/add-school-grades")
+    @PostMapping(ADD_SCHOOL_GRADES)
     public BasicResponse addSchoolGrades(@RequestParam String schoolCode, @RequestBody List<String> gradesName) {
         return schoolManagerService.addSchoolGrades(schoolCode, gradesName);
     }
 
-    @PostMapping("/remove-school-grades")
+    @PostMapping(REMOVE_SCHOOL_GRADES)
     public BasicResponse removeSchoolGrades(@RequestParam String schoolCode, @RequestBody List<String> gradesName) {
         return schoolManagerService.removeSchoolGrades(schoolCode, gradesName);
     }
 
-    @PostMapping("/add-classes-to-grade")
+    @PostMapping(ADD_CLASSES_TO_GRADE)
     public BasicResponse addClassesToGrade(
             @RequestParam String schoolCode,
             @RequestParam String gradeName,
@@ -79,7 +74,7 @@ public BasicResponse getAllLessonsForClassRoom(@RequestParam String schoolCode ,
 
     }
 
-    @PostMapping("/add-additional-class-to-grade")
+    @PostMapping(ADD_ADDITIONAL_CLASS_TO_GRADE)
     public BasicResponse addAdditionalClassToGrade(
             @RequestParam String schoolCode,
             @RequestParam String gradeName,
@@ -89,7 +84,7 @@ public BasicResponse getAllLessonsForClassRoom(@RequestParam String schoolCode ,
 
     }
 
-    @PostMapping("/assign-teacher-to-classes")
+    @PostMapping(ASSIGN_TEACHER_TO_CLASSES)
     public BasicResponse assignTeacherToClasses(
             @RequestParam String schoolCode,
             @RequestParam String teacherId,
@@ -97,41 +92,41 @@ public BasicResponse getAllLessonsForClassRoom(@RequestParam String schoolCode ,
         return schoolManagerService.assignTeacherToClasses(schoolCode, teacherId, classNames);
     }
 
-    @PostMapping("/remove-teacher-from-class")
+    @PostMapping(REMOVE_TEACHER_FROM_CLASS)
     public BasicResponse removeTeacherFromClass(@RequestParam String schoolCode,
                                                 @RequestParam String teacherId,
                                                 @RequestParam String className) {
         return schoolManagerService.removeTeacherFromClass(schoolCode, teacherId, className);
     }
 
-    @GetMapping("/get-class-names-by-school-and-grade")
+    @GetMapping(GET_CLASS_NAMES_BY_SCHOOL_AND_GRADE)
     public BasicResponse getClassNamesBySchoolAndGrade(@RequestParam String schoolCode, @RequestParam String gradeName) {
         return schoolGradeService.getClassNamesBySchoolAndGrade(schoolCode, gradeName);
     }
 
-    @GetMapping("/grades")
+    @GetMapping(GET_GRADES)
     public BasicResponse getGradesBySchoolCode(@RequestParam String schoolCode) {
         return schoolService.getGradesBySchoolCode(schoolCode);
     }
 
-    @PostMapping("/add-lesson-to-teacher")
+    @PostMapping(ADD_LESSON_TO_TEACHER)
     public BasicResponse addLessonToTeacher(@RequestBody LessonDTO dto, @RequestParam String teacherId) {
         return teacherService.addLessonToTeacher(dto, teacherId);
 
     }
 
-    @PostMapping("/add-teaching-subject-to-teacher")
+    @PostMapping(ADD_TEACHING_SUBJECT_TO_TEACHER)
     public BasicResponse addTeachingSubjectToTeacher(@RequestParam String teacherId, @RequestBody List<String> subjects) {
         return teacherService.addTeachingSubjectToTeacher(teacherId, subjects);
 
     }
 
-    @PostMapping("/remove-teaching-subject-from-teacher")
+    @PostMapping(REMOVE_TEACHING_SUBJECT_FROM_TEACHER)
     public BasicResponse removeTeachingSubjectFromTeacher(@RequestParam String teacherId, @RequestParam String subjectToRemove) {
         return teacherService.removeTeachingSubjectFromTeacher(teacherId, subjectToRemove);
     }
 
-    @PostMapping("/assign-student-to-class")
+    @PostMapping(ASSIGN_STUDENT_TO_CLASS)
     public BasicResponse assignStudentToClass(
             @RequestParam String schoolCode,
             @RequestParam String studentId,
@@ -140,7 +135,7 @@ public BasicResponse getAllLessonsForClassRoom(@RequestParam String schoolCode ,
         return schoolManagerService.assignStudentToClass(schoolCode, studentId, className);
     }
 
-    @PostMapping("/change-student-class")
+    @PostMapping(CHANGE_STUDENT_CLASS)
     public BasicResponse changeStudentClass(
             @RequestParam String schoolCode,
             @RequestParam String studentId,
@@ -149,22 +144,22 @@ public BasicResponse getAllLessonsForClassRoom(@RequestParam String schoolCode ,
     ) {
         return schoolManagerService.changeStudentClass(schoolCode, studentId, gradeName, newClassName);
     }
-    @GetMapping("/get-all-teachers")
+    @GetMapping(GET_ALL_TEACHERS)
     public BasicResponse getAllTeachers(@RequestParam String schoolCode) {
         return schoolManagerService.getAllTeachers(schoolCode);
     }
 
-    @GetMapping("/get-all-students")
+    @GetMapping(GET_ALL_STUDENTS)
     public BasicResponse getAllStudents(@RequestParam String schoolCode) {
         return schoolManagerService.getAllStudents(schoolCode);
     }
 
-    @GetMapping("/get-teacher-teaching-subjects")
+    @GetMapping(GET_TEACHER_TEACHING_SUBJECTS)
     public BasicResponse getTeacherTeachingSubjects(@RequestParam String teacherId) {
         return teacherService.getTeacherTeachingSubjects(teacherId);
     }
 
-    @GetMapping("/get-school")
+    @GetMapping(GET_SCHOOL)
     public BasicResponse getSchool(@RequestParam String schoolManagerId) {
         return schoolService.getSchoolDTO(schoolManagerId);
     }

@@ -1,10 +1,18 @@
 package org.example.learningprojectserver.entities;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "school_entity", indexes = {
         @Index(name = "idx_school_code", columnList = "schoolCode")
 })
@@ -35,71 +43,5 @@ public class SchoolEntity {
     @OneToOne(mappedBy = "school")
     private SchoolManagerEntity schoolManager;
 
-
-    public SchoolEntity() {}
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public List<SchoolGradeEntity> getSchoolGrades() {
-        return schoolGrades;
-    }
-
-    public void setSchoolGrades(List<SchoolGradeEntity> schoolGrades) {
-        this.schoolGrades = schoolGrades;
-    }
-
-    public String getSchoolCode() {
-        return schoolCode;
-    }
-
-    public void setSchoolCode(String schoolCode) {
-        this.schoolCode = schoolCode;
-    }
-
-    public String getSchoolName() {
-        return schoolName;
-    }
-
-    public void setSchoolName(String schoolName) {
-        this.schoolName = schoolName;
-    }
-
-    public List<TeacherEntity> getTeachers() {
-        return teachers;
-    }
-
-    public void setTeachers(List<TeacherEntity> teachers) {
-        this.teachers = teachers;
-    }
-
-    public List<StudentEntity> getStudents() {
-        return students;
-    }
-
-    public void setStudents(List<StudentEntity> students) {
-        this.students = students;
-    }
-
-    public List<ClassRoomEntity> getClassRooms() {
-        return classRooms;
-    }
-
-    public void setClassRooms(List<ClassRoomEntity> classRooms) {
-        this.classRooms = classRooms;
-    }
-
-    public SchoolManagerEntity getSchoolManager() {
-        return schoolManager;
-    }
-
-    public void setSchoolManager(SchoolManagerEntity schoolManager) {
-        this.schoolManager = schoolManager;
-    }
 }
 

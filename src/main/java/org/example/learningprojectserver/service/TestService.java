@@ -1,5 +1,6 @@
 package org.example.learningprojectserver.service;
 
+import lombok.RequiredArgsConstructor;
 import org.example.learningprojectserver.dto.TestDTO;
 import org.example.learningprojectserver.entities.QuestionEntity;
 import org.example.learningprojectserver.entities.TestEntity;
@@ -17,20 +18,13 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 @Service
+@RequiredArgsConstructor
 public class TestService {
 
     private final TestRepository testRepository;
     private final TestEntityToTestDTOMapper testEntityToTestDTOMapper;
     private final QuestionEntityToTestQuestionMapper questionEntityToTestQuestionMapper;
     private final QuestionRepository questionRepository;
-
-@Autowired
-    public TestService(TestRepository testRepository, TestEntityToTestDTOMapper testEntityToTestDTOMapper, QuestionEntityToTestQuestionMapper questionEntityToTestQuestionMapper, QuestionRepository questionRepository) {
-        this.testRepository = testRepository;
-    this.testEntityToTestDTOMapper = testEntityToTestDTOMapper;
-    this.questionEntityToTestQuestionMapper = questionEntityToTestQuestionMapper;
-    this.questionRepository = questionRepository;
-}
 
 
     public TestDTO getTestDto(Long testId) {

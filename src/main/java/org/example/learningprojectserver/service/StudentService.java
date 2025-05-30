@@ -2,6 +2,7 @@ package org.example.learningprojectserver.service;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.example.learningprojectserver.dto.*;
 import org.example.learningprojectserver.entities.*;
 import org.example.learningprojectserver.enums.Role;
@@ -26,6 +27,7 @@ import java.util.Random;
 
 
 @Service
+@RequiredArgsConstructor
 public class StudentService {
 
 private final StudentProgressRepository studentProgressRepository;
@@ -34,7 +36,6 @@ private final QuestionRepository questionRepository;
 private final UserRepository userRepository;
 private final PracticeTestRepository practiceTestRepository;
 private final ClassRoomRepository classRoomRepository;
-private final QuestionEntityToTestQuestionMapper questionEntityToTestQuestionMapper;
 private final TestEntityToTestDTOMapper testEntityToTestDTOMapper;
 private final QuestionEntityToQuestionDTOMapper questionEntityToQuestionDTOMapper;
 private final QuestionEntityToPracticeQuestionMapper questionEntityToPracticeQuestionMapper;
@@ -43,27 +44,6 @@ private final LessonsToScheduleMapper lessonsToScheduleMapper;
 private final ChatGptService chatGptService;
 private final StudentEntityToStudentTestStatusDTOMapper studentEntityToStudentTestStatusDTOMapper;
 private final TestService testService;
-
-
-
-@Autowired
-    public StudentService(StudentProgressRepository studentProgressRepository, StudentQuestionHistoryRepository studentQuestionHistoryRepository, QuestionRepository questionRepository, UserRepository userRepository, PracticeTestRepository practiceTestRepository, ClassRoomRepository classRoomRepository, QuestionEntityToTestQuestionMapper questionEntityToTestQuestionMapper, QuestionEntityToQuestionDTOMapper questionEntityToQuestionDTOMapper, TestEntityToTestDTOMapper testEntityToTestDTOMapper, QuestionEntityToQuestionDTOMapper questionEntityToQuestionDTOMapper1, QuestionEntityToPracticeQuestionMapper questionEntityToPracticeQuestionMapper, SchoolRepository schoolRepository, LessonsToScheduleMapper lessonsToScheduleMapper, ChatGptService chatGptService, StudentEntityToStudentTestStatusDTOMapper studentEntityToStudentTestStatusDTOMapper, TestService testService) {
-        this.studentProgressRepository = studentProgressRepository;
-        this.studentQuestionHistoryRepository = studentQuestionHistoryRepository;
-        this.questionRepository = questionRepository;
-        this.userRepository = userRepository;
-        this.practiceTestRepository = practiceTestRepository;
-    this.classRoomRepository = classRoomRepository;
-    this.questionEntityToTestQuestionMapper = questionEntityToTestQuestionMapper;
-    this.testEntityToTestDTOMapper = testEntityToTestDTOMapper;
-    this.questionEntityToQuestionDTOMapper = questionEntityToQuestionDTOMapper1;
-    this.questionEntityToPracticeQuestionMapper = questionEntityToPracticeQuestionMapper;
-    this.schoolRepository = schoolRepository;
-    this.lessonsToScheduleMapper = lessonsToScheduleMapper;
-    this.chatGptService = chatGptService;
-    this.studentEntityToStudentTestStatusDTOMapper = studentEntityToStudentTestStatusDTOMapper;
-    this.testService = testService;
-}
 
 
     @Cacheable(value = "studentTestsStatus", key = "#userId")

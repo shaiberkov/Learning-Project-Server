@@ -6,15 +6,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Entity
+
 public class StudentQuestionHistoryEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    // קשר OneToOne עם UserEntity
     @OneToOne
-    @JoinColumn(name = "student_id") // או שם אחר שתבחר
+    @JoinColumn(name = "student_id")
     private StudentEntity student;
 
 
@@ -46,18 +46,10 @@ public class StudentQuestionHistoryEntity {
         this.student = student;
     }
 
-    // Getters and Setters
     public int getId() {
         return id;
     }
 
-//    public UserEntity getUser() {
-//        return user;
-//    }
-//
-//    public void setUser(UserEntity user) {
-//        this.user = user;
-//    }
 
     public Map<QuestionEntity, Boolean> getAnsweredQuestions() {
         return answeredQuestions;
@@ -68,14 +60,4 @@ public class StudentQuestionHistoryEntity {
     }
 
 
-
-    //@Override
-//    public String toString() {
-//        return "QuestionHistoryEntity{" +
-//                "id=" + id +
-//
-//                ", answeredQuestions=" + answeredQuestions +
-//
-//                '}';
-//    }
 }

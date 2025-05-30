@@ -1,6 +1,7 @@
 package org.example.learningprojectserver.service;
 
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.example.learningprojectserver.dto.LessonDTO;
 import org.example.learningprojectserver.dto.StudentTestStatusDTO;
 import org.example.learningprojectserver.dto.TeacherDTO;
@@ -33,6 +34,7 @@ import java.time.format.DateTimeParseException;
 import java.util.*;
 
 @Service
+@RequiredArgsConstructor
 public class TeacherService {
     private final LessonRepository lessonRepository;
     private final UserRepository userRepository;
@@ -40,44 +42,15 @@ public class TeacherService {
     private final ScheduleRepository scheduleRepository;
     private final StudentRepository studentRepository;
     private final TeacherTestRepository teacherTestRepository;
-    private final QuestionRepository questionRepository;
-    private final QuestionEntityToQuestionDTOMapper questionEntityToQuestionDTOMapper;
-    private final LessonEntityToLessonDTOMapper lessonEntityToLessonDTOMapper;
-    private final QuestionEntityToTestQuestionMapper questionEntityToTestQuestionMapper;
     private final TestEntityToTestDTOMapper testEntityToTestDTOMapper;
     private final TeacherEntityToTeacherDTOMapper teacherEntityToTeacherDTOMapper;
     private final SchoolRepository schoolRepository;
     private final LessonsToScheduleMapper lessonsToScheduleMapper;
     private final StudentEntityToStudentTestStatusDTOMapper studentEntityToStudentTestStatusDTOMapper;
-    private final NotificationService notificationService;
     private final NotificationEventPublisher notificationEventPublisher;
     private final TestService testService;
     private final CacheManager cacheManager;
 
-
-
-    @Autowired
-    public TeacherService(LessonRepository lessonRepository, UserRepository userRepository, ClassRoomRepository classRoomRepository, ScheduleRepository scheduleRepository, StudentRepository studentRepository, TeacherTestRepository teacherTestRepository, QuestionRepository questionRepository, QuestionEntityToQuestionDTOMapper questionEntityToQuestionDTOMapper, LessonEntityToLessonDTOMapper lessonEntityToLessonDTOMapper, QuestionEntityToTestQuestionMapper questionEntityToTestQuestionMapper, TestEntityToTestDTOMapper testEntityToTestDTOMapper, TeacherEntityToTeacherDTOMapper teacherEntityToTeacherDTOMapper, SchoolRepository schoolRepository, LessonsToScheduleMapper lessonsToScheduleMapper, StudentEntityToStudentTestStatusDTOMapper studentEntityToStudentTestStatusDTOMapper, NotificationService notificationService, NotificationEventPublisher notificationEventPublisher, TestService testService, CacheManager cacheManager) {
-        this.lessonRepository = lessonRepository;
-        this.userRepository = userRepository;
-        this.classRoomRepository = classRoomRepository;
-        this.scheduleRepository = scheduleRepository;
-        this.studentRepository = studentRepository;
-        this.teacherTestRepository = teacherTestRepository;
-        this.questionRepository = questionRepository;
-        this.questionEntityToQuestionDTOMapper = questionEntityToQuestionDTOMapper;
-        this.lessonEntityToLessonDTOMapper = lessonEntityToLessonDTOMapper;
-        this.questionEntityToTestQuestionMapper = questionEntityToTestQuestionMapper;
-        this.testEntityToTestDTOMapper = testEntityToTestDTOMapper;
-        this.teacherEntityToTeacherDTOMapper = teacherEntityToTeacherDTOMapper;
-        this.schoolRepository = schoolRepository;
-        this.lessonsToScheduleMapper = lessonsToScheduleMapper;
-        this.studentEntityToStudentTestStatusDTOMapper = studentEntityToStudentTestStatusDTOMapper;
-        this.notificationService = notificationService;
-        this.notificationEventPublisher = notificationEventPublisher;
-        this.testService = testService;
-        this.cacheManager = cacheManager;
-    }
 
 
 //    public BasicResponse getLessonsForTeacher(String teacherId) {

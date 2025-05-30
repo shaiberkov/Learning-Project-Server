@@ -1,6 +1,7 @@
 package org.example.learningprojectserver.service;
 
 import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import org.example.learningprojectserver.dto.SchoolDTO;
 import org.example.learningprojectserver.entities.SchoolEntity;
 import org.example.learningprojectserver.entities.SchoolManagerEntity;
@@ -21,19 +22,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class SystemAdminService {
 
 private final UserRepository userRepository;
 private final SchoolRepository schoolRepository;
 private final UserMapperFactory userMapperFactory;
 private final SchoolEntityToSchoolDTOMapper schoolEntityToSchoolDTOMapper;
-@Autowired
-    public SystemAdminService(UserRepository userRepository, SchoolRepository schoolRepository, UserMapperFactory userMapperFactory, SchoolEntityToSchoolDTOMapper schoolEntityToSchoolDTOMapper) {
-        this.userRepository = userRepository;
-    this.schoolRepository = schoolRepository;
-    this.userMapperFactory = userMapperFactory;
-    this.schoolEntityToSchoolDTOMapper = schoolEntityToSchoolDTOMapper;
-}
+
 
     @CacheEvict(value = "allSchools", allEntries = true)
     public BasicResponse assignUserAsSchoolManager(String userId) {

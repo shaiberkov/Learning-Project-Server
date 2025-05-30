@@ -1,5 +1,6 @@
 package org.example.learningprojectserver.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.example.learningprojectserver.dto.QuestionDTO;
 import org.example.learningprojectserver.entities.QuestionEntity;
 import org.example.learningprojectserver.response.SubmitAnswerResponse;
@@ -10,15 +11,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController("/Learning-App/Question")
+import static org.example.learningprojectserver.constants.ControllerConstants.Question.QUESTION_BASE_PATH;
+
+@RestController(QUESTION_BASE_PATH)
+@RequiredArgsConstructor
 public class QuestionController {
 
     private final QuestionService questionService;
 
-    @Autowired
-    public QuestionController(QuestionService questionService) {
-        this.questionService = questionService;
-    }
 
 //    @GetMapping("/generate-question")
 //    public QuestionDTO generateQuestion(

@@ -1,13 +1,11 @@
 package org.example.learningprojectserver.service;
 
 
+import lombok.RequiredArgsConstructor;
 import org.example.learningprojectserver.repository.SchoolManagerRepository;
-import org.example.learningprojectserver.repository.SessionRepository;
 import org.example.learningprojectserver.repository.StudentRepository;
 import org.example.learningprojectserver.repository.TeacherRepository;
 import org.example.learningprojectserver.response.TokenValidationResponse;
-import org.example.learningprojectserver.utils.JwtUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -15,9 +13,9 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
+@RequiredArgsConstructor
 public class SessionService {
 
-    private final SessionRepository sessionRepository;
     private final JwtService jwtService;
     private final SchoolManagerRepository schoolManagerRepository;
     private final TeacherRepository teacherRepository;
@@ -25,17 +23,6 @@ public class SessionService {
     private final Map<String, TokenValidationResponse> tokenCache = new ConcurrentHashMap<>();
 
 
-
-
-
-    @Autowired
-    public SessionService(SessionRepository sessionRepository, JwtService jwtService, SchoolManagerRepository schoolManagerRepository, TeacherRepository teacherRepository, StudentRepository studentRepository) {
-        this.sessionRepository = sessionRepository;
-        this.jwtService = jwtService;
-        this.schoolManagerRepository = schoolManagerRepository;
-        this.teacherRepository = teacherRepository;
-        this.studentRepository = studentRepository;
-    }
 
     @Scheduled(fixedRate = 7_200_000)
     public void clearTokenCache() {

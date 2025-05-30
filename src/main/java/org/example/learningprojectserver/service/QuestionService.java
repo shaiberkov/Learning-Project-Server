@@ -1,5 +1,6 @@
 package org.example.learningprojectserver.service;
 
+import lombok.RequiredArgsConstructor;
 import org.example.learningprojectserver.dto.QuestionDTO;
 import org.example.learningprojectserver.entities.QuestionEntity;
 import org.example.learningprojectserver.repository.StudentQuestionHistoryRepository;
@@ -9,19 +10,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class QuestionService {
 
     private QuestionRepository questionRepository;
     private StudentQuestionHistoryRepository studentQuestionHistoryRepository;
     private StudentProgressRepository userprogressRepository;
 
-    @Autowired
-    public QuestionService(QuestionRepository questionRepository, StudentQuestionHistoryRepository studentQuestionHistoryRepository, StudentProgressRepository userprogressRepository) {
-        this.questionRepository = questionRepository;
-        this.studentQuestionHistoryRepository = studentQuestionHistoryRepository;
-        this.userprogressRepository = userprogressRepository;
-
-    }
 //    @PostConstruct
 //    public void init() {
 //        System.out.println("QuestionService initilized")

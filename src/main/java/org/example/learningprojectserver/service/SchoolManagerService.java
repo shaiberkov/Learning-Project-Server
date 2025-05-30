@@ -1,6 +1,7 @@
 package org.example.learningprojectserver.service;
 
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.example.learningprojectserver.dto.StudentDTO;
 import org.example.learningprojectserver.dto.TeacherDTO;
 import org.example.learningprojectserver.entities.*;
@@ -20,6 +21,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class SchoolManagerService {
     private final UserRepository userRepository;
     private final SchoolRepository schoolRepository;
@@ -32,19 +34,6 @@ public class SchoolManagerService {
     private final StudentEntityToStudentDTOMapper studentEntityToStudentDTOMapper;
     private final SchoolManagerRepository schoolManagerRepository;
 
-    @Autowired
-    public SchoolManagerService(UserRepository userRepository, SchoolRepository schoolRepository, SchoolGradeRepository schoolGradeRepository, UserMapperFactory userMapperFactory, TeacherRepository teacherRepository, ClassRoomRepository classRoomRepository, StudentRepository studentRepository, TeacherEntityToTeacherDTOMapper teacherEntityToTeacherDTOMapper, StudentEntityToStudentDTOMapper studentEntityToStudentDTOMapper, SchoolManagerRepository schoolManagerRepository) {
-        this.userRepository = userRepository;
-        this.schoolRepository = schoolRepository;
-        this.schoolGradeRepository = schoolGradeRepository;
-        this.userMapperFactory = userMapperFactory;
-        this.teacherRepository = teacherRepository;
-        this.classRoomRepository = classRoomRepository;
-        this.studentRepository = studentRepository;
-        this.teacherEntityToTeacherDTOMapper = teacherEntityToTeacherDTOMapper;
-        this.studentEntityToStudentDTOMapper = studentEntityToStudentDTOMapper;
-        this.schoolManagerRepository = schoolManagerRepository;
-    }
 
 public BasicResponse getSchoolCode(String userId){
 

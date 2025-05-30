@@ -1,6 +1,7 @@
 package org.example.learningprojectserver.service;
 import jakarta.annotation.PostConstruct;
 import jakarta.persistence.Entity;
+import lombok.RequiredArgsConstructor;
 import org.example.learningprojectserver.dto.SchoolDTO;
 import org.example.learningprojectserver.entities.*;
 import org.example.learningprojectserver.mappers.SchoolEntityToSchoolDTOMapper;
@@ -13,17 +14,12 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class SchoolService {
 
     private final SchoolRepository schoolRepository;
     private final SchoolEntityToSchoolDTOMapper schoolEntityToSchoolDTOMapper;
 
-
-    @Autowired
-    public SchoolService(SchoolRepository schoolRepository, SchoolEntityToSchoolDTOMapper schoolEntityToSchoolDTOMapper) {
-        this.schoolRepository = schoolRepository;
-        this.schoolEntityToSchoolDTOMapper = schoolEntityToSchoolDTOMapper;
-    }
 
 
     @Cacheable(value = "schoolDTO", key = "#SchoolManagerId")

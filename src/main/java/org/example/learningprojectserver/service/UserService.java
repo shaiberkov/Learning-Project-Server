@@ -1,16 +1,14 @@
 package org.example.learningprojectserver.service;
 
-import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import org.example.learningprojectserver.dto.UserDto;
 import org.example.learningprojectserver.entities.*;
 import org.example.learningprojectserver.enums.Role;
-import org.example.learningprojectserver.repository.SessionRepository;
 import org.example.learningprojectserver.repository.UserRepository;
 import org.example.learningprojectserver.response.BasicResponse;
 import org.example.learningprojectserver.response.LoginResponse;
 import org.example.learningprojectserver.response.RegisterResponse;
 import org.example.learningprojectserver.response.ResetPasswordResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -23,21 +21,14 @@ import static org.example.learningprojectserver.utils.GeneratorUtils.*;
 import static org.example.learningprojectserver.utils.SmsSender.sendSms;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
 
 
     private final UserRepository userRepository;
     private final ActiveUserService activeUserService;
     private final JwtService jwtService;
-
-
     private static final ConcurrentHashMap<String, String> otpStorage = new ConcurrentHashMap<>();
-
-    public UserService(UserRepository userRepository, ActiveUserService activeUserService, JwtService jwtService) {
-        this.userRepository = userRepository;
-        this.activeUserService = activeUserService;
-        this.jwtService = jwtService;
-    }
 
     public RegisterResponse createUser(String username,String userId, String password, String confirmPassword, String email, String phone) {
 //todo להוסיף פונקציה שבודקת תקינות סיסמא
@@ -187,12 +178,12 @@ public class UserService {
             String otp = generatorCode();
             List<String> toSend = new ArrayList<>();
             toSend.add(phoneNumber);
-            System.out.println(phoneNumber);
             userEntity.setOtp(otp);
             userEntity.setOtpTimestamp(System.currentTimeMillis());
             userRepository.save(userEntity);
 
-            sendSms(otp, toSend);
+            System.out.println(otp);
+//           sendSms(otp, toSend);
 
             basicResponse.setSuccess(true);
             basicResponse.setErrorCode("OTP sent");

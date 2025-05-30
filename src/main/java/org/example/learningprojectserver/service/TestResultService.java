@@ -2,6 +2,7 @@ package org.example.learningprojectserver.service;
 
 
 import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import org.example.learningprojectserver.dto.QuestionDTO;
 import org.example.learningprojectserver.dto.TestDTO;
 import org.example.learningprojectserver.entities.*;
@@ -21,57 +22,15 @@ import java.util.List;
 import java.util.Map;
 
 @Service
+@RequiredArgsConstructor
 public class TestResultService {
 
-    private  TestResultRepository testResultRepository;
-    private QuestionRepository questionRepository;
-    private UserRepository UserRepository;
-    private TestRepository testRepository;
-    private TestResultRepository TestResultRepository;
+
     private final PracticeTestResultRepository practiceTestResultRepository;
     private final PracticeTestRepository practiceTestRepository;
     private final TeacherTestResultRepository teacherTestResultRepository;
     private final TeacherTestRepository teacherTestRepository;
-
-
-    @Autowired
-    public TestResultService(QuestionRepository questionRepository
-            , UserRepository UserRepository, TestRepository testRepository, TestResultRepository testResultRepository, PracticeTestResultRepository practiceTestResultRepository, PracticeTestRepository practiceTestRepository, TeacherTestResultRepository teacherTestResultRepository, TeacherTestRepository teacherTestRepository) {
-        this.questionRepository = questionRepository;
-        this.UserRepository = UserRepository;
-        this.testRepository = testRepository;
-        this.TestResultRepository = testResultRepository;
-        this.testResultRepository = testResultRepository;
-        this.practiceTestResultRepository = practiceTestResultRepository;
-        this.practiceTestRepository = practiceTestRepository;
-        this.teacherTestResultRepository = teacherTestResultRepository;
-        this.teacherTestRepository = teacherTestRepository;
-    }
-
-
-//    @PostConstruct
-//    public void init() {
-//
-//       System.out.println(generateTest("shai","מתמטיקה","מספרים שלמים","קשה",5));
-//
-//
-//    }
-
-
-//    private String subject;
-//    private String difficulty;
-//    private int questionCount;
-
-
-
-
-
-
-
-
-
-
-
+    private final UserRepository userRepository;
 
 
     public BasicResponse startTest(Long testId,String userId) {
@@ -111,7 +70,7 @@ public class TestResultService {
     public BasicResponse checkPracticeTest(String userid, Long testId, Map<Long, String> userAnswers) {
 
 
-        UserEntity user = UserRepository.findUserByUserId(userid);
+        UserEntity user = userRepository.findUserByUserId(userid);
 
         if (user.getRole() != Role.STUDENT) {
             return new BasicResponse(false, "אין הרשאה לפעולה זו");
@@ -155,7 +114,7 @@ public class TestResultService {
 
 
         student.getPracticeTestsResult().add(testResult);
-        UserRepository.save(student);
+        userRepository.save(student);
 
         TestResultResponse response = new TestResultResponse();
         response.setScore(score);
@@ -183,7 +142,7 @@ public class TestResultService {
     @CacheEvict(value = "studentTestsStatus", key = "#userId")
     public BasicResponse checkTeacherTest(String userId, Long testId, Map<Long, String> userAnswers) {
 
-            UserEntity user1 = UserRepository.findUserByUserId(userId);
+            UserEntity user1 = userRepository.findUserByUserId(userId);
 
         if (user1.getRole() != Role.STUDENT) {
             return new BasicResponse(false, "אין הרשאה ליצירת מיבחנים לתירגול אישי");
@@ -231,7 +190,7 @@ public class TestResultService {
 
 
             student.getTeacherTestsResult().add(testResult);
-            UserRepository.save(student);
+            userRepository.save(student);
 
             TestResultResponse response = new TestResultResponse();
             response.setScore(score);

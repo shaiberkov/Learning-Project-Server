@@ -1,5 +1,6 @@
 package org.example.learningprojectserver.service;
 
+import lombok.RequiredArgsConstructor;
 import org.example.learningprojectserver.notification.NotificationType;
 import org.example.learningprojectserver.notification.dto.NotificationDTO;
 import org.example.learningprojectserver.dto.MessageDTO;
@@ -28,28 +29,17 @@ import java.util.List;
 import static org.example.learningprojectserver.utils.SmsSender.sendSms;
 
 @Service
+@RequiredArgsConstructor
 public class MessageService {
 
     private final UserRepository userRepository;
     private final MessageRepository messageRepository;
     private final MessageRecipientStrategyFactory strategyFactory;
-    private final NotificationService notificationService;
     private final MessageEntityToMessageDTOMapper messageEntityToMessageDTOMapper;
     private final NotificationEventPublisher notificationEventPublisher;
     private final CacheManager cacheManager;
 
 
-
-    @Autowired
-    public MessageService(UserRepository userRepository, MessageRepository messageRepository, MessageRecipientStrategyFactory strategyFactory, NotificationService notificationService, MessageEntityToMessageDTOMapper messageEntityToMessageDTOMapper, NotificationEventPublisher notificationEventPublisher, CacheManager cacheManager) {
-        this.userRepository = userRepository;
-        this.messageRepository = messageRepository;
-        this.strategyFactory = strategyFactory;
-        this.notificationService = notificationService;
-        this.messageEntityToMessageDTOMapper = messageEntityToMessageDTOMapper;
-        this.notificationEventPublisher = notificationEventPublisher;
-        this.cacheManager = cacheManager;
-    }
 
     public BasicResponse getRecipientTypes(String userId) {
         UserEntity user = userRepository.findUserByUserId(userId);

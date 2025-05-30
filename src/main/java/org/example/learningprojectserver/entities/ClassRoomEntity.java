@@ -1,11 +1,20 @@
 package org.example.learningprojectserver.entities;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
 @Entity
-public class ClassRoomEntity {
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class
+ClassRoomEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -29,63 +38,5 @@ public class ClassRoomEntity {
 
     @OneToOne(mappedBy = "classRoom", cascade = CascadeType.ALL, orphanRemoval = true)
     private ScheduleEntity schedule;
-    public ClassRoomEntity() {
 
-    }
-
-    public ScheduleEntity getSchedule() {
-        return schedule;
-    }
-
-    public void setSchedule(ScheduleEntity schedule) {
-        this.schedule = schedule;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public SchoolGradeEntity getGrade() {
-        return grade;
-    }
-
-    public void setGrade(SchoolGradeEntity grade) {
-        this.grade = grade;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public List<TeacherEntity> getTeachers() {
-        return teachers;
-    }
-
-    public void setTeachers(List<TeacherEntity> teachers) {
-        this.teachers = teachers;
-    }
-
-    public List<StudentEntity> getStudents() {
-        return students;
-    }
-
-    public void setStudents(List<StudentEntity> students) {
-        this.students = students;
-    }
-
-    public SchoolEntity getSchool() {
-        return school;
-    }
-
-    public void setSchool(SchoolEntity school) {
-        this.school = school;
-    }
 }

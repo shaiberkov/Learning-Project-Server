@@ -1,5 +1,6 @@
 package org.example.learningprojectserver.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.example.learningprojectserver.response.BasicResponse;
 import org.example.learningprojectserver.service.TeacherService;
 import org.example.learningprojectserver.service.TestResultService;
@@ -9,27 +10,24 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
+import static org.example.learningprojectserver.constants.ControllerConstants.Teacher.*;
+
 @RestController
-@RequestMapping("/Learning-App/Teacher")
+@RequestMapping(TEACHER_BASE_PATH)
+@RequiredArgsConstructor
 public class TeacherController {
 
 private final TeacherService teacherService;
 private final TestResultService testResultService;
 
-@Autowired
-    public TeacherController(TeacherService teacherService, TestResultService testResultService) {
-        this.teacherService = teacherService;
-    this.testResultService = testResultService;
-}
 
-
-    @GetMapping("/schedule-for-teacher")
+    @GetMapping(SCHEDULE_FOR_TEACHER)
     public BasicResponse getScheduleForTeacher(@RequestParam String teacherId) {
         return teacherService.getTeacherSchedule(teacherId);
     }
 
 
-    @PostMapping("/generate-test-for-students")
+    @PostMapping(GENERATE_TEST_FOR_STUDENTS)
     public BasicResponse generateTestForStudents(
             @RequestBody List<String> usersIds,
             @RequestParam String teacherId,
@@ -51,7 +49,7 @@ private final TestResultService testResultService;
                     timeLimitMinutes
             );
         }
-    @PostMapping("/check-teacher-test")
+    @PostMapping(CHECK_TEACHER_TEST)
     public BasicResponse checkTeacherTest(
             @RequestParam String userId,
             @RequestParam Long testId,

@@ -6,7 +6,6 @@ public class StudentStatisticsEntity {
 
     private int loginStreak;
     private Map<String, Map<String, Map<String, Map<String, Integer>>>> userLearningStatistics;
-//    private   userTestsStatistics;
 
     public Map<String, Map<String, Map<String, Map<String, Integer>>>> getUserLearningStatistics() {
         return userLearningStatistics;

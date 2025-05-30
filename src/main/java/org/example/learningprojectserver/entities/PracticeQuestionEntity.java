@@ -4,9 +4,15 @@ import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @DiscriminatorValue("PRACTICE")
+@Getter
+@Setter
+@NoArgsConstructor
 public class PracticeQuestionEntity extends QuestionEntity {
 
     @ManyToOne
@@ -17,23 +23,4 @@ public class PracticeQuestionEntity extends QuestionEntity {
     @JoinColumn(name = "question_history_id")
     private StudentQuestionHistoryEntity questionHistory;
 
-    public PracticeQuestionEntity() {
-        super();
-    }
-
-    public StudentProgressEntity getProgressEntity() {
-        return progressEntity;
-    }
-
-    public void setProgressEntity(StudentProgressEntity progressEntity) {
-        this.progressEntity = progressEntity;
-    }
-
-    public StudentQuestionHistoryEntity getQuestionHistory() {
-        return questionHistory;
-    }
-
-    public void setQuestionHistory(StudentQuestionHistoryEntity questionHistory) {
-        this.questionHistory = questionHistory;
-    }
 }

@@ -10,8 +10,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import static org.example.learningprojectserver.constants.ControllerConstants.Lesson.LESSON_BASE_PATH;
+
 @RestController
-@RequestMapping("/Learning-App/Lesson")
+@RequestMapping(LESSON_BASE_PATH)
 public class LessonController {
 
 

@@ -1,5 +1,6 @@
 package org.example.learningprojectserver.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.example.learningprojectserver.dto.StudentTestStatusDTO;
 import org.example.learningprojectserver.response.BasicResponse;
 import org.example.learningprojectserver.service.StudentService;
@@ -10,27 +11,24 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
+import static org.example.learningprojectserver.constants.ControllerConstants.Student.*;
+
 @RestController
-@RequestMapping("/Learning-App/Student")
+@RequestMapping(STUDENT_BASE_PATH)
+@RequiredArgsConstructor
 public class StudentController {
 
 private final StudentService studentService;
 private final TestResultService testResultService;
 
 
-    @Autowired
-    public StudentController(StudentService studentService, TestResultService testResultService) {
-        this.studentService = studentService;
-        this.testResultService = testResultService;
-    }
 
-
-    @GetMapping("/get-student-schedule")
+    @GetMapping(GET_STUDENT_SCHEDULE)
     public BasicResponse getStudentSchedule(@RequestParam String schoolCode,@RequestParam String studentId){
         return studentService.getStudentSchedule(schoolCode,studentId);
     }
 
-    @GetMapping("/generate-question")
+    @GetMapping(GENERATE_QUESTION)
     public BasicResponse generateQuestionForPractice(
             @RequestParam String userId,
             @RequestParam String subject,
@@ -39,7 +37,7 @@ private final TestResultService testResultService;
         return studentService.generateQuestionForPractice(userId, subject, topic, subTopic);
     }
 
-    @PostMapping("/submit-answer")
+    @PostMapping(SUBMIT_ANSWER)
     public BasicResponse submitAnswer(
             @RequestParam String userId,
             @RequestParam Long id,
@@ -47,7 +45,7 @@ private final TestResultService testResultService;
             @RequestParam String answer) {
         return studentService.submitAnswer(userId,id,subTopic,answer);
     }
-    @PostMapping("/generate-practice-test")
+    @PostMapping(GENERATE_PRACTICE_TEST)
     public BasicResponse generatePracticeTest(
             @RequestParam String userId,
             @RequestParam String subject,
@@ -59,7 +57,7 @@ private final TestResultService testResultService;
         return studentService.generatePracticeTest(userId, subject, topic, difficulty, questionCount, timeLimitMinutes);
     }
 
-    @PostMapping("/check-practice-test")
+    @PostMapping(CHECK_PRACTICE_TEST)
     public BasicResponse checkPracticeTest(
             @RequestParam String userId,
             @RequestParam Long testId,
@@ -68,23 +66,16 @@ private final TestResultService testResultService;
         return testResultService.checkPracticeTest(userId, testId, userAnswers);
     }
 
-    @PostMapping("/check-teacher-test")
-    public BasicResponse checkTeacherTest(
-            @RequestParam String userId,
-            @RequestParam Long testId,
-            @RequestBody Map<Long, String> userAnswers) {
 
-        return testResultService.checkTeacherTest(userId,testId, userAnswers);
-    }
 
-    @PostMapping("/start-test")
+    @PostMapping(START_TEST)
     public BasicResponse startTest(
             @RequestParam String userId,
             @RequestParam Long testId) {
         return testResultService.startTest(testId,userId);
     }
 
-    @GetMapping("/get-student-tests-status")
+    @GetMapping(GET_STUDENT_TESTS_STATUS)
     public List<StudentTestStatusDTO> getStudentTestsStatus(@RequestParam String studentId){
         return studentService.getStudentTestsStatus(studentId);
     }

@@ -17,6 +17,10 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import static org.example.learningprojectserver.constants.SecurityConstants.JwtAuthenticationFilterConstants.*;
+import static org.example.learningprojectserver.constants.SharedConstants.SharedControllerConstants.AUTH_HEADER;
+import static org.example.learningprojectserver.constants.SharedConstants.SharedControllerConstants.BEARER_PREFIX;
+
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
@@ -30,13 +34,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
 
-        String header = request.getHeader("Authorization");
-        if (header == null || !header.startsWith("Bearer ")) {
+        String header = request.getHeader(AUTH_HEADER);
+        if (header == null || !header.startsWith(BEARER_PREFIX)) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        String token = header.replace("Bearer ", "");
+        String token = header.replace(BEARER_PREFIX, "");
 
         if (!jwtService.isTokenValid(token)) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -49,14 +53,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String username = jwtService.extractUsername(token);
 
         Map<String, String> principal = Map.of(
-                "userId", userId,
-                "username", username
+                PRINCIPAL_USER_ID_KEY, userId,
+                PRINCIPAL_USERNAME_KEY, username
         );
 
         UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                 principal,
                 null,
-                List.of(new SimpleGrantedAuthority("ROLE_" + role))
+                List.of(new SimpleGrantedAuthority(ROLE_PREFIX + role))
         );
 
         SecurityContextHolder.getContext().setAuthentication(authToken);
