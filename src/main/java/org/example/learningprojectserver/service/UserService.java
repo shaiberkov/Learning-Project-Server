@@ -9,6 +9,7 @@ import org.example.learningprojectserver.response.BasicResponse;
 import org.example.learningprojectserver.response.LoginResponse;
 import org.example.learningprojectserver.response.RegisterResponse;
 import org.example.learningprojectserver.response.ResetPasswordResponse;
+import org.example.learningprojectserver.utils.SmsSender;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -18,7 +19,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static org.example.learningprojectserver.utils.ApiEmailProcessor.sendEmail;
 import static org.example.learningprojectserver.utils.GeneratorUtils.*;
-import static org.example.learningprojectserver.utils.SmsSender.sendSms;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +28,8 @@ public class UserService {
     private final UserRepository userRepository;
     private final ActiveUserService activeUserService;
     private final JwtService jwtService;
+    private final SmsSender smsSender;
+
     private static final ConcurrentHashMap<String, String> otpStorage = new ConcurrentHashMap<>();
 
     public RegisterResponse createUser(String username,String userId, String password, String confirmPassword, String email, String phone) {
@@ -183,7 +185,7 @@ public class UserService {
             userRepository.save(userEntity);
 
             System.out.println(otp);
-//           sendSms(otp, toSend);
+           smsSender.sendSms(otp, toSend);
 
             basicResponse.setSuccess(true);
             basicResponse.setErrorCode("OTP sent");
@@ -265,7 +267,7 @@ public class UserService {
         otpStorage.put(userId, otp);
         System.out.println(userId+      "111111"+otpStorage.get(userId));
 
-        sendSms( otp,  List.of(user.getPhoneNumber()) );
+       smsSender.sendSms( otp,  List.of(user.getPhoneNumber()) );
             resetPasswordResponse.setSuccess(true);
         return resetPasswordResponse;
     }

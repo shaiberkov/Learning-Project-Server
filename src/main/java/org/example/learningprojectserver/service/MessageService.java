@@ -26,7 +26,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.example.learningprojectserver.utils.SmsSender.sendSms;
 
 @Service
 @RequiredArgsConstructor
@@ -38,6 +37,7 @@ public class MessageService {
     private final MessageEntityToMessageDTOMapper messageEntityToMessageDTOMapper;
     private final NotificationEventPublisher notificationEventPublisher;
     private final CacheManager cacheManager;
+    private final SmsSender smsSender;
 
 
 
@@ -130,7 +130,7 @@ public class MessageService {
         notificationEventPublisher.publish(recipientsIds, notificationDTO);
 
         String smsMessage = "קיבלת הודעה חדשה במערכת. לצפייה היכנס: https://your-app.com/messages";
-        sendSms(smsMessage, recipientsPhoneNumber);
+        smsSender.sendSms(smsMessage, recipientsPhoneNumber);
 
         messageRepository.saveAll(messages);
         recipients.forEach(r ->

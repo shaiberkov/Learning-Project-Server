@@ -20,7 +20,7 @@ import java.util.concurrent.CompletableFuture;
 @RequiredArgsConstructor
 public class ChatGptService {
 
-
+    @Autowired
     private final GptMassenger gptMassenger;
 
     private static Map<String, List<ChatMessage>> userConversations = new HashMap<>();
