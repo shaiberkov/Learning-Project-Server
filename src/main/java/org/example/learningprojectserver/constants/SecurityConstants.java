@@ -77,6 +77,8 @@ public final class SecurityConstants {
         public static final List<String> ALLOWED_ORIGINS =
                 List.of("http://localhost:5173","https://schoolmanagmentsystem-z0m5.onrender.com/");
 
+
+
         public static final List<String> ALLOWED_METHODS =
                 List.of("GET", "POST", "PUT", "DELETE");
 
