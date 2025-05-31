@@ -129,7 +129,7 @@ public class MessageService {
 
         notificationEventPublisher.publish(recipientsIds, notificationDTO);
 
-        String smsMessage = "קיבלת הודעה חדשה במערכת. לצפייה היכנס: https://your-app.com/messages";
+        String smsMessage = "קיבלת הודעה חדשה במערכת. לצפייה היכנס: https://schoolmanagmentsystem-z0m5.onrender.com/login";
         smsSender.sendSms(smsMessage, recipientsPhoneNumber);
 
         messageRepository.saveAll(messages);
