@@ -10,7 +10,6 @@ import jakarta.persistence.*;
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 @DiscriminatorColumn(name = "question_type")
-
 public class QuestionEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,7 +21,6 @@ public class QuestionEntity {
     private String questionText;
     private String answer;
 
-    // Getters and Setters (כמו שיש כבר)
 
     public QuestionEntity() {
     }

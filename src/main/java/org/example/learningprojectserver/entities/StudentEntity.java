@@ -9,33 +9,33 @@ import java.util.List;
 @NoArgsConstructor
 public class StudentEntity extends UserEntity {
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "class_room_id")
     private ClassRoomEntity classRoom;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "school_id")
     private SchoolEntity schoolName;
 
-    @ManyToMany(mappedBy = "students")  // מיפוי עם TeacherEntity
+    @ManyToMany(mappedBy = "students")
     private List<TeacherEntity> teachers=new ArrayList<>();
 
-    @OneToOne(mappedBy = "student", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "student",fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private StudentProgressEntity studentProgressEntity;
 
-    @OneToOne(mappedBy = "student", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "student", fetch = FetchType.LAZY,cascade = CascadeType.ALL)
     private StudentQuestionHistoryEntity studentQuestionHistoryEntity;
 
-    @OneToMany(mappedBy = "student", cascade = CascadeType.ALL,fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "student", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     private List<PracticeTestResultEntity> practiceTestsResult=new ArrayList<>();
 
-    @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<TeacherTestResultEntity> teacherTestsResult=new ArrayList<>();
 
-    @OneToMany(mappedBy = "student", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "student", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<PracticeTestEntity> practiceTests=new ArrayList<>();
 
-    @ManyToMany(mappedBy = "students", fetch = FetchType.EAGER)
+    @ManyToMany(mappedBy = "students", fetch = FetchType.LAZY)
     private List<TeacherTestEntity> teacherTests=new ArrayList<>();
 
 

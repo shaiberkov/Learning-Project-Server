@@ -23,10 +23,10 @@ public class SchoolGradeEntity {
     @Column(nullable = false)
     private String gradeName; // למשל: "א'", "ז'", "י"ב"
 
-    @OneToMany(mappedBy = "grade", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "grade", fetch = FetchType.LAZY,cascade = CascadeType.ALL)
     private List<ClassRoomEntity> classes=new ArrayList<>();
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "school_id")
     private SchoolEntity school;
 

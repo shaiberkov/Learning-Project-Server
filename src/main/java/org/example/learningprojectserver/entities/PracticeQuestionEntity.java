@@ -1,9 +1,6 @@
 package org.example.learningprojectserver.entities;
 
-import jakarta.persistence.DiscriminatorValue;
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -15,11 +12,11 @@ import lombok.Setter;
 @NoArgsConstructor
 public class PracticeQuestionEntity extends QuestionEntity {
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "student_progress_id")
     private StudentProgressEntity progressEntity;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "question_history_id")
     private StudentQuestionHistoryEntity questionHistory;
 

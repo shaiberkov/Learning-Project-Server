@@ -12,7 +12,7 @@ public class TeacherTestEntity extends TestEntity {
 
 
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany
     @JoinTable(
             name = "teacher_test_student",
             joinColumns = @JoinColumn(name = "test_id"),
@@ -21,7 +21,7 @@ public class TeacherTestEntity extends TestEntity {
     private List<StudentEntity> students = new ArrayList<>();
 
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "teacher_id")
     private TeacherEntity teacher;
 

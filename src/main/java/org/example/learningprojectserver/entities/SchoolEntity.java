@@ -27,20 +27,20 @@ public class SchoolEntity {
     @Column(nullable = false)
     private String schoolCode;
 
-    @OneToMany(mappedBy = "teachingSchool",fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "teachingSchool",fetch = FetchType.LAZY)
     private List<TeacherEntity> teachers=new ArrayList<>();
 
-    @OneToMany(mappedBy = "schoolName",fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "schoolName",fetch = FetchType.LAZY)
     private List<StudentEntity> students=new ArrayList<>();
 
-    @OneToMany(mappedBy = "school",fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "school",fetch = FetchType.LAZY)
     private List<ClassRoomEntity> classRooms=new ArrayList<>();
 
-    @OneToMany(mappedBy = "school", cascade = CascadeType.ALL,fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "school", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     private List<SchoolGradeEntity> schoolGrades=new ArrayList<>();
 
 
-    @OneToOne(mappedBy = "school")
+    @OneToOne(mappedBy = "school",fetch = FetchType.LAZY)
     private SchoolManagerEntity schoolManager;
 
 }

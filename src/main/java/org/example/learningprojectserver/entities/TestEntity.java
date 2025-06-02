@@ -21,7 +21,7 @@ public class TestEntity {
     private String difficulty;
     private int questionCount;
 
-    @OneToMany(mappedBy = "test", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "test", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<TestQuestionEntity> questions=new ArrayList<>();
 
     private int timeLimitMinutes;

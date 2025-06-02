@@ -13,7 +13,7 @@ public class StudentProgressEntity {
     private Long id;
 
     // קשר OneToOne עם UserEntity
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "student_id") // השם בעמודת הדאטהבייס
     private StudentEntity student;
 
@@ -23,18 +23,18 @@ public class StudentProgressEntity {
 //    private Map<String, Integer> questionsAnsweredBySubTopic;
 
     // שמירת התקדמות לפי תתי נושא
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "sub_topic_success_streak", joinColumns = @JoinColumn(name = "progress_id"))
     @Column(name = "success_streak")
     private Map<String, Integer> subTopicSuccessStreak;
 
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "sub_topic_incorrect_streak", joinColumns = @JoinColumn(name = "progress_id"))
     @Column(name = "incorrect_streak")
     private Map<String, Integer> subTopicIncorrectStreak;
 
     // שמירת רמות המיומנות לפי תתי נושא
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "skill_levels_by_sub_topic", joinColumns = @JoinColumn(name = "progress_id"))
     @Column(name = "skill_level")
     private Map<String, Integer> skillLevelsBySubTopic;

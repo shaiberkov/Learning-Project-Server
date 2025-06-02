@@ -13,12 +13,12 @@ public class StudentQuestionHistoryEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "student_id")
     private StudentEntity student;
 
 
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "answered_questions", joinColumns = @JoinColumn(name = "history_id"))
     @MapKeyJoinColumn(name = "question_id")
     @Column(name = "is_answered_correct")

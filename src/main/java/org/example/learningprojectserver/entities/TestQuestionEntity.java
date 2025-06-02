@@ -6,7 +6,7 @@ import jakarta.persistence.*;
 @DiscriminatorValue("TEST")
 public class TestQuestionEntity extends QuestionEntity {
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "test_id")
     private TestEntity test;
 

@@ -21,30 +21,17 @@ public class TestResultEntity {
 
     private String finishTime;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "test_id")
     private TestEntity test;
 
 
-    @OneToMany
+    @OneToMany(fetch = FetchType.LAZY)
     private List<TestQuestionEntity> correctQuestions=new ArrayList<>();
-    @OneToMany
+    @OneToMany(fetch = FetchType.LAZY)
     private List<TestQuestionEntity> incorrectQuestions=new ArrayList<>();
 
 
-//
-//
-//    @ManyToOne
-//    @JoinColumn(name = "student_id") // קשר Many-to-One (רבים ליחיד)
-//    private StudentEntity student;
-
-//    public TestEntity getTest() {
-//        return test;
-//    }
-//
-//    public void setTest(TestEntity test) {
-//        this.test = test;
-//    }
 
     public String getFinishTime() {
         return finishTime;

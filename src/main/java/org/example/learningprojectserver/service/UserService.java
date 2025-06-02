@@ -1,5 +1,7 @@
 package org.example.learningprojectserver.service;
 
+import jakarta.annotation.PostConstruct;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.example.learningprojectserver.dto.UserDto;
 import org.example.learningprojectserver.entities.*;
@@ -127,6 +129,11 @@ public class UserService {
         return isValid;
     }
 
+//    @PostConstruct
+//    public void init() {
+//        userRepository.loadUserWithSessionsByUserId("325256017");
+//    }
+
     public BasicResponse loginUser(String userId, String password) {
         BasicResponse basicResponse = new BasicResponse();
 
@@ -137,7 +144,11 @@ public class UserService {
         }
 
         try {
+
+
+            /////////
             UserEntity userEntity= userRepository.findUserByUserId(userId);
+////////////
 
             if (userEntity == null) {
                 basicResponse.setSuccess(false);
@@ -209,8 +220,8 @@ public class UserService {
                 return loginResponse;
             }
             try {
-                UserEntity userEntity= userRepository.findUserByUserId(userId);
-
+               UserEntity userEntity= userRepository.findUserByUserId(userId);
+                //UserEntity userEntity= userRepository.loadUserWithSessionsByUserId(userId);
 
                 if (userEntity == null) {
                     loginResponse.setSuccess(false);

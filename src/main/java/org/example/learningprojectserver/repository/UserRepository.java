@@ -2,6 +2,7 @@ package org.example.learningprojectserver.repository;
 
 
 import org.example.learningprojectserver.entities.UserEntity;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -42,5 +43,10 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
 
     @Query("SELECT u FROM UserEntity u WHERE u.role = 'SCHOOLMANAGER'")
     List<UserEntity> getAllSchoolManagers();
+
+
+    @EntityGraph(value = "User.withSessions", type = EntityGraph.EntityGraphType.FETCH)
+    @Query("select u from UserEntity u where u.userId = :userId")
+    UserEntity loadUserWithSessionsByUserId(@Param("userId") String userId);
 
 }

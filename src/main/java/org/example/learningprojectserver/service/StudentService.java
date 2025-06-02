@@ -16,6 +16,7 @@ import org.example.learningprojectserver.service.QuestionGenerator.SubjectQuesti
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StopWatch;
 
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
@@ -44,6 +45,7 @@ private final LessonsToScheduleMapper lessonsToScheduleMapper;
 private final ChatGptService chatGptService;
 private final StudentEntityToStudentTestStatusDTOMapper studentEntityToStudentTestStatusDTOMapper;
 private final TestService testService;
+    private final StudentRepository studentRepository;
 
 
     @Cacheable(value = "studentTestsStatus", key = "#userId")
@@ -61,10 +63,10 @@ private final TestService testService;
     @Cacheable(value = "studentSchedule", key = "#studentId")
 public BasicResponse getStudentSchedule(String schoolCode, String studentId){
 
-    SchoolEntity school = schoolRepository.findBySchoolCode(schoolCode);
-    if (school == null) {
-        return new BasicResponse(false, "בית הספר לא נמצא לפי הקוד שסופק");
-    }
+//    SchoolEntity school = schoolRepository.findBySchoolCode(schoolCode);
+//    if (school == null) {
+//        return new BasicResponse(false, "בית הספר לא נמצא לפי הקוד שסופק");
+//    }
 
     UserEntity user = userRepository.findUserByUserId(studentId);
     if (user == null || user.getRole() != Role.STUDENT) {
@@ -100,58 +102,200 @@ public void sendJobMessage(String userId,String subject,String subTopic) {
     chatGptService.initializeConversationWithJob(userId, job);
 
 }
+//
+//    public BasicResponse generateQuestionForPractice(String userId, String subject, String topic, String subTopic) {
+//        sendJobMessage(userId,subject,subTopic);
+//
+//       UserEntity user= userRepository.findUserByUserId(userId);
+//       if(user == null) {
+//           return new BasicResponse(false,"יוזר לא קיים");
+//       }
+//       if (!(user.getRole()== Role.STUDENT)){
+//           return new BasicResponse(false,"יוזר זה אינו תלמיד");
+//       }
+////       StudentEntity student=(StudentEntity)user;
+//
+//       ClassRoomEntity classRoom=classRoomRepository.findClassRoomOfUserByUserId(userId);
+//        if(classRoom == null){
+//            return new BasicResponse(false,",תלמיד עוד לא משובץ לכיתה");
+//        }
+//
+//        StudentProgressEntity studentProgressEntity = studentProgressRepository.findStudentProgressByUserId(userId);
+//
+//
+//        Map<String, Integer> skillLevelsBySubTopic = studentProgressEntity.getSkillLevelsBySubTopic();
+//
+//        skillLevelsBySubTopic.putIfAbsent(subTopic, 1);
+//
+//        studentProgressEntity.setSkillLevelsBySubTopic(skillLevelsBySubTopic);
+//        studentProgressRepository.save(studentProgressEntity);
+//
+//        int level = skillLevelsBySubTopic.get(subTopic);
+//        SubjectQuestionGenerator generator = QuestionGeneratorFactory.getSubjectQuestionGenerator(subject);
+//        QuestionGenerator questionGenerator = generator.getQuestionGenerator(topic, subTopic);
+//
+//        QuestionEntity baseQuestion = questionGenerator.generateQuestion(level);
+//
+//        PracticeQuestionEntity questionEntity=questionEntityToPracticeQuestionMapper.apply(baseQuestion);
+//
+//        StudentQuestionHistoryEntity historyEntity = studentQuestionHistoryRepository.findStudentQuestionHistoryByUserId(userId);
+//
+//        questionEntity.setQuestionHistory(historyEntity);
+//        questionEntity.setProgressEntity(studentProgressEntity);
+//
+//        String questionTextWithoutLRM = questionEntity.getQuestionText().replaceAll("[\u200E\u200F]", "");
+//        questionEntity.setQuestionText(questionTextWithoutLRM);
+//
+//        String answerWithoutLRM = questionEntity.getAnswer().replaceAll("[\u200E\u200F]", "");
+//        questionEntity.setAnswer(answerWithoutLRM);
+//
+//        questionEntity = questionRepository.save(questionEntity);
+//        BasicResponse basicResponse = new BasicResponse(true, null);
+//       QuestionDTO questionDTO= questionEntityToQuestionDTOMapper.apply(questionEntity);
+//       basicResponse.setData(questionDTO);
+//        return basicResponse;
+//    }
 
+
+
+//    public BasicResponse generateQuestionForPractice(String userId, String subject, String topic, String subTopic) {
+//        sendJobMessage(userId,subject,subTopic);
+//
+////        UserEntity user= userRepository.findUserByUserId(userId);
+////        if(user == null) {
+////            return new BasicResponse(false,"יוזר לא קיים");
+////        }
+////        if (!(user.getRole()== Role.STUDENT)){
+////            return new BasicResponse(false,"יוזר זה אינו תלמיד");
+////        }
+////       StudentEntity student=(StudentEntity)user;
+//
+////        ClassRoomEntity classRoom=classRoomRepository.findClassRoomOfUserByUserId(userId);
+//StudentEntity student =studentRepository.findFullStudent(userId);
+//        if(student.getClassRoom() == null || student.getClassRoom().getId() == null){
+//            return new BasicResponse(false,",תלמיד עוד לא משובץ לכיתה");
+//        }
+//
+//        StudentProgressEntity studentProgressEntity = student.getStudentProgressEntity();
+//
+//
+//        Map<String, Integer> skillLevelsBySubTopic = studentProgressEntity.getSkillLevelsBySubTopic();
+//
+//        skillLevelsBySubTopic.putIfAbsent(subTopic, 1);
+//
+//        studentProgressEntity.setSkillLevelsBySubTopic(skillLevelsBySubTopic);
+//        studentProgressRepository.save(studentProgressEntity);
+//
+//        int level = skillLevelsBySubTopic.get(subTopic);
+//        SubjectQuestionGenerator generator = QuestionGeneratorFactory.getSubjectQuestionGenerator(subject);
+//        QuestionGenerator questionGenerator = generator.getQuestionGenerator(topic, subTopic);
+//
+////        QuestionEntity baseQuestion = questionGenerator.generateQuestion(level);
+//        StopWatch sw = new StopWatch();
+//        sw.start();
+//
+//// קטע הקוד הכבד
+//        QuestionEntity baseQuestion = questionGenerator.generateQuestion(level);
+//        sw.stop();
+//        System.out.println( sw.getTotalTimeMillis());
+//
+//        PracticeQuestionEntity questionEntity=questionEntityToPracticeQuestionMapper.apply(baseQuestion);
+//
+//        StudentQuestionHistoryEntity historyEntity = student.getQuestionHistoryEntity();
+//
+//        questionEntity.setQuestionHistory(historyEntity);
+//        questionEntity.setProgressEntity(studentProgressEntity);
+//
+//        String questionTextWithoutLRM = questionEntity.getQuestionText().replaceAll("[\u200E\u200F]", "");
+//        questionEntity.setQuestionText(questionTextWithoutLRM);
+//
+//        String answerWithoutLRM = questionEntity.getAnswer().replaceAll("[\u200E\u200F]", "");
+//        questionEntity.setAnswer(answerWithoutLRM);
+//
+//        questionEntity = questionRepository.save(questionEntity);
+//        BasicResponse basicResponse = new BasicResponse(true, null);
+//        QuestionDTO questionDTO= questionEntityToQuestionDTOMapper.apply(questionEntity);
+//        basicResponse.setData(questionDTO);
+//        return basicResponse;
+//    }
+
+
+
+
+    @Transactional
     public BasicResponse generateQuestionForPractice(String userId, String subject, String topic, String subTopic) {
-        sendJobMessage(userId,subject,subTopic);
+        sendJobMessage(userId, subject, subTopic);
 
-       UserEntity user= userRepository.findUserByUserId(userId);
-       if(user == null) {
-           return new BasicResponse(false,"יוזר לא קיים");
-       }
-       if (!(user.getRole()== Role.STUDENT)){
-           return new BasicResponse(false,"יוזר זה אינו תלמיד");
-       }
+        StopWatch totalStopWatch = new StopWatch();
+        totalStopWatch.start();
 
-       ClassRoomEntity classRoom=classRoomRepository.findClassRoomOfUserByUserId(userId);
-        if(classRoom == null){
-            return new BasicResponse(false,",תלמיד עוד לא משובץ לכיתה");
+        StopWatch sw = new StopWatch();
+
+        // שלב 1: טעינת הסטודנט (רק עם progress ו-history, בלי cascades כבדים)
+        sw.start();
+        StudentEntity student = studentRepository.findStudentWithProgressAndHistory(userId);
+        sw.stop();
+        System.out.println("⏱️ load student time: " + sw.getTotalTimeMillis() + "ms");
+
+        if (student.getClassRoom() == null || student.getClassRoom().getId() == null) {
+            return new BasicResponse(false, "תלמיד עוד לא משובץ לכיתה");
         }
 
-        StudentProgressEntity studentProgressEntity = studentProgressRepository.findStudentProgressByUserId(userId);
+        // שלב 2: עדכון progress בזיכרון (ללא save)
+        sw = new StopWatch();
+        sw.start();
+        StudentProgressEntity progress = student.getStudentProgressEntity();
+        Map<String, Integer> skillLevels = progress.getSkillLevelsBySubTopic();
+        skillLevels.putIfAbsent(subTopic, 1); // עדכון מקומי
+        sw.stop();
+        System.out.println("⏱️ update progress time: " + sw.getTotalTimeMillis() + "ms");
 
-
-        Map<String, Integer> skillLevelsBySubTopic = studentProgressEntity.getSkillLevelsBySubTopic();
-
-        skillLevelsBySubTopic.putIfAbsent(subTopic, 1);
-
-        studentProgressEntity.setSkillLevelsBySubTopic(skillLevelsBySubTopic);
-        studentProgressRepository.save(studentProgressEntity);
-
-        int level = skillLevelsBySubTopic.get(subTopic);
+        // שלב 3: הפקת שאלה
+        sw = new StopWatch();
+        sw.start();
+        int level = skillLevels.get(subTopic);
         SubjectQuestionGenerator generator = QuestionGeneratorFactory.getSubjectQuestionGenerator(subject);
         QuestionGenerator questionGenerator = generator.getQuestionGenerator(topic, subTopic);
-
         QuestionEntity baseQuestion = questionGenerator.generateQuestion(level);
+        sw.stop();
+        System.out.println("⏱️ generate question logic time: " + sw.getTotalTimeMillis() + "ms");
 
-        PracticeQuestionEntity questionEntity=questionEntityToPracticeQuestionMapper.apply(baseQuestion);
+        // שלב 4: יצירת הישויות לקשר לשאלה
+        sw = new StopWatch();
+        sw.start();
+        PracticeQuestionEntity questionEntity = questionEntityToPracticeQuestionMapper.apply(baseQuestion);
 
-        StudentQuestionHistoryEntity historyEntity = studentQuestionHistoryRepository.findStudentQuestionHistoryByUserId(userId);
+        questionEntity.setProgressEntity(progress); // קשר LAZY
+        questionEntity.setQuestionHistory(student.getStudentQuestionHistoryEntity()); // קשר LAZY
 
-        questionEntity.setQuestionHistory(historyEntity);
-        questionEntity.setProgressEntity(studentProgressEntity);
+        // ניקוי תווי כיוון טקסט
+        questionEntity.setQuestionText(questionEntity.getQuestionText().replaceAll("[\u200E\u200F]", ""));
+        questionEntity.setAnswer(questionEntity.getAnswer().replaceAll("[\u200E\u200F]", ""));
+        sw.stop();
+        System.out.println("⏱️ prepare question entity time: " + sw.getTotalTimeMillis() + "ms");
 
-        String questionTextWithoutLRM = questionEntity.getQuestionText().replaceAll("[\u200E\u200F]", "");
-        questionEntity.setQuestionText(questionTextWithoutLRM);
-
-        String answerWithoutLRM = questionEntity.getAnswer().replaceAll("[\u200E\u200F]", "");
-        questionEntity.setAnswer(answerWithoutLRM);
-
+        // שלב 5: שמירה לבסיס נתונים (עם Batch insert, אין save של progress/histories)
+        sw = new StopWatch();
+        sw.start();
         questionEntity = questionRepository.save(questionEntity);
-        BasicResponse basicResponse = new BasicResponse(true, null);
-       QuestionDTO questionDTO= questionEntityToQuestionDTOMapper.apply(questionEntity);
-       basicResponse.setData(questionDTO);
-        return basicResponse;
+        sw.stop();
+        System.out.println("⏱️ save questionEntity time: " + sw.getTotalTimeMillis() + "ms");
+
+        // שלב 6: מיפוי ל-DTO
+        sw = new StopWatch();
+        sw.start();
+        QuestionDTO questionDTO = questionEntityToQuestionDTOMapper.apply(questionEntity);
+        BasicResponse response = new BasicResponse(true, null);
+        response.setData(questionDTO);
+        sw.stop();
+        System.out.println("⏱️ map to DTO time: " + sw.getTotalTimeMillis() + "ms");
+
+        totalStopWatch.stop();
+        System.out.println("✅ total time for generateQuestionForPractice: " + totalStopWatch.getTotalTimeMillis() + "ms");
+
+        return response;
     }
+
 
 
     //TODO להשאיר רמה מקסימלית ל5

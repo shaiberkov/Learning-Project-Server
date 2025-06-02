@@ -7,7 +7,7 @@ import java.util.List;
 
 @Entity
 public class TeacherEntity extends UserEntity {
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "school_id")
     private SchoolEntity teachingSchool;
 
@@ -27,19 +27,19 @@ public class TeacherEntity extends UserEntity {
             inverseJoinColumns = @JoinColumn(name = "student_id"))
     private List<StudentEntity> students = new ArrayList<>();
 
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "teacher_subject", joinColumns = @JoinColumn(name = "teacher_id"))
     @Column(name = "subject_name")
     private List<String> teachingSubjects=new ArrayList<>();
 
 
-    @OneToMany(mappedBy = "teacher",fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "teacher",fetch = FetchType.LAZY)
     private List<TeacherTestEntity> tests = new ArrayList<>();
 
-    @OneToMany(mappedBy = "teacher",fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "teacher",fetch = FetchType.LAZY)
     private List<LessonEntity> lessons = new ArrayList<>();
 
-    @OneToMany(mappedBy = "teacher")
+    @OneToMany(mappedBy = "teacher",fetch = FetchType.LAZY)
     private List<TeacherTestResultEntity> testResults=new ArrayList<>();
 
     public List<TeacherTestResultEntity> getTestResults() {

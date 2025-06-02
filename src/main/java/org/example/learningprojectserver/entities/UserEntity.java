@@ -14,6 +14,10 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
+@NamedEntityGraph(
+        name = "User.withSessions",
+        attributeNodes = @NamedAttributeNode("sessionList")
+)
 @Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "user_entity", indexes = {
         @Index(name = "idx_user_userId", columnList = "userId")
@@ -47,13 +51,13 @@ public abstract class UserEntity {
 //    private int age;
     @Column(nullable = true)
     private String profilePicture;
-    @OneToMany(mappedBy = "user",fetch = FetchType.EAGER ,cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user",fetch = FetchType.LAZY ,cascade = CascadeType.ALL)
     private List<Session> sessionList=new ArrayList<>();
 
-    @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "sender",fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MessageEntity> sentMessages = new ArrayList<>();
 
-    @OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "receiver", fetch = FetchType.LAZY,cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MessageEntity> receivedMessages = new ArrayList<>();
 
 

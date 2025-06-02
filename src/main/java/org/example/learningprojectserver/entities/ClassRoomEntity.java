@@ -22,21 +22,21 @@ ClassRoomEntity {
     @Column(nullable = false)
     private String name;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "grade_id")
     private SchoolGradeEntity grade;
 
     @ManyToMany(mappedBy = "teachingClassRooms")
     private List<TeacherEntity> teachers=new ArrayList<>();
 
-    @OneToMany(mappedBy = "classRoom")
+    @OneToMany(mappedBy = "classRoom",fetch = FetchType.LAZY)
     private List<StudentEntity> students=new ArrayList<>();
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "school_id")
     private SchoolEntity school;
 
-    @OneToOne(mappedBy = "classRoom", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "classRoom",fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private ScheduleEntity schedule;
 
 }
