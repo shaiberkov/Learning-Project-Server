@@ -22,18 +22,8 @@ public class LessonsToScheduleMapper implements Mapper<List<LessonEntity>,Map<Da
 
     @Override
     public Map<DayOfWeek, List<LessonDTO>> apply(List<LessonEntity> lessons) {
-        return lessons.stream()
-                .map(lessonEntityToLessonDTOMapper)
-                .collect(Collectors.groupingBy(
-                        LessonDTO::getDayOfWeek,
-                        () -> new TreeMap<>(Comparator.comparingInt(day -> day == DayOfWeek.SUNDAY ? 0 : day.getValue())),
-                        Collectors.collectingAndThen(
-                                Collectors.toList(),
-                                list -> list.stream()
-                                        .sorted(Comparator.comparing(LessonDTO::getStartTime))
-                                        .collect(Collectors.toList())
-                        )
-                ));
+     return null;
+
     }
 
 }

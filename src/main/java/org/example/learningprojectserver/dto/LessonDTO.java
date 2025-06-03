@@ -6,10 +6,12 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.DayOfWeek;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 public class LessonDTO {
     private String subject;
     private DayOfWeek dayOfWeek;
@@ -18,5 +20,13 @@ public class LessonDTO {
     private String classRoomName;
     private String teacherName;
 
+    public LessonDTO(String subject, DayOfWeek dayOfWeek, LocalTime startTime, LocalTime endTime, String classRoomName, String teacherName) {
+        this.subject = subject;
+        this.dayOfWeek = dayOfWeek;
+        this.startTime = startTime.format(DateTimeFormatter.ofPattern("HH:mm"));
+        this.endTime = endTime.format(DateTimeFormatter.ofPattern("HH:mm"));
+        this.classRoomName = classRoomName;
+        this.teacherName = teacherName;
+    }
 
 }

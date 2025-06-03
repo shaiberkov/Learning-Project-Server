@@ -141,25 +141,19 @@ public class MessageService {
     }
 
 
-    @Cacheable(value = "receivedMessages", key = "#userId")
+
+
+   @Cacheable(value = "receivedMessages", key = "#userId")
     public BasicResponse getAllRecivedMessages(String userId) {
-        BasicResponse basicResponse = new BasicResponse();
-        UserEntity user = userRepository.findUserByUserId(userId);
-        if (user == null) {
-            basicResponse.setSuccess(false);
-            return basicResponse;
-        }
+ BasicResponse basicResponse = new BasicResponse();
 
-        List<MessageEntity> messages = user.getReceivedMessages();
-        List<MessageDTO> messageDTOS = messages.stream()
-                .map(messageEntityToMessageDTOMapper)
-                .toList();
-        basicResponse.setSuccess(true);
-        basicResponse.setData(messageDTOS);
-        return basicResponse;
+List<MessageDTO> messageDTOs = messageRepository.findMessagesByRecipientUserId(userId);
 
+basicResponse.setSuccess(true);
+basicResponse.setData(messageDTOs);
+return basicResponse;
     }
-    //Todo לשים בקונטרולר
+
     public BasicResponse getAllSentMessages(String userId) {
         BasicResponse basicResponse = new BasicResponse();
         UserEntity user = userRepository.findUserByUserId(userId);

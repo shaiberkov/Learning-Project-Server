@@ -21,10 +21,8 @@ import org.springframework.util.StopWatch;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -45,7 +43,8 @@ private final LessonsToScheduleMapper lessonsToScheduleMapper;
 private final ChatGptService chatGptService;
 private final StudentEntityToStudentTestStatusDTOMapper studentEntityToStudentTestStatusDTOMapper;
 private final TestService testService;
-    private final StudentRepository studentRepository;
+private final StudentRepository studentRepository;
+private final LessonRepository lessonRepository;
 
 
 
@@ -56,30 +55,30 @@ public List<StudentTestStatusDTO> getStudentTestsStatus(String userId) {
 }
 
     @Cacheable(value = "studentSchedule", key = "#studentId")
-public BasicResponse getStudentSchedule(String schoolCode, String studentId){
+    public BasicResponse getStudentSchedule(String schoolCode, String studentId) {
+        List<LessonDTO> lessons = lessonRepository.findLessonsByStudentId(studentId);
 
-//    SchoolEntity school = schoolRepository.findBySchoolCode(schoolCode);
-//    if (school == null) {
-//        return new BasicResponse(false, "בית הספר לא נמצא לפי הקוד שסופק");
-//    }
+        Map<DayOfWeek, List<LessonDTO>> lessonsByDay = lessons.stream()
+                .collect(Collectors.groupingBy(
+                        LessonDTO::getDayOfWeek,
+                        () -> new TreeMap<>(Comparator.comparingInt(day -> day == DayOfWeek.SUNDAY ? 0 : day.getValue())),
+                        Collectors.collectingAndThen(
+                                Collectors.toList(),
+                                list -> list.stream()
+                                        .sorted(Comparator.comparing(LessonDTO::getStartTime))
+                                        .collect(Collectors.toList())
+                        )
+                ));
 
-        StudentEntity student=studentRepository.findStudentWithFullScheduleByStudentId(studentId);
-    if (student == null) {
-        return new BasicResponse(false, "המשתמש לא נמצא או שאינו תלמיד");
+        BasicResponse response = new BasicResponse(true, null);
+        response.setData(lessonsByDay);
+        return response;
     }
 
-    List<LessonEntity> studentsLessons=student.getClassRoom().getSchedule().getLessons();
-
-    Map<DayOfWeek, List<LessonDTO>> lessonsByDay = lessonsToScheduleMapper.apply(studentsLessons);
-
-    BasicResponse response = new BasicResponse(true, null);
-    response.setData(lessonsByDay);
-return response;
-}
 
 
 
-public void sendJobMessage(String userId,String subject,String subTopic) {
+    public void sendJobMessage(String userId,String subject,String subTopic) {
     String job = String.format("""
             אתה מורה פרטי ל%s שמדבר עברית ורק עברית.
             אתה מסביר בצורה פשוטה וברורה, כך שגם ילדים יוכלו להבין אותך בקלות.
