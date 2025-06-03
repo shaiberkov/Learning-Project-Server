@@ -1,8 +1,11 @@
 package org.example.learningprojectserver.mappers;
 
+import lombok.RequiredArgsConstructor;
 import org.example.learningprojectserver.dto.StudentTestStatusDTO;
 import org.example.learningprojectserver.dto.UpcomingEventDto;
 import org.example.learningprojectserver.entities.StudentEntity;
+import org.example.learningprojectserver.repository.StudentRepository;
+import org.example.learningprojectserver.utils.HolidayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -14,17 +17,14 @@ import static org.example.learningprojectserver.utils.HolidayUtils.daysUntil;
 import static org.example.learningprojectserver.utils.HolidayUtils.fetchHebrewHolidayEvents;
 
 @Component
-public class StudentEntityToUpcomingEventDTOMapper implements Mapper<StudentEntity, List<UpcomingEventDto>>{
+@RequiredArgsConstructor
+public class StudentEntityToUpcomingEventDTOMapper implements Mapper<String, List<UpcomingEventDto>>{
 
-    private final StudentEntityToStudentTestStatusDTOMapper studentEntityToStudentTestStatusDTOMapper;
-@Autowired
-    public StudentEntityToUpcomingEventDTOMapper(StudentEntityToStudentTestStatusDTOMapper studentEntityToStudentTestStatusDTOMapper) {
-        this.studentEntityToStudentTestStatusDTOMapper = studentEntityToStudentTestStatusDTOMapper;
-    }
+    private final StudentRepository studentRepository;
 
     @Override
-    public List<UpcomingEventDto> apply(StudentEntity student) {
-        List<StudentTestStatusDTO> studentTestStatusDTOS = studentEntityToStudentTestStatusDTOMapper.apply(student);
+    public List<UpcomingEventDto> apply(String studentId) {
+        List<StudentTestStatusDTO> studentTestStatusDTOS = studentRepository.findTestStatusForStudent(studentId);
 
         List<UpcomingEventDto> upcomingEventDtos = new ArrayList<>();
 
@@ -37,7 +37,7 @@ public class StudentEntityToUpcomingEventDTOMapper implements Mapper<StudentEnti
             }
         }
 
-        upcomingEventDtos.addAll(fetchHebrewHolidayEvents());
+        upcomingEventDtos.addAll(HolidayUtils.getCachedEvents());
 
         upcomingEventDtos.sort(Comparator.comparingInt(UpcomingEventDto::getEventInDays));
 

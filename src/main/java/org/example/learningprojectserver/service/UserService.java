@@ -169,6 +169,7 @@ public class UserService {
 
             basicResponse.setSuccess(true);
             basicResponse.setErrorCode("");
+            basicResponse.setData(userCredentialsProjection.getPhoneNumber());
             return basicResponse;
 
         } catch (Exception e) {

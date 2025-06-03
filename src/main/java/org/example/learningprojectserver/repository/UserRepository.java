@@ -50,7 +50,7 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
     @Query("select u from UserEntity u where u.userId = :userId")
     UserEntity loadUserWithSessionsByUserId(@Param("userId") String userId);
 
-    @Query("SELECT u.salt AS salt, u.passwordHash AS passwordHash FROM UserEntity u WHERE u.userId = :userId")
+    @Query("SELECT u.salt AS salt, u.passwordHash AS passwordHash, u.phoneNumber AS phoneNumber FROM UserEntity u WHERE u.userId = :userId")
     UserCredentialsProjection findBasicCredentialsByUserId(@Param("userId") String userId);
 
 }

@@ -5,6 +5,7 @@ import org.example.learningprojectserver.entities.ClassRoomEntity;
 import org.example.learningprojectserver.entities.StudentEntity;
 import org.example.learningprojectserver.entities.TeacherEntity;
 import org.example.learningprojectserver.entities.TeacherTestEntity;
+import org.example.learningprojectserver.utils.HolidayUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -51,7 +52,7 @@ public class TeacherEntityToUpcomingEventDTOMapper implements Mapper<TeacherEnti
             }
 
         }
-        upcomingEventDtos.addAll(fetchHebrewHolidayEvents());
+        upcomingEventDtos.addAll(HolidayUtils.getCachedEvents());
 
         upcomingEventDtos.sort(Comparator.comparingInt(UpcomingEventDto::getEventInDays));
 

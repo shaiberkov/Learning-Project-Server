@@ -3,6 +3,7 @@ package org.example.learningprojectserver.mappers;
 import org.example.learningprojectserver.dto.UpcomingEventDto;
 import org.example.learningprojectserver.entities.SchoolManagerEntity;
 import org.example.learningprojectserver.entities.TeacherEntity;
+import org.example.learningprojectserver.utils.HolidayUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -15,7 +16,7 @@ public class SchoolManagerEntityToUpcomingEventDTOMapper implements Mapper<Schoo
     @Override
     public List<UpcomingEventDto> apply(SchoolManagerEntity schoolManagerEntity) {
         List<UpcomingEventDto> upcomingEventDtos = new ArrayList<>();
-        upcomingEventDtos.addAll(fetchHebrewHolidayEvents());
+        upcomingEventDtos.addAll(HolidayUtils.getCachedEvents());
         upcomingEventDtos.sort(Comparator.comparingInt(UpcomingEventDto::getEventInDays));
 
         return upcomingEventDtos;
