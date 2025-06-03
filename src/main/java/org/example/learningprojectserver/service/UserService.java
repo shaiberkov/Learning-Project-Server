@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import org.example.learningprojectserver.dto.UserDto;
 import org.example.learningprojectserver.entities.*;
 import org.example.learningprojectserver.enums.Role;
+import org.example.learningprojectserver.projection.UserCredentialsProjection;
+import org.example.learningprojectserver.repository.StudentRepository;
 import org.example.learningprojectserver.repository.UserRepository;
 import org.example.learningprojectserver.response.BasicResponse;
 import org.example.learningprojectserver.response.LoginResponse;
@@ -31,6 +33,7 @@ public class UserService {
     private final ActiveUserService activeUserService;
     private final JwtService jwtService;
     private final SmsSender smsSender;
+    private final StudentRepository studentRepository;
 
     private static final ConcurrentHashMap<String, String> otpStorage = new ConcurrentHashMap<>();
 
@@ -131,8 +134,12 @@ public class UserService {
 
 //    @PostConstruct
 //    public void init() {
-//        userRepository.loadUserWithSessionsByUserId("325256017");
+//        UserEntity u=userRepository.findUserByUserId("325256017");
+//        System.out.println("/////////////////////////////");
+//        StudentEntity s=studentRepository.findStudentByStudentId("325256017");
 //    }
+
+
 
     public BasicResponse loginUser(String userId, String password) {
         BasicResponse basicResponse = new BasicResponse();
@@ -145,18 +152,16 @@ public class UserService {
 
         try {
 
+            UserCredentialsProjection userCredentialsProjection=userRepository.findBasicCredentialsByUserId(userId);
 
-            /////////
-            UserEntity userEntity= userRepository.findUserByUserId(userId);
-////////////
 
-            if (userEntity == null) {
+            if (userCredentialsProjection.getSalt() == null) {
                 basicResponse.setSuccess(false);
                 basicResponse.setErrorCode("שם משתמש או סיסמה אינם נכונים");
                 return basicResponse;
             }
-            String hashedPassword = hashPassword(password, userEntity.getSalt());
-            if (!hashedPassword.equals(userEntity.getPasswordHash())) {
+            String hashedPassword = hashPassword(password, userCredentialsProjection.getSalt());
+            if (!hashedPassword.equals(userCredentialsProjection.getPasswordHash())) {
                 basicResponse.setSuccess(false);
                 basicResponse.setErrorCode("הסיסמה שגויה");
                 return basicResponse;

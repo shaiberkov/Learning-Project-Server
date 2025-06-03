@@ -13,27 +13,6 @@ public class StudentEntityToStudentTestStatusDTOMapper implements Mapper<Student
     @Override
     public List<StudentTestStatusDTO> apply(StudentEntity student) {
 
-//        List<StudentTestStatusDTO> studentTestStatusDTOList = new ArrayList<>();
-//
-//        for (TeacherTestEntity teacherTestEntity : student.getTeacherTests()) {
-//            StudentTestStatusDTO studentTestStatusDTO = new StudentTestStatusDTO();
-//            studentTestStatusDTO.setTestId(teacherTestEntity.getId());
-//            studentTestStatusDTO.setSubject(teacherTestEntity.getSubject());
-//            studentTestStatusDTO.setTopic(teacherTestEntity.getTopic());
-//            Optional<Integer> optionalScore = student.getTeacherTestsResult().stream()
-//                    .filter(result -> result.getTest().getId().equals(teacherTestEntity.getId()))
-//                    .map(TeacherTestResultEntity::getScore)
-//                    .filter(Objects::nonNull)
-//                    .findFirst();
-//
-//            int score = optionalScore.orElse(-1);
-//            studentTestStatusDTO.setScore(score);
-//
-//            studentTestStatusDTO.setStartTime(teacherTestEntity.getStartTime());
-//            studentTestStatusDTO.setTimeLimitMinutes(teacherTestEntity.getTimeLimitMinutes());
-//            studentTestStatusDTOList.add(studentTestStatusDTO);
-//
-//        }
 
         Map<Long, Integer> scoreMap = student.getTeacherTestsResult().stream()
                 .collect(Collectors.toMap(

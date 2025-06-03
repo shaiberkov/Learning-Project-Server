@@ -2,6 +2,7 @@ package org.example.learningprojectserver.repository;
 
 
 import org.example.learningprojectserver.entities.UserEntity;
+import org.example.learningprojectserver.projection.UserCredentialsProjection;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -48,5 +49,8 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
     @EntityGraph(value = "User.withSessions", type = EntityGraph.EntityGraphType.FETCH)
     @Query("select u from UserEntity u where u.userId = :userId")
     UserEntity loadUserWithSessionsByUserId(@Param("userId") String userId);
+
+    @Query("SELECT u.salt AS salt, u.passwordHash AS passwordHash FROM UserEntity u WHERE u.userId = :userId")
+    UserCredentialsProjection findBasicCredentialsByUserId(@Param("userId") String userId);
 
 }

@@ -36,6 +36,7 @@ public class TestService {
 
     }
 
+
     public List<TestQuestionEntity> generateTestQuestions(
             String subject,
             String topic,
@@ -45,41 +46,78 @@ public class TestService {
 
         List<TestQuestionEntity> result = new ArrayList<>();
 
-        for (int i = 0; i < questionCount; i++) {
-            result.add(createSingleQuestion(subject, topic, difficulty, testEntity));
-        }
-        return result;
-    }
-
-
-    private TestQuestionEntity createSingleQuestion(
-            String subject,
-            String topic,
-            String difficulty,
-            TestEntity testEntity) {
-
         Random random = new Random();
-
         int[] difficultyLevels = getDifficultyLevels(difficulty);
-        int level = difficultyLevels[random.nextInt(difficultyLevels.length)];
-
         List<String> subTopics = getSubTopics(topic);
-        String subTopic = subTopics.get(random.nextInt(subTopics.size()));
 
         SubjectQuestionGenerator subjectGenerator =
                 QuestionGeneratorFactory.getSubjectQuestionGenerator(subject);
 
-        QuestionGenerator questionGenerator =
-                subjectGenerator.getQuestionGenerator(topic, subTopic);
+        for (int i = 0; i < questionCount; i++) {
+            int level = difficultyLevels[random.nextInt(difficultyLevels.length)];
+            String subTopic = subTopics.get(random.nextInt(subTopics.size()));
 
-        QuestionEntity questionEntity = questionGenerator.generateQuestion(level);
+            QuestionGenerator questionGenerator =
+                    subjectGenerator.getQuestionGenerator(topic, subTopic);
 
-        TestQuestionEntity tqe = questionEntityToTestQuestionMapper.apply(questionEntity);
-        tqe.setTest(testEntity);
-        questionRepository.save(tqe);
+            QuestionEntity questionEntity = questionGenerator.generateQuestion(level);
 
-        return tqe;
+            TestQuestionEntity tqe = questionEntityToTestQuestionMapper.apply(questionEntity);
+            tqe.setTest(testEntity);
+            result.add(tqe); // אל תשמור כאן עדיין
+        }
+
+        // שמירה מרוכזת אחרי הלולאה
+        questionRepository.saveAll(result);
+
+        return result;
     }
+
+
+//    public List<TestQuestionEntity> generateTestQuestions(
+//            String subject,
+//            String topic,
+//            int questionCount,
+//            String difficulty,
+//            TestEntity testEntity) {
+//
+//        List<TestQuestionEntity> result = new ArrayList<>();
+//
+//        for (int i = 0; i < questionCount; i++) {
+//            result.add(createSingleQuestion(subject, topic, difficulty, testEntity));
+//        }
+//        return result;
+//    }
+//
+//
+//    private TestQuestionEntity createSingleQuestion(
+//            String subject,
+//            String topic,
+//            String difficulty,
+//            TestEntity testEntity) {
+//
+//        Random random = new Random();
+//
+//        int[] difficultyLevels = getDifficultyLevels(difficulty);
+//        int level = difficultyLevels[random.nextInt(difficultyLevels.length)];
+//
+//        List<String> subTopics = getSubTopics(topic);
+//        String subTopic = subTopics.get(random.nextInt(subTopics.size()));
+//
+//        SubjectQuestionGenerator subjectGenerator =
+//                QuestionGeneratorFactory.getSubjectQuestionGenerator(subject);
+//
+//        QuestionGenerator questionGenerator =
+//                subjectGenerator.getQuestionGenerator(topic, subTopic);
+//
+//        QuestionEntity questionEntity = questionGenerator.generateQuestion(level);
+//
+//        TestQuestionEntity tqe = questionEntityToTestQuestionMapper.apply(questionEntity);
+//        tqe.setTest(testEntity);
+//        questionRepository.save(tqe);
+//
+//        return tqe;
+//    }
 
 
 

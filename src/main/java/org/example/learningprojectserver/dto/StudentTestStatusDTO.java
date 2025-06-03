@@ -14,7 +14,8 @@ public class StudentTestStatusDTO {
     private String subject;
     private String Topic;
     private int score;
-    private int timeLimitMinutes;
     private String startTime;
+    private int timeLimitMinutes;
+
 
 }
