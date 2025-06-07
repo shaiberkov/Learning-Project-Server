@@ -31,6 +31,7 @@ public class TestResultService {
     private final TeacherTestResultRepository teacherTestResultRepository;
     private final TeacherTestRepository teacherTestRepository;
     private final UserRepository userRepository;
+    private final StudentRepository studentRepository;
 
 
     public BasicResponse startTest(Long testId,String userId) {
@@ -70,13 +71,8 @@ public class TestResultService {
     public BasicResponse checkPracticeTest(String userid, Long testId, Map<Long, String> userAnswers) {
 
 
-        UserEntity user = userRepository.findUserByUserId(userid);
 
-        if (user.getRole() != Role.STUDENT) {
-            return new BasicResponse(false, "אין הרשאה לפעולה זו");
-
-        }
-        StudentEntity student = (StudentEntity) user;
+        StudentEntity student =studentRepository.findStudentByStudentId(userid);
         PracticeTestEntity test = practiceTestRepository.findById(testId).orElse(null);
 
 
@@ -142,9 +138,9 @@ public class TestResultService {
     @CacheEvict(value = "studentTestsStatus", key = "#userId")
     public BasicResponse checkTeacherTest(String userId, Long testId, Map<Long, String> userAnswers) {
 
-            UserEntity user1 = userRepository.findUserByUserId(userId);
+        StudentEntity student =studentRepository.findStudentByStudentId(userId);
 
-        if (user1.getRole() != Role.STUDENT) {
+        if (student==null) {
             return new BasicResponse(false, "אין הרשאה ליצירת מיבחנים לתירגול אישי");
         }
         TeacherTestEntity test = teacherTestRepository.findById(testId).orElse(null);
@@ -153,7 +149,6 @@ public class TestResultService {
         }
         TeacherEntity teacher =test.getTeacher();
 
-            StudentEntity student = (StudentEntity) user1;
 
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
             LocalDateTime now = LocalDateTime.now();

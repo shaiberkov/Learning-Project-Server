@@ -16,17 +16,11 @@ import java.util.List;
 public interface UserRepository extends JpaRepository<UserEntity, Long> {
 
 
-    //    @Query("SELECT u FROM UserEntity u WHERE u.username = :username AND u.passwordHash = :password")
-//    UserEntity findByUsernameAndPasswordHash(@Param("username") String username, @Param("password") String password);
     @Query("SELECT u FROM UserEntity u WHERE u NOT IN " +
             "(SELECT s.user FROM Session s WHERE s.lastActivity >= :lastWeek)")
     List<UserEntity> findUsersNotLoggedInLastWeek(@Param("lastWeek") Date lastWeek);
 
-    @Query("SELECT u FROM UserEntity u WHERE u.username = :userName")
-    UserEntity findByUserName(@Param("userName") String userName);
 
-    @Query("SELECT u.phoneNumber FROM UserEntity u WHERE u.userId=:userId")
-    String findPhoneNumberByUserId(@Param("userId") String userId);
 
     boolean existsByUsername(String username);
 
@@ -46,11 +40,20 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
     List<UserEntity> getAllSchoolManagers();
 
 
-    @EntityGraph(value = "User.withSessions", type = EntityGraph.EntityGraphType.FETCH)
-    @Query("select u from UserEntity u where u.userId = :userId")
-    UserEntity loadUserWithSessionsByUserId(@Param("userId") String userId);
 
     @Query("SELECT u.salt AS salt, u.passwordHash AS passwordHash, u.phoneNumber AS phoneNumber FROM UserEntity u WHERE u.userId = :userId")
     UserCredentialsProjection findBasicCredentialsByUserId(@Param("userId") String userId);
 
+//    @Query("SELECT u.id FROM UserEntity u WHERE u.userId = :userId")
+//    Long findIdByUserId(@Param("userId") String userId);
+
+    @Query(
+            value = """
+          SELECT u.id
+          FROM user_entity u
+          WHERE u.user_id = :userId
+        """,
+            nativeQuery = true
+    )
+    Long findIdByUserId(@Param("userId") String userId);
 }

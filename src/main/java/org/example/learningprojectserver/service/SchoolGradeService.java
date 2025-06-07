@@ -24,15 +24,12 @@ public class SchoolGradeService {
             return new BasicResponse(false, "שם השכבה לא יכול להיות ריק");
         }
 
-        List<ClassRoomEntity> classRooms = classRoomRepository.findClassRoomsBySchoolCodeAndGradeName(schoolCode, gradeName);
 
-        if (classRooms.isEmpty()) {
-            return new BasicResponse(false, "לא נמצאו כיתות לשכבה זו ");
+        List<String> classNames = classRoomRepository.findClassRoomNamesBySchoolCodeAndGradeName(schoolCode, gradeName);
+
+        if (classNames.isEmpty()) {
+            return new BasicResponse(false, "לא נמצאו כיתות לשכבה זו");
         }
-
-        List<String> classNames = classRooms.stream()
-                .map(ClassRoomEntity::getName)
-                .toList();
 
         BasicResponse basicResponse = new BasicResponse(true, "הכיתות לשכבה " + gradeName + " בבית הספר " + schoolCode + " הן:");
         basicResponse.setData(classNames);

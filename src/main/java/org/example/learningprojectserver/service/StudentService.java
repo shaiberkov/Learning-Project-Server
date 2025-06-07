@@ -51,7 +51,7 @@ private final LessonRepository lessonRepository;
 @Cacheable(value = "studentTestsStatus", key = "#userId")
 public List<StudentTestStatusDTO> getStudentTestsStatus(String userId) {
 
-    return studentRepository.findTestStatusForStudent(userId);
+      return studentRepository.findAllTestsForStudent(userId);
 }
 
     @Cacheable(value = "studentSchedule", key = "#studentId")
@@ -100,213 +100,107 @@ public List<StudentTestStatusDTO> getStudentTestsStatus(String userId) {
     public BasicResponse generateQuestionForPractice(String userId, String subject, String topic, String subTopic) {
         sendJobMessage(userId, subject, subTopic);
 
-        StopWatch totalStopWatch = new StopWatch();
-        totalStopWatch.start();
-
-        StopWatch sw = new StopWatch();
-
-        // שלב 1: טעינת הסטודנט (רק עם progress ו-history, בלי cascades כבדים)
-        sw.start();
         StudentEntity student = studentRepository.findStudentWithProgressAndHistory(userId);
-        sw.stop();
-        System.out.println("⏱️ load student time: " + sw.getTotalTimeMillis() + "ms");
 
         if (student.getClassRoom() == null || student.getClassRoom().getId() == null) {
             return new BasicResponse(false, "תלמיד עוד לא משובץ לכיתה");
         }
 
-        // שלב 2: עדכון progress בזיכרון (ללא save)
-        sw = new StopWatch();
-        sw.start();
         StudentProgressEntity progress = student.getStudentProgressEntity();
         Map<String, Integer> skillLevels = progress.getSkillLevelsBySubTopic();
-        skillLevels.putIfAbsent(subTopic, 1); // עדכון מקומי
-        sw.stop();
-        System.out.println("⏱️ update progress time: " + sw.getTotalTimeMillis() + "ms");
+        skillLevels.putIfAbsent(subTopic, 1);
 
-        // שלב 3: הפקת שאלה
-        sw = new StopWatch();
-        sw.start();
+
         int level = skillLevels.get(subTopic);
         SubjectQuestionGenerator generator = QuestionGeneratorFactory.getSubjectQuestionGenerator(subject);
         QuestionGenerator questionGenerator = generator.getQuestionGenerator(topic, subTopic);
         QuestionEntity baseQuestion = questionGenerator.generateQuestion(level);
-        sw.stop();
-        System.out.println("⏱️ generate question logic time: " + sw.getTotalTimeMillis() + "ms");
 
-        // שלב 4: יצירת הישויות לקשר לשאלה
-        sw = new StopWatch();
-        sw.start();
         PracticeQuestionEntity questionEntity = questionEntityToPracticeQuestionMapper.apply(baseQuestion);
 
-        questionEntity.setProgressEntity(progress); // קשר LAZY
-        questionEntity.setQuestionHistory(student.getStudentQuestionHistoryEntity()); // קשר LAZY
-
-        // ניקוי תווי כיוון טקסט
+        questionEntity.setProgressEntity(progress);
+        questionEntity.setQuestionHistory(student.getStudentQuestionHistoryEntity());
         questionEntity.setQuestionText(questionEntity.getQuestionText().replaceAll("[\u200E\u200F]", ""));
         questionEntity.setAnswer(questionEntity.getAnswer().replaceAll("[\u200E\u200F]", ""));
-        sw.stop();
-        System.out.println("⏱️ prepare question entity time: " + sw.getTotalTimeMillis() + "ms");
 
-        // שלב 5: שמירה לבסיס נתונים (עם Batch insert, אין save של progress/histories)
-        sw = new StopWatch();
-        sw.start();
+
         questionEntity = questionRepository.save(questionEntity);
-        sw.stop();
-        System.out.println("⏱️ save questionEntity time: " + sw.getTotalTimeMillis() + "ms");
 
-        // שלב 6: מיפוי ל-DTO
-        sw = new StopWatch();
-        sw.start();
         QuestionDTO questionDTO = questionEntityToQuestionDTOMapper.apply(questionEntity);
         BasicResponse response = new BasicResponse(true, null);
         response.setData(questionDTO);
-        sw.stop();
-        System.out.println("⏱️ map to DTO time: " + sw.getTotalTimeMillis() + "ms");
-
-        totalStopWatch.stop();
-        System.out.println("✅ total time for generateQuestionForPractice: " + totalStopWatch.getTotalTimeMillis() + "ms");
-
         return response;
     }
 
 
 
-//    //TODO להשאיר רמה מקסימלית ל5
-//    @Transactional
-//    public BasicResponse submitAnswer(String userId, Long id, String subTopic, String answer) {
-//
-//        UserEntity user= userRepository.findUserByUserId(userId);
-//        if(user == null) {
-//            return new BasicResponse(false,"יוזר לא קיים");
-//        }
-//        if (!(user.getRole()== Role.STUDENT)){
-//            return new BasicResponse(false,"יוזר זה אינו תלמיד");
-//        }
-//
-//        ClassRoomEntity classRoom=classRoomRepository.findClassRoomOfUserByUserId(userId);
-//        if(classRoom == null){
-//            return new BasicResponse(false,",תלמיד עוד לא משובץ לכיתה");
-//        }
-//        StudentQuestionHistoryEntity historyEntity = studentQuestionHistoryRepository.findStudentQuestionHistoryByUserId(userId);
-//        StudentProgressEntity studentProgressEntity = studentProgressRepository.findStudentProgressByUserId(userId);
-//
-//
-//        QuestionEntity questionEntity = questionRepository.findQuestionById(id);
-//        if (questionEntity == null) {
-//            return new BasicResponse(false, "השאלה לא נמצאה");
-//        }
-//        boolean isCorrect = questionEntity.getAnswer().equalsIgnoreCase(answer.trim());
-//        System.out.println(questionEntity.getAnswer() + "  " + answer.trim());
-//        historyEntity.addAnsweredQuestion(questionEntity, isCorrect);
-//        studentQuestionHistoryRepository.save(historyEntity);
-//
-//        Map<String, Integer> subTopicSuccessStreak = studentProgressEntity.getSubTopicSuccessStreak();
-//        int currentSuccesStreak = subTopicSuccessStreak.getOrDefault(subTopic, 0);
-//        Map<String, Integer> skillLevelsBySubTopic = studentProgressEntity.getSkillLevelsBySubTopic();;
-//        Map<String, Integer> subTopicIncorrectStreak = studentProgressEntity.getSubTopicIncorrectStreak();
-//        int currentIncorrectStreak = subTopicIncorrectStreak.getOrDefault(subTopic, 0);
-//        if (isCorrect) {
-//            subTopicIncorrectStreak.put(subTopic, 0);
-//            subTopicSuccessStreak.put(subTopic, currentSuccesStreak + 1);
-//
-//            if (subTopicSuccessStreak.get(subTopic) == 3) {
-//                //skillLevelsBySubTopic = userProgressEntity.getSkillLevelsBySubTopic();
-//                skillLevelsBySubTopic.put(subTopic, skillLevelsBySubTopic.get(subTopic) + 1);
-//                subTopicSuccessStreak.put(subTopic, 0);
-//            }
-//        } else {
-//
-//            subTopicSuccessStreak.put(subTopic, 0);
-//            subTopicIncorrectStreak.put(subTopic,currentIncorrectStreak+1 );
-//            if (subTopicIncorrectStreak.get(subTopic) == 3) {
-//                if(skillLevelsBySubTopic.get(subTopic)>1){
-//                    //skillLevelsBySubTopic = userProgressEntity.getSkillLevelsBySubTopic();
-//                    skillLevelsBySubTopic.put(subTopic, skillLevelsBySubTopic.get(subTopic) -1);
-//                    subTopicIncorrectStreak.put(subTopic, 0);
-//                }
-//
-//
-//            }
-//        }
-//        studentProgressEntity.setSkillLevelsBySubTopic(skillLevelsBySubTopic);
-//        studentProgressEntity.setSubTopicSuccessStreak(subTopicSuccessStreak);
-//        studentProgressEntity.setSubTopicIncorrectStreak(subTopicIncorrectStreak);
-//        studentProgressRepository.save(studentProgressEntity);
-//
-//        SubmitAnswerResponse submitAnswerResponse=new SubmitAnswerResponse();
-//        submitAnswerResponse.setSuccess(true);
-//        System.out.println(isCorrect);
-//        submitAnswerResponse.setCorrect(isCorrect);
-//        submitAnswerResponse.setMessage(isCorrect ? "תשובה נכונה כל הכבוד" : "תשובה לא נכונה ");
-//        BasicResponse basicResponse = new BasicResponse(true, null);
-//        basicResponse.setData(submitAnswerResponse);
-//        return basicResponse;
-//    }
-
-
+    //TODO להשאיר רמה מקסימלית ל5
     @Transactional
-    public BasicResponse submitAnswer(String userId, Long questionId,
-                                      String subTopic, String answer) {
+    public BasicResponse submitAnswer(String userId, Long id, String subTopic, String answer) {
 
-        StudentEntity student =
-                studentRepository.findStudentWithProgressAndHistory(userId);
-        if (student == null)
-            return new BasicResponse(false, "יוזר לא קיים");
-
-        if (student.getClassRoom() == null || student.getClassRoom().getId() == null)
-            return new BasicResponse(false, "תלמיד עוד לא משובץ לכיתה");
-
-        /* שלב 2 – טעינת השאלה */
-        QuestionEntity question =
-                questionRepository.findById(questionId).orElse(null);
-        if (question == null)
-            return new BasicResponse(false, "השאלה לא נמצאה");
-
-        /* --- לוגיקת בדיקת תשובה --- */
-        boolean isCorrect =
-                question.getAnswer().equalsIgnoreCase(answer.trim());
-
-        /* History ו-Progress כבר טעונים בזיכרון */
-        StudentQuestionHistoryEntity history = student.getStudentQuestionHistoryEntity();
-        StudentProgressEntity progress    = student.getStudentProgressEntity();
-
-        history.addAnsweredQuestion(question, isCorrect);
-
-        /* עדכון מפות התקדמות */
-        Map<String,Integer> success  = progress.getSubTopicSuccessStreak();
-        Map<String,Integer> fail     = progress.getSubTopicIncorrectStreak();
-        Map<String,Integer> levels   = progress.getSkillLevelsBySubTopic();
-
-        int succ = success.getOrDefault(subTopic,0);
-        int inc  = fail   .getOrDefault(subTopic,0);
-
-        if (isCorrect) {
-            fail.put(subTopic, 0);
-            success.put(subTopic, succ + 1);
-            if (success.get(subTopic) == 3) {
-                levels.put(subTopic, levels.getOrDefault(subTopic,1) + 1);
-                success.put(subTopic, 0);
-            }
-        } else {
-            success.put(subTopic, 0);
-            fail.put(subTopic, inc + 1);
-            if (fail.get(subTopic) == 3 && levels.getOrDefault(subTopic,1) > 1) {
-                levels.put(subTopic, levels.get(subTopic) - 1);
-                fail.put(subTopic, 0);
-            }
+        StudentEntity student = studentRepository.findStudentWithAllData(userId);
+        if(student == null) {
+            return new BasicResponse(false,"יוזר לא קיים");
         }
 
-        SubmitAnswerResponse dto = new SubmitAnswerResponse();
-        dto.setSuccess(true);
-        dto.setCorrect(isCorrect);
-        dto.setMessage(isCorrect ? "תשובה נכונה – כל הכבוד!" : "תשובה לא נכונה");
 
-        BasicResponse resp = new BasicResponse(true, null);
-        resp.setData(dto);
-        return resp;
+        if(student.getClassRoom() == null){
+            return new BasicResponse(false,",תלמיד עוד לא משובץ לכיתה");
+        }
+        StudentQuestionHistoryEntity historyEntity = student.getQuestionHistoryEntity();
+        StudentProgressEntity studentProgressEntity = student.getStudentProgressEntity();
+
+
+        QuestionEntity questionEntity = questionRepository.findQuestionById(id);
+        if (questionEntity == null) {
+            return new BasicResponse(false, "השאלה לא נמצאה");
+        }
+        boolean isCorrect = questionEntity.getAnswer().equalsIgnoreCase(answer.trim());
+        historyEntity.addAnsweredQuestion(questionEntity, isCorrect);
+        studentQuestionHistoryRepository.save(historyEntity);
+
+        Map<String, Integer> subTopicSuccessStreak = studentProgressEntity.getSubTopicSuccessStreak();
+        int currentSuccesStreak = subTopicSuccessStreak.getOrDefault(subTopic, 0);
+        Map<String, Integer> skillLevelsBySubTopic = studentProgressEntity.getSkillLevelsBySubTopic();;
+        Map<String, Integer> subTopicIncorrectStreak = studentProgressEntity.getSubTopicIncorrectStreak();
+        int currentIncorrectStreak = subTopicIncorrectStreak.getOrDefault(subTopic, 0);
+        if (isCorrect) {
+            subTopicIncorrectStreak.put(subTopic, 0);
+            subTopicSuccessStreak.put(subTopic, currentSuccesStreak + 1);
+
+            if (subTopicSuccessStreak.get(subTopic) == 3) {
+                //skillLevelsBySubTopic = userProgressEntity.getSkillLevelsBySubTopic();
+                skillLevelsBySubTopic.put(subTopic, skillLevelsBySubTopic.get(subTopic) + 1);
+                subTopicSuccessStreak.put(subTopic, 0);
+            }
+        } else {
+
+            subTopicSuccessStreak.put(subTopic, 0);
+            subTopicIncorrectStreak.put(subTopic,currentIncorrectStreak+1 );
+            if (subTopicIncorrectStreak.get(subTopic) == 3) {
+                if(skillLevelsBySubTopic.get(subTopic)>1){
+                    //skillLevelsBySubTopic = userProgressEntity.getSkillLevelsBySubTopic();
+                    skillLevelsBySubTopic.put(subTopic, skillLevelsBySubTopic.get(subTopic) -1);
+                    subTopicIncorrectStreak.put(subTopic, 0);
+                }
+
+
+            }
+        }
+        studentProgressEntity.setSkillLevelsBySubTopic(skillLevelsBySubTopic);
+        studentProgressEntity.setSubTopicSuccessStreak(subTopicSuccessStreak);
+        studentProgressEntity.setSubTopicIncorrectStreak(subTopicIncorrectStreak);
+        studentProgressRepository.save(studentProgressEntity);
+
+        SubmitAnswerResponse submitAnswerResponse=new SubmitAnswerResponse();
+        submitAnswerResponse.setSuccess(true);
+        System.out.println(isCorrect);
+        submitAnswerResponse.setCorrect(isCorrect);
+        submitAnswerResponse.setMessage(isCorrect ? "תשובה נכונה כל הכבוד" : "תשובה לא נכונה ");
+        BasicResponse basicResponse = new BasicResponse(true, null);
+        basicResponse.setData(submitAnswerResponse);
+        return basicResponse;
     }
-
 
 
     @Transactional

@@ -15,10 +15,6 @@ import org.example.learningprojectserver.notification.dto.NotificationDTO;
 import org.example.learningprojectserver.notification.publisher.NotificationEventPublisher;
 import org.example.learningprojectserver.repository.*;
 import org.example.learningprojectserver.response.BasicResponse;
-import org.example.learningprojectserver.service.QuestionGenerator.QuestionGenerator;
-import org.example.learningprojectserver.service.QuestionGenerator.QuestionGeneratorFactory;
-import org.example.learningprojectserver.service.QuestionGenerator.SubjectQuestionGenerator;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
@@ -30,8 +26,8 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -50,70 +46,31 @@ public class TeacherService {
     private final NotificationEventPublisher notificationEventPublisher;
     private final TestService testService;
     private final CacheManager cacheManager;
+    private final TeacherRepository teacherRepository;
 
 
 
-//    public BasicResponse getLessonsForTeacher(String teacherId) {
-//
-//        UserEntity teacher = userRepository.findUserByUserId(teacherId);
-//        if (teacher == null) {
-//
-//            return new BasicResponse(false, "מורה לא נימצא");
-//        }
-//
-//        List<LessonEntity> lessonEntities = lessonRepository.findLessonsByTeacherId(teacherId);
-//
-//        if (lessonEntities.isEmpty()) {
-//            return new BasicResponse(false, "אין שיעורים למורה זה");
-//        }
-//
-//
-//        List<LessonDTO> lessonDTOs = lessonEntities.stream()
-//                .map(lessonEntityToLessonDTOMapper).toList();
-//
-//        BasicResponse basicResponse = new BasicResponse(true, null);
-//        basicResponse.setData(lessonDTOs);
-//        return basicResponse;
-//    }
+public BasicResponse getTeacherDTO(String teacherId,String schoolCode) {
 
-    public BasicResponse getTeacherDTO(String teacherId,String schoolCode) {
+   TeacherDTO teacherDTO= teacherRepository.findTeacherDTOByUserIdAndSchoolCode(teacherId,schoolCode);
+   if(teacherDTO != null) {
+       BasicResponse basicResponse = new BasicResponse(true, null);
+       basicResponse.setData(teacherDTO);
+       return basicResponse;
+   }
+    BasicResponse basicResponse = new BasicResponse(true, "לא קיים מורה כזה בבית ספר");
 
-        UserEntity user = userRepository.findUserByUserId(teacherId);
-        SchoolEntity  school=schoolRepository.findBySchoolCode(schoolCode);
-        if (school == null) {
-            return new BasicResponse(false,"אין בית ספר כזה");
-        }
-        if (user == null) {
-            return new BasicResponse(false, "המורה לא נמצא במערכת");
-
-        }
-        if (user.getRole() != Role.TEACHER) {
-            return new BasicResponse(false, "המשתמש אינו מורה");
-
-        }
-        if (!school.getTeachers().contains(user)) {
-            return new BasicResponse(false, "המורה לא שייך לבית הספר ");
-
-        }
-        TeacherEntity teacher = (TeacherEntity) user;
-        BasicResponse basicResponse = new BasicResponse(true, null);
-
-        TeacherDTO teacherDTO = teacherEntityToTeacherDTOMapper.apply(teacher);
-        basicResponse.setData(teacherDTO);
-        return basicResponse;
-    }
+    return basicResponse;
+}
 
 
 
     public BasicResponse addTeachingSubjectToTeacher(String teacherId, List<String> subjects) {
-        UserEntity user = userRepository.findUserByUserId(teacherId);
-        if (user == null) {
+
+        TeacherEntity teacher = teacherRepository.findByUserIdWithSubjects(teacherId);
+        if (teacher == null) {
             return new BasicResponse(false, "המורה לא נמצא במערכת");
         }
-        if (user.getRole() != Role.TEACHER) {
-            return new BasicResponse(false, "המשתמש אינו מורה");
-        }
-        TeacherEntity teacher = (TeacherEntity) user;
 
         List<String> subjectsOfTeacher=teacher.getTeachingSubjects();
         if (!Collections.disjoint(subjectsOfTeacher, subjects)) {
@@ -126,14 +83,11 @@ public class TeacherService {
     }
 
     public BasicResponse removeTeachingSubjectFromTeacher(String teacherId,String subjectToRemove) {
-        UserEntity user = userRepository.findUserByUserId(teacherId);
-        if (user == null) {
+
+        TeacherEntity teacher = teacherRepository.findByUserIdWithSubjects(teacherId);
+        if (teacher == null) {
             return new BasicResponse(false, "המורה לא נמצא במערכת");
         }
-        if (user.getRole() != Role.TEACHER) {
-            return new BasicResponse(false, "המשתמש אינו מורה");
-        }
-        TeacherEntity teacher = (TeacherEntity) user;
         if (!teacher.getTeachingSubjects().contains(subjectToRemove)) {
             return new BasicResponse(false, "המורה אינו מלמד מקצוע זה ");
         }
@@ -145,11 +99,12 @@ public class TeacherService {
     }
 
 
+
     @CacheEvict(value = "teacherSchedule", key = "#teacherId")
     @Transactional
     public BasicResponse addLessonToTeacher(LessonDTO dto, String teacherId) {
-        UserEntity user = userRepository.findUserByUserId(teacherId);
-        if (user == null) {
+        TeacherEntity teacher=teacherRepository.findByUserId(teacherId);
+        if (teacher == null) {
             return new BasicResponse(false, "מורה לא נמצא");
         }
 
@@ -158,7 +113,6 @@ public class TeacherService {
             return new BasicResponse(false, "כיתה לא נמצאה");
         }
 
-        TeacherEntity teacher = (TeacherEntity) user;
         if (!teacher.getTeachingClassRooms().contains(classRoom)) {
             return new BasicResponse(false, "המורה אינו משויך לכיתה '" + dto.getClassRoomName() + "'");
         }
@@ -222,7 +176,6 @@ public class TeacherService {
         return new BasicResponse(true, "השיעור נוסף בהצלחה");
     }
 
-
     public boolean isOverlapping(LessonEntity newLesson, LessonEntity existingLesson) {
         if (newLesson.getDayOfWeek() != existingLesson.getDayOfWeek()) {
             return false;
@@ -251,25 +204,19 @@ public class TeacherService {
     @Transactional
     public BasicResponse generateTestForStudents(List<String> usersIds, String teacherId, String testStartTime,
                                                  String subject, String topic, String difficulty, int questionCount, int timeLimitMinutes) {
-        UserEntity user = userRepository.findUserByUserId(teacherId);
-        if (user == null) {
+
+
+
+
+        TeacherEntity teacher=teacherRepository.findByUserId(teacherId);
+        if (teacher == null) {
             return new BasicResponse(false, "המורה לא נמצא");
-        }
-
-
-
-        if (user.getRole() != Role.TEACHER) {
-            return new BasicResponse(false, "המשתמש לא מורה");
         }
 
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
         LocalDateTime start;
         start = LocalDateTime.parse(testStartTime, fmt);
-//        try {
-//            start = LocalDateTime.parse(testStartTime, fmt);   // המרה
-//        } catch (DateTimeParseException e) {
-//            return new BasicResponse(false, "פורמט תאריך לא חוקי — פורמט נדרש: yyyy-MM-dd HH:mm");
-//        }
+
 
         LocalDateTime now = LocalDateTime.now();
         if (start.isBefore(now)) {
@@ -281,7 +228,6 @@ public class TeacherService {
         if (minutesDiff < 120) {
             return new BasicResponse(false, "יש לקבוע את מועד המבחן לפחות שעתיים מראש");
         }
-        TeacherEntity teacher = (TeacherEntity) user;
 
         List<StudentEntity> students = studentRepository.findStudentsByUserIds(usersIds);
         if (students.isEmpty()) {
@@ -337,11 +283,12 @@ public class TeacherService {
         return basicResponse;
     }
 
+
     private void notifyStudentsAboutNewTest(List<StudentEntity> students, TeacherTestEntity test) {
         for (StudentEntity student : students) {
             student.getTeacherTests().add(test);
 
-            List<StudentTestStatusDTO> studentTestStatusDTOS = studentEntityToStudentTestStatusDTOMapper.apply(student);
+            List<StudentTestStatusDTO> studentTestStatusDTOS = studentRepository.findAllTestsForStudent(student.getUserId());
 
             StudentTestStatusDTO studentTestStatusDTO = studentTestStatusDTOS.get(studentTestStatusDTOS.size() - 1);
 
@@ -354,27 +301,22 @@ public class TeacherService {
             );
         }
     }
-
     @Cacheable(value = "teacherSchedule", key = "#teacherId")
     public BasicResponse getTeacherSchedule(String teacherId) {
 
+        List<LessonDTO> lessons = lessonRepository.findLessonsByTeacherId(teacherId);
 
-        UserEntity user = userRepository.findUserByUserId(teacherId);
-        if (user == null) {
-            return new BasicResponse(false, "המורה לא נמצא");
-        }
-
-        if (user.getRole() != Role.TEACHER) {
-            return new BasicResponse(false, "המשתמש לא מורה");
-        }
-
-        TeacherEntity teacher = (TeacherEntity) user;
-
-        if(teacher.getLessons().isEmpty()){
-            return new BasicResponse(false,"אין כרגע שיעורים");
-        }
-
-        Map<DayOfWeek, List<LessonDTO>> lessonsByDay = lessonsToScheduleMapper.apply(teacher.getLessons());
+        Map<DayOfWeek, List<LessonDTO>> lessonsByDay = lessons.stream()
+                .collect(Collectors.groupingBy(
+                        LessonDTO::getDayOfWeek,
+                        () -> new TreeMap<>(Comparator.comparingInt(day -> day == DayOfWeek.SUNDAY ? 0 : day.getValue())),
+                        Collectors.collectingAndThen(
+                                Collectors.toList(),
+                                list -> list.stream()
+                                        .sorted(Comparator.comparing(LessonDTO::getStartTime))
+                                        .collect(Collectors.toList())
+                        )
+                ));
 
 
         BasicResponse response = new BasicResponse(true, null);
@@ -382,18 +324,13 @@ public class TeacherService {
         return response;
     }
 
+
     public BasicResponse getTeacherTeachingSubjects(String teacherId) {
 
-        UserEntity user = userRepository.findUserByUserId(teacherId);
-        if (user == null) {
+        TeacherEntity teacher = teacherRepository.findByUserIdWithSubjects(teacherId);
+        if (teacher == null) {
             return new BasicResponse(false, "המורה לא נמצא");
         }
-
-        if (user.getRole() != Role.TEACHER) {
-            return new BasicResponse(false, "המשתמש לא מורה");
-        }
-
-        TeacherEntity teacher = (TeacherEntity) user;
 
         List<String> subjects=teacher.getTeachingSubjects();
         BasicResponse response = new BasicResponse(true, null);

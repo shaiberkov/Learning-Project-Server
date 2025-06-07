@@ -1,9 +1,11 @@
 package org.example.learningprojectserver.strategy.UpcomingEvents;
 
+import lombok.RequiredArgsConstructor;
 import org.example.learningprojectserver.dto.UpcomingEventDto;
 import org.example.learningprojectserver.entities.*;
 import org.example.learningprojectserver.enums.Role;
 import org.example.learningprojectserver.mappers.TeacherEntityToUpcomingEventDTOMapper;
+import org.example.learningprojectserver.repository.TeacherRepository;
 import org.example.learningprojectserver.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -12,15 +14,12 @@ import java.util.List;
 
 
 @Component
+@RequiredArgsConstructor
 public class TeacherEventStrategy implements UpcomingEventStrategy{
 
-    private final UserRepository userRepository;
     private final TeacherEntityToUpcomingEventDTOMapper teacherEntityToUpcomingEventDTOMapper;
-@Autowired
-    public TeacherEventStrategy(UserRepository userRepository, TeacherEntityToUpcomingEventDTOMapper teacherEntityToUpcomingEventDTOMapper) {
-        this.userRepository = userRepository;
-    this.teacherEntityToUpcomingEventDTOMapper = teacherEntityToUpcomingEventDTOMapper;
-}
+    private final TeacherRepository teacherRepository;
+
 
     @Override
     public Role supports() {
@@ -29,9 +28,8 @@ public class TeacherEventStrategy implements UpcomingEventStrategy{
 
     @Override
     public List<UpcomingEventDto> findUpcomingEvents(String userId) {
-        UserEntity user = userRepository.findUserByUserId(userId);
-        TeacherEntity teacher = (TeacherEntity) user;
-        List<UpcomingEventDto> upcomingEventDtos=teacherEntityToUpcomingEventDTOMapper.apply(teacher);
+
+        List<UpcomingEventDto> upcomingEventDtos=teacherEntityToUpcomingEventDTOMapper.apply(teacherRepository.findByUserId(userId));
 
         return upcomingEventDtos;
     }

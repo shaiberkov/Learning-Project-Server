@@ -14,10 +14,6 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-@NamedEntityGraph(
-        name = "User.withSessions",
-        attributeNodes = @NamedAttributeNode("sessionList")
-)
 @Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "user_entity", indexes = {
         @Index(name = "idx_user_userId", columnList = "userId")

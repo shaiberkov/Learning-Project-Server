@@ -13,8 +13,8 @@ import java.util.List;
 @Repository
 public interface LessonRepository extends JpaRepository<LessonEntity, Long>  {
 
-    @Query("SELECT l FROM LessonEntity l WHERE l.teacher.userId = :teacherId")
-    List<LessonEntity> findLessonsByTeacherId(String teacherId);
+//    @Query("SELECT l FROM LessonEntity l WHERE l.teacher.userId = :teacherId")
+//    List<LessonEntity> findLessonsByTeacherId(String teacherId);
     @Query("""
     SELECT new org.example.learningprojectserver.dto.LessonDTO(
         l.subject,
@@ -33,5 +33,21 @@ public interface LessonRepository extends JpaRepository<LessonEntity, Long>  {
 """)
     List<LessonDTO> findLessonsByStudentId(@Param("userId") String userId);
 
+    @Query("""
+    SELECT new org.example.learningprojectserver.dto.LessonDTO(
+        l.subject,
+        l.dayOfWeek,
+        l.startTime,
+        l.endTime,
+        c.name,
+        t.username
+    )
+    FROM LessonEntity l
+    JOIN l.schedule s
+    JOIN s.classRoom c
+    JOIN l.teacher t
+    WHERE t.userId = :userId
+""")
+    List<LessonDTO> findLessonsByTeacherId(@Param("userId") String userId);
 
 }

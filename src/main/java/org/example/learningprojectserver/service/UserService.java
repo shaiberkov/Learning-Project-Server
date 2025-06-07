@@ -16,9 +16,7 @@ import org.example.learningprojectserver.response.ResetPasswordResponse;
 import org.example.learningprojectserver.utils.SmsSender;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static org.example.learningprojectserver.utils.ApiEmailProcessor.sendEmail;
@@ -34,7 +32,7 @@ public class UserService {
     private final JwtService jwtService;
     private final SmsSender smsSender;
     private final StudentRepository studentRepository;
-
+    private static final ConcurrentHashMap<String, Map<String,String>> otpLoginStorage = new ConcurrentHashMap<>();
     private static final ConcurrentHashMap<String, String> otpStorage = new ConcurrentHashMap<>();
 
     public RegisterResponse createUser(String username,String userId, String password, String confirmPassword, String email, String phone) {
@@ -186,20 +184,22 @@ public class UserService {
             basicResponse.setErrorCode("Phone number is required");
             return basicResponse;
         }
-
         try {
-            UserEntity userEntity= userRepository.findUserByUserId(userId);
-            if (userEntity == null) {
+            Long id = userRepository.findIdByUserId(userId);
+            if (id == null) {
                 basicResponse.setSuccess(false);
-                basicResponse.setErrorCode("User not found");
+                basicResponse.setErrorCode("משתמש לא נימצא");
                 return basicResponse;
             }
             String otp = generatorCode();
             List<String> toSend = new ArrayList<>();
             toSend.add(phoneNumber);
-            userEntity.setOtp(otp);
-            userEntity.setOtpTimestamp(System.currentTimeMillis());
-            userRepository.save(userEntity);
+
+            Map<String, String> otpDetails = new HashMap<>();
+            otpDetails.put("OTP",otp);
+            otpDetails.put("timestamp", String.valueOf(System.currentTimeMillis()));
+
+            otpLoginStorage.put(userId, otpDetails);
 
             System.out.println(otp);
            smsSender.sendSms(otp, toSend);
@@ -227,8 +227,6 @@ public class UserService {
             }
             try {
                UserEntity userEntity= userRepository.findUserByUserId(userId);
-                //UserEntity userEntity= userRepository.loadUserWithSessionsByUserId(userId);
-
                 if (userEntity == null) {
                     loginResponse.setSuccess(false);
                     loginResponse.setErrorCode("המשתמש לא נמצא");
@@ -236,19 +234,26 @@ public class UserService {
                     return loginResponse;
                 }
 
-                if (userEntity.getOtp() == null || !userEntity.getOtp().equals(otp)) {
+//                if (userEntity.getOtp() == null || !userEntity.getOtp().equals(otp)) {
+//                    loginResponse.setSuccess(false);
+//                    loginResponse.setErrorCode("קוד האימות שגוי");
+//                    return loginResponse;
+//                }
+                Map<String, String> otpDetails = otpLoginStorage.get(userId);
+                if (otpDetails.get("OTP") == null || !otpDetails.get("OTP").equals(otp)) {
                     loginResponse.setSuccess(false);
                     loginResponse.setErrorCode("קוד האימות שגוי");
                     return loginResponse;
                 }
 
-                long otpTimestamp = userEntity.getOtpTimestamp();
+                long otpTimestamp = Long.parseLong(otpDetails.get("timestamp"));
                 long currentTime = System.currentTimeMillis();
                 if (currentTime - otpTimestamp > 120000) {
                     loginResponse.setSuccess(false);
                     loginResponse.setErrorCode("עברו 2 דקות");
                     return loginResponse;
                 }
+
                 String token = jwtService.generateToken(userId,userEntity.getUsername(),String.valueOf(userEntity.getRole()));
                 loginResponse.setSuccess(true);
                 loginResponse.setErrorCode("הקוד נכון");
@@ -273,8 +278,8 @@ public class UserService {
         }
     public ResetPasswordResponse sendPasswordResetOtp(String userId) {
         ResetPasswordResponse resetPasswordResponse= new ResetPasswordResponse();
-        UserEntity user = userRepository.findUserByUserId(userId);
-        if (user == null) {
+        Long id = userRepository.findIdByUserId(userId);
+        if (id == null) {
             resetPasswordResponse.setSuccess(false);
             resetPasswordResponse.setUserIdError("משתמש לא נמצא");
             return resetPasswordResponse;
@@ -282,9 +287,10 @@ public class UserService {
 
         String otp = generatorCode();
         otpStorage.put(userId, otp);
-        System.out.println(userId+      "111111"+otpStorage.get(userId));
 
-       smsSender.sendSms( otp,  List.of(user.getPhoneNumber()) );
+        UserCredentialsProjection userCredentialsProjection=userRepository.findBasicCredentialsByUserId(userId);
+
+       smsSender.sendSms( otp,List.of(userCredentialsProjection.getPhoneNumber()));
             resetPasswordResponse.setSuccess(true);
         return resetPasswordResponse;
     }
@@ -293,11 +299,8 @@ public class UserService {
        ResetPasswordResponse resetPasswordResponse= new ResetPasswordResponse();
         String subject = "הסיסמה שלך שונתה בהצלחה";
         String message = "שלום,\n\nסיסמתך שונתה בהצלחה. אם לא ביצעת שינוי זה, אנא צור קשר עם התמיכה שלנו באופן מיידי.\n\nבברכה,\nצוות התמיכה";
-        System.out.println(userId+      "22222"+otpStorage.get(userId));
 
         if(!otpStorage.containsKey(userId)){
-            System.out.println(userId+      "33333"+otpStorage.get(userId));
-
              resetPasswordResponse.setSuccess(false);
             resetPasswordResponse.setUserIdError("תז לא תקין");
             return resetPasswordResponse;
@@ -331,13 +334,6 @@ public class UserService {
         return resetPasswordResponse;
     }
 
-
-    public UserDto getUserPhoneNumber(String userId) {
-        UserDto userDto=new UserDto();
-        String userPhoneNumber= userRepository.findPhoneNumberByUserId(userId);
-        userDto.setPhoneNumber(userPhoneNumber);
-        return userDto;
-    }
 
 
 }

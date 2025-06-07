@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.learningprojectserver.dto.SchoolDTO;
 import org.example.learningprojectserver.entities.*;
 import org.example.learningprojectserver.mappers.SchoolEntityToSchoolDTOMapper;
+import org.example.learningprojectserver.repository.ClassRoomRepository;
 import org.example.learningprojectserver.repository.SchoolRepository;
 import org.example.learningprojectserver.response.BasicResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,7 @@ public class SchoolService {
 
     private final SchoolRepository schoolRepository;
     private final SchoolEntityToSchoolDTOMapper schoolEntityToSchoolDTOMapper;
+    private final ClassRoomRepository classRoomRepository;
 
 
 
@@ -59,21 +61,19 @@ public class SchoolService {
     }
 
 
-//    @PostConstruct
-//    public void init() {
-//        getAllClassesNameBySchoolCode("10");
-//    }
+
 
     public BasicResponse getAllClassesNameBySchoolCode(String schoolCode) {
 
          if (schoolCode == null ) {
              return new BasicResponse(false, "אין בית ספר כזה ");
          }
-        SchoolEntity school = schoolRepository.findBySchoolCode(schoolCode);
-        if (school == null) {
-            return new BasicResponse(false, "בית ספר עם הקוד " + schoolCode + " לא נמצא");
-        }
-        List<String> classes = school.getClassRooms().stream().distinct().map(ClassRoomEntity::getName).toList();
+//        SchoolEntity school = schoolRepository.findBySchoolCode(schoolCode);
+//        if (school == null) {
+//            return new BasicResponse(false, "בית ספר עם הקוד " + schoolCode + " לא נמצא");
+//        }
+        List<String> classes = classRoomRepository.findDistinctClassNamesBySchoolCode(schoolCode);
+
 
         if (classes == null || classes.isEmpty()) {
             return new BasicResponse(false, "לא נמצאו כיתות בבית ספר זה");

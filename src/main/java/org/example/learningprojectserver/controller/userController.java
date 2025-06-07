@@ -62,11 +62,7 @@ private final UserService userService;
                                        @RequestParam String newPassword) {
         return userService.resetPassword(userId, otp, newPassword);
     }
-    @GetMapping(GET_USER_PHONE)
-    public UserDto getUserPhoneNumber(@RequestParam String userId) {
-        return userService.getUserPhoneNumber(userId);
 
-    }
 
 
 

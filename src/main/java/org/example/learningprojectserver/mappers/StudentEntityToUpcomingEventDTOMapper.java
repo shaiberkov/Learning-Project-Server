@@ -24,7 +24,7 @@ public class StudentEntityToUpcomingEventDTOMapper implements Mapper<String, Lis
 
     @Override
     public List<UpcomingEventDto> apply(String studentId) {
-        List<StudentTestStatusDTO> studentTestStatusDTOS = studentRepository.findTestStatusForStudent(studentId);
+        List<StudentTestStatusDTO> studentTestStatusDTOS = studentRepository.findAllTestsForStudent(studentId);
 
         List<UpcomingEventDto> upcomingEventDtos = new ArrayList<>();
 

@@ -16,6 +16,7 @@ import static org.example.learningprojectserver.utils.HolidayUtils.daysUntil;
 import static org.example.learningprojectserver.utils.HolidayUtils.fetchHebrewHolidayEvents;
 @Component
 public class TeacherEntityToUpcomingEventDTOMapper implements Mapper<TeacherEntity, List<UpcomingEventDto>>{
+
     @Override
     public List<UpcomingEventDto> apply(TeacherEntity teacher) {
 

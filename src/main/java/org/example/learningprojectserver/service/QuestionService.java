@@ -17,13 +17,7 @@ public class QuestionService {
     private StudentQuestionHistoryRepository studentQuestionHistoryRepository;
     private StudentProgressRepository userprogressRepository;
 
-//    @PostConstruct
-//    public void init() {
-//        System.out.println("QuestionService initilized")
-//        ;
-//        System.out.println(generateQuestion("shai","מתמטיקה","מספרים שלמים","חיבור מספרים שלמים"));;
-//
-//    }
+
 
 
 
