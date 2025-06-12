@@ -57,7 +57,6 @@ public List<StudentTestStatusDTO> getStudentTestsStatus(String userId) {
     @Cacheable(value = "studentSchedule", key = "#studentId")
     public BasicResponse getStudentSchedule(String schoolCode, String studentId) {
         List<LessonDTO> lessons = lessonRepository.findLessonsByStudentId(studentId);
-
         Map<DayOfWeek, List<LessonDTO>> lessonsByDay = lessons.stream()
                 .collect(Collectors.groupingBy(
                         LessonDTO::getDayOfWeek,

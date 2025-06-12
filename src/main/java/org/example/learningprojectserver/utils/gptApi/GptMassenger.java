@@ -13,7 +13,6 @@ import org.springframework.core.env.Environment;
 
 import java.io.IOException;
 
-//import static org.example.learningprojectserver.constants.SharedConstants.apiConstants.GPT_TOKEN;
 
 @Component
 public class GptMassenger {
@@ -33,12 +32,13 @@ public  Environment env;
         return headers;
     }
 
-    public String sendChatGptRequest(ChatGptRequest request) throws IOException, JsonProcessingException {
+    public String sendChatGptRequest(ChatGptRequest request) throws IOException {
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = createHeaders();
         HttpEntity<String> entity = new HttpEntity<>(new ObjectMapper().writeValueAsString(request), headers);
 
         ResponseEntity<String> response = restTemplate.exchange(API_URL, HttpMethod.POST, entity, String.class);
+        System.out.println(response.getBody());
         if (response != null && response.getStatusCode() == HttpStatus.OK) {
             JSONObject jsonObject = new JSONObject(response.getBody());
             JSONArray choices = jsonObject.getJSONArray("choices");

@@ -172,7 +172,6 @@ public BasicResponse getTeacherDTO(String teacherId,String schoolCode) {
         cacheManager.getCache("classRoomSchedule")
                 .evict(classRoom.getSchool().getSchoolCode() + "_" + classRoom.getName());
 
-
         return new BasicResponse(true, "השיעור נוסף בהצלחה");
     }
 

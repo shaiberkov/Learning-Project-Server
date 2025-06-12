@@ -13,8 +13,7 @@ import java.util.List;
 @Repository
 public interface LessonRepository extends JpaRepository<LessonEntity, Long>  {
 
-//    @Query("SELECT l FROM LessonEntity l WHERE l.teacher.userId = :teacherId")
-//    List<LessonEntity> findLessonsByTeacherId(String teacherId);
+
     @Query("""
     SELECT new org.example.learningprojectserver.dto.LessonDTO(
         l.subject,
