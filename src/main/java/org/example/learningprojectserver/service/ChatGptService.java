@@ -30,24 +30,18 @@ public class ChatGptService {
 
     public String getResponseFromChatGptWithMemory(String userId, String userMessage) {
         try {
-
             userConversations.putIfAbsent(userId, new ArrayList<>());
             List<ChatMessage> conversation = userConversations.get(userId);
             conversation.add(new ChatMessage("user", userMessage));
-
             ChatGptRequest chatGptRequest = new ChatGptRequest("gpt-4o", conversation);
             String response = gptMassenger.sendChatGptRequest(chatGptRequest);
-            System.out.println(response);
             if (response != null) {
                 conversation.add(new ChatMessage("assistant", response));
                 return response;
             } else {
-                System.out.println(response);
                 return "אירעה שגיאה במהלך קבלת התשובה. אנא נסה שוב.";
             }
-
         } catch (Exception e) {
-            e.printStackTrace();
             return "אירעה שגיאה במהלך קבלת התשובה. אנא נסה שוב.";
         }
     }
