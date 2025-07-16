@@ -17,6 +17,7 @@ public class ActiveUserController {
     @PostMapping(CONNECT_USER)
     public void userConnected(@RequestParam String userId) {
         activeUserService.connectUser(userId);
+
     }
 
     @PostMapping(DISCONNECT_USER)
