@@ -8,7 +8,7 @@ RUN mvn clean package -DskipTests
 
 
 
-FROM openjdk:17-jdk-alpine
+FROM eclipse-temurin:17-jdk
 VOLUME /tmp
 COPY --from=build /schoolManagement/target/learningProjectServer-0.0.1-SNAPSHOT.jar app.jar
 ENTRYPOINT ["java", "-jar", "/app.jar"]
