@@ -104,13 +104,22 @@ public class HolidayUtils {
 
     @Getter
     private static List<UpcomingEventDto> cachedEvents = new ArrayList<>();
+    @Getter
+    private static LocalDate startDate;
 
+    @Getter
+    private static LocalDate endDate;
     public static void updateHolidayEventsCache() {
         cachedEvents = fetchHebrewHolidayEvents();
     }
     @PostConstruct
     public void init() {
+        updateDateRange();
         updateHolidayEventsCache();
+    }
+    private static void updateDateRange() {
+        startDate = LocalDate.now();
+        endDate = startDate.plusMonths(3);
     }
     @Scheduled(cron = "0 0 0 * * *", zone = "Asia/Jerusalem")
     public void scheduledHolidayFetch() {
@@ -119,8 +128,10 @@ public class HolidayUtils {
     }
 
     public static List<UpcomingEventDto> fetchHebrewHolidayEvents() {
-        String url = "https://www.hebcal.com/hebcal?cfg=json&maj=on&start=2025-05-26&end=2025-08-26&geo=il&lg=he";
-        RestTemplate restTemplate = new RestTemplate();
+        String url = String.format(
+                "https://www.hebcal.com/hebcal?cfg=json&maj=on&start=%s&end=%s&geo=il&lg=he",
+                startDate, endDate
+        );        RestTemplate restTemplate = new RestTemplate();
         List<UpcomingEventDto> events = new ArrayList<>();
 
         try {
